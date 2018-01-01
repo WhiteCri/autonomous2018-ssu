@@ -7,11 +7,15 @@ autonomous2018-ssu
 
 1. 저장소 사용법
  1. 작업 디렉토리를 최신 로컬상태로 변경
+
     git checkout master
  2. 커밋 히스토리 확인
+
     git log --graph --decorate --oneline --all -n
+
  n 대신 확인하고 싶은 커밋의 개수를 넣습니다. 디폴트는 모든 커밋
  3. 작업 디렉토리를 원격저장소로부터 업데이트
+
     git checkout master
     git push upstream master
 
