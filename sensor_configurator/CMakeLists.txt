@@ -5,14 +5,11 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   serial
-  std_msgs
 )
 
 catkin_package(
   CATKIN_DEPENDS
     serial
-    std_msgs
-    SerialCommunicator
 )
 
 include_directories(
@@ -20,8 +17,13 @@ include_directories(
   include
 )
 
-add_executable(test_main_node src/test_main_node.cpp src/SerialCommunicator.cpp)
+add_executable(imu_test_main_node
+  src/imu_test_main_node.cpp
+  src/IMUConfigurator.cpp
+  src/SensorConfigurator.cpp
+  src/SerialCommunicator.cpp
+)
 
-target_link_libraries(test_main_node
+target_link_libraries(imu_test_main_node
   ${catkin_LIBRARIES}
 )

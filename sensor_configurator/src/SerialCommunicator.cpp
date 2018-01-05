@@ -6,7 +6,7 @@ SerialCommunicator::SerialCommunicator(const std::string& port, int baudrate, in
     //serial setting member
     : port_(port), baudrate_(baudrate), timeout_(timeout), validInstance(false),
     //data member
-    raw(""), now("")
+    raw(""), now(""), ser()
 {
   try{
     ser.setPort(port_.c_str());
@@ -16,17 +16,18 @@ SerialCommunicator::SerialCommunicator(const std::string& port, int baudrate, in
     ser.open();
     //0 is error num, but i don't know each number point which err. i just put it to
     //complete function call
-    if(!ser.isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,0);
+    if(!ser.isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,1);
   }
   catch (serial::IOException& e)
   {
       //hold error Msg
       errorMsg = e.what();
-      validInstance = false;
+      return;
   }
   catch (std::exception& e)
   {
     errorMsg = string("Not a serial IOException : ") + e.what();
+    return;
   }
 
   validInstance = true;
@@ -44,6 +45,7 @@ const string& SerialCommunicator::read(){
   }
 
   if(ser.available()){
+    //validInstance = true;
       raw = ser.read(ser.available());
 
       //one line parsing
@@ -51,7 +53,12 @@ const string& SerialCommunicator::read(){
       std::getline(ss,now);
       std::getline(ss,now);
   }
-  else raw = now = "";
+  else {
+    errorMsg = "serial is not available";
+    raw = now = "";
+    //validInstance = false;
+  }
+
   return now;
 }
 

@@ -1,12 +1,10 @@
-#ifndef _SERIALCOMMUNICATOR_H
-#define _SERIALCOMMUNICATOR_H
-#endif
+#pragma once
 
 #include <serial/serial.h>
 #include <iostream>
 
 using std::string;
-#define DD 3
+
 class SerialCommunicator{
 public:
   SerialCommunicator(const string& port, int baudrate = 9600, int timeout = 1000);
@@ -16,7 +14,13 @@ public:
   void write(const string& write);
   const string& getErrorMsg();
 private:
-  //serial communication setting
+  //serial /Accelation_X
+/Accelation_Y
+/Accelation_Z
+/Pitch
+/Roll
+/Yaw
+communication setting
   serial::Serial ser;
   string port_;
   int baudrate_;
