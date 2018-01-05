@@ -4,9 +4,9 @@
 string SerialCommunicator::errorMsg = "";
 SerialCommunicator::SerialCommunicator(const std::string& port, int baudrate, int timeout)
     //serial setting member
-    : port_(port), baudrate_(baudrate), timeout_(timeout), validInstance(false),
+    : port_(port), baudrate_(baudrate), timeout_(timeout), creationCheck(false),
     //data member
-    raw(""), now(""), ser()
+    raw(""), now(""), ser(), validDataCheck(false)
 {
   try{
     ser.setPort(port_.c_str());
@@ -30,22 +30,20 @@ SerialCommunicator::SerialCommunicator(const std::string& port, int baudrate, in
     return;
   }
 
-  validInstance = true;
+  creationCheck = true;
 }
 
-bool SerialCommunicator::isValid(){
-  return validInstance;
+bool SerialCommunicator::isCreationValid() const{
+  return creationCheck;
+}
+
+bool SerialCommunicator::isValid() const{
+  return validDataCheck;
 }
 
 const string& SerialCommunicator::read(){
-  if(!isValid()) {
-    now = "";
-    raw = "";
-    return now;
-  }
-
   if(ser.available()){
-    //validInstance = true;
+      validDataCheck = true;
       raw = ser.read(ser.available());
 
       //one line parsing
@@ -54,6 +52,7 @@ const string& SerialCommunicator::read(){
       std::getline(ss,now);
   }
   else {
+    validDataCheck = false;
     errorMsg = "serial is not available";
     raw = now = "";
     //validInstance = false;
@@ -66,10 +65,20 @@ const string& SerialCommunicator::getRaw(){
   return raw;
 }
 
-void SerialCommunicator::write(const string& data){
-  ser.write(data.c_str());
+void SerialCommunicator::write(const uint8_t* data, size_t length){
+  ser.write(data, length);
 }
 
 const string& SerialCommunicator::getErrorMsg(){
   return SerialCommunicator::errorMsg;
+}
+
+const string& SerialCommunicator::getPort(){
+  return port_;
+}
+int SerialCommunicator::getBaudrate() const{
+  return baudrate_;
+}
+int SerialCommunicator::getTimeout() const{
+  return timeout_;
 }

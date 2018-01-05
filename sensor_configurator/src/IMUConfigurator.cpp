@@ -1,12 +1,15 @@
 #include <sstream>
 #include "IMUConfigurator.h"
 
-IMUConfigurator::IMUConfigurator(){
+IMUConfigurator::IMUConfigurator()
+  : paramName(),imuData()
+{
   init();
 }
+
 void IMUConfigurator::init(){
   setSerial(IMU_PATH);
-
+  if(!ser_ptr_->isCreationValid()) ROS_ERROR("%s communicator is not available",IMU_PATH);
   //initalize params
   std::string params[] = {
     IMU_PARAM1,
@@ -17,23 +20,21 @@ void IMUConfigurator::init(){
     IMU_PARAM6
   };
   for(auto& param : params)
-    paramName.push_back(param);
+    paramName.emplace_back(param);
 }
 void IMUConfigurator::setParameterData(ros::NodeHandle& nh){
   if(parse() == false) return;
 
   //set params
-  for(size_t i = 0 ; i < 6;++i){
-    ROS_INFO("%d",i);
+  for(size_t i = 0 ; i < paramName.size();++i){
     nh.setParam(paramName[i], imuData[i]);
   }
 }
 bool IMUConfigurator::parse(){
   //check serial
-  //  if(!ser_ptr_->isValid()) ROS_INFO("what the fuck : %s",ser_ptr_->getErrorMsg().c_str());
   std::string parsingData = ser_ptr_->read();
-  ROS_INFO("daf :%s",parsingData.c_str());
   std::stringstream ss(parsingData);
+  ROS_INFO("parsing : %s",parsingData.c_str());
   //data format : *-22.29,-31.83,32.33,0.011,0.007,-0.019
 
   /*
@@ -57,13 +58,11 @@ bool IMUConfigurator::parse(){
       getline(ss,dataString,',');
       double data = std::stod(dataString); // stod : string to double
       imuData.push_back(data);
-      ROS_INFO("%d : %lf",i ,data);
     }
   }
   catch(std::exception& e){
-    ROS_INFO("error : %s", e.what());
-    ROS_INFO("parsing data : %s",parsingData.c_str());
-    ROS_INFO("why stopping...");
+    ROS_WARN("error : %s", e.what());
+    ROS_WARN("parsing data : %s",parsingData.c_str());
     return false;
   }
   return true;
