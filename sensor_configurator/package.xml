@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>sensor_configurator</name>
+  <version>0.0.0</version>
+  <description>call me "WhiteHerb"</description>
+
+  <author email="sjrnfu12@gmail.com">WhiteHerb</author>
+
+  <maintainer email="sjrnfu12@gmail.com">WhiteHerb</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>serial</build_depend>
+  <run_depend>serial</run_depend>
+  <run_depend>IMUConfigurator</run_depend>
+</package>
