@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "sensor_configurator/DriveIssue.h"
+#include "platform_tx/DriveIssue.h"
 
 #define FRE 50
 
@@ -13,11 +13,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "drive_publisher");
     ros::NodeHandle nh;
 
-    ros::Publisher drive_pub = nh.advertise<sensor_configurator::DriveIssue>("drive_msg", 100);
+    ros::Publisher drive_pub = nh.advertise<platform_tx::DriveIssue>("drive_msg", 100);
 
     ros::Rate loop_rate(FRE);
    
-    sensor_configurator::DriveIssue msg;
+    platform_tx::DriveIssue msg;
     
 
     nh.setParam("drive_speed", 0);

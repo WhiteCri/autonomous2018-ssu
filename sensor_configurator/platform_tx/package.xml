@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>sensor_configurator</name>
+  <name>platform_tx</name>
   <version>0.0.0</version>
-  <description>The sensor_configurator package</description>
+  <description>The platform_tx package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

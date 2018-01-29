@@ -1,12 +1,12 @@
 #include "ros/ros.h"
 #include "serial/serial.h"
-#include "sensor_configurator/DriveIssue.h"
-#include "sensor_configurator/platformtx_data.h"
+#include "platform_tx/DriveIssue.h"
+#include "platformtx_data.h"
 
 #define FRE 50
 PlatformTXdata TXdata;
 
-void msgCallback(const sensor_configurator::DriveIssue::ConstPtr& msg)
+void msgCallback(const platform_tx::DriveIssue::ConstPtr& msg)
 {
     TXdata.setTXdata(msg->speed,msg->steer,msg->brake);   
 
