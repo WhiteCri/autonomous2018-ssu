@@ -23,12 +23,11 @@ include_directories(
   include
 )
 
-add_executable(platformRx_test_main_node
-  src/platformrx_main_node.cpp 
-  src/PlatformRX.cpp
+add_executable(platform_rx_main_node
+  src/platform_rx_main_node.cpp 
 )
 
-target_link_libraries(platformRx_test_main_node
+target_link_libraries(platform_rx_main_node
   ${catkin_LIBRARIES}
 )
 
