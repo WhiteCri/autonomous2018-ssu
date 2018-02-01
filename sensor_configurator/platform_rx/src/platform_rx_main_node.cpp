@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <deque>
 #include <serial/serial.h>
-#include "sensor_configurator/PlatformRX_msg.h"
+#include "platform_rx/PlatformRX_msg.h"
 
 static const size_t PlatformRXPacketByte = 18U;
 static constexpr int EncoderIndex = 11;
@@ -12,13 +12,22 @@ typedef int32_t EncoderDataType;
 typedef int16_t SteeringDataType;
 typedef int8_t BrakeDataType;
 
-static constexpr EncoderDataType InitialEncoderLength = 25;
+//initializing macro
+static constexpr EncoderDataType    InitialEncoderLength    = 15;
+static constexpr EncoderDataType    EncoderInitialDataBound = 200;
 
-static constexpr EncoderDataType EncoderInitialBound = 10000000;//1000만.
+//handling error encoder value function
+inline double handleEncoderValue(std::deque<EncoderDataType> target){
+    //[2][1][0]
+    //new = [0] + (([1] - [0]) - (([2] - [1]) - ([1] - [0])))
+    double re = 3 * target[0] - 3 * target[1] + target[2];
+}
+
+static constexpr EncoderDataType    EncoderInitialBound     = 10000000;//1000만.
 //바퀴당 100씩 엔코더가 변화하므로 1000만 / 100 * 1.655m = 165500m, 165km임
-static constexpr EncoderDataType EncoderBound = 50;
-static constexpr SteeringDataType SteerBound = 1000;
-static constexpr BrakeDataType BrakeBound = 10;
+static constexpr EncoderDataType    EncoderBound            = 50;
+static constexpr SteeringDataType   SteerBound              = 1000;
+static constexpr BrakeDataType      BrakeBound              = 10;
 
 int loop = 0;
 
@@ -50,14 +59,6 @@ serial::Serial *getSerial(const char* path_, int baudrate_){
 
 static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
-double calcSpeed(std::deque<int> encoderValue, int frequencyBetweenData){
-    //바퀴가 돌아간 시간 : 1 / (플랫폼serial통신 주기) * (엔코더 측정 간 주기cnt). 단위는 초
-    double revolutionTime = static_cast<double>(1) / loop * frequencyBetweenData;
-    //속도 : (두 엔코더값의 차) / ((한바퀴당 돌아간 값) * (1바퀴의 지름) /  (돌아간 시간)
-    //변위 / 시간 
-    return (encoderValue[0] - encoderValue[1])/ encoderValuePerCycle
-        * distanceValuePerCycle / revolutionTime;
-}
 
 bool checkSerial(serial::Serial **ser, int argc, char **argv);
 //serial에 오버로디드 대입 연산자가 삭제됨
@@ -66,7 +67,6 @@ bool checkSerial(serial::Serial **ser, int argc, char **argv);
 struct Past{
     Past() : encoder(std::deque<EncoderDataType>(InitialEncoderLength)), steering(0), brake(0) {}
     std::deque<EncoderDataType> encoder;
-    double                speed;
     SteeringDataType      steering;
     BrakeDataType         brake;
 };
@@ -85,19 +85,17 @@ int main (int argc, char** argv){
     ros::init(argc, argv, "platform_rx_main_node");
     ros::NodeHandle nh;
 
-    ros::Publisher pub = nh.advertise<sensor_configurator::PlatformRX_msg>("raw/platform_rx",100);
-    sensor_configurator::PlatformRX_msg msg;
+    ros::Publisher pub = nh.advertise<platform_rx::PlatformRX_msg>("raw/platform_rx",100);
+    platform_rx::PlatformRX_msg msg;
     Past past;
 
-    //initialize
-    msg.speed = 0;      
+    //initialize   
     msg.steering = 0;          
     msg.brake = 0;             
 
     loop = atoi(argv[2]);
     ros::Rate loop_rate(loop);
 
-    int frequencyBetweenData = 0;
     size_t cnt = 0;
 
 
@@ -120,7 +118,7 @@ int main (int argc, char** argv){
             //ROS_WARN("wait for 2 second");
             //sleep(2);
         } 
-        else  if (static_cast<int>(cnt) < past.encoder.size()){
+        else if (static_cast<int>(cnt) < past.encoder.size()){
             uint8_t dataArray[PlatformRXPacketByte];
             for(int i = 0 ; i < PlatformRXPacketByte;++i){
                 dataArray[i] = raw.c_str()[i];
@@ -135,46 +133,42 @@ int main (int argc, char** argv){
         ROS_INFO("receiving initial value : %lu(cnt) need and Got %lu(cnt)",past.encoder.size(),cnt);
         loop_rate.sleep();
     } 
-    past.encoder = std::deque<EncoderDataType>(past.encoder.rbegin(), past.encoder.rbegin() + 10);
-    debugVec = std::vector<EncoderDataType>(debugVec.rbegin(), debugVec.rbegin() + 10);
-    
+
     {
-        for(int j = 0 ; j < 2; ++j){
-            //평균을 구한다.
-            EncoderDataType avg = 0;
-            for(size_t i = 0 ; i < past.encoder.size();++i)
-                avg += past.encoder[i];
-            avg /= past.encoder.size();
+        //initial algorithm start
+        std::vector<std::vector<bool> > table(past.encoder.size());
+        for(int i = 0 ; i < past.encoder.size();++i)
+            table.emplace_back(past.encoder.size()); // fill with FALSE
+        std::vector<int> score(past.encoder.size());
 
-            //평균에러의 min/max를 구한다
-            EncoderDataType e_avg_max = 0;
-            EncoderDataType e_avg_min = avg;
-            for(int i = 0 ; i < past.encoder.size();++i){
-                EncoderDataType error = abs(past.encoder[i] - avg);
-                if(error > e_avg_max) e_avg_max = error;
-                if(error < e_avg_min) e_avg_min = error;
-            }
-
-            //min_max의 차이가 크다면 에러변인들을 앞뒤값의 평균으로 대체함
-            //else 초기화 끝
-            constexpr int InitialEncoderTolerence = 200;//두바퀴
-            if((e_avg_max - e_avg_min) > InitialEncoderTolerence){
-                ROS_INFO("%d %d",e_avg_max,e_avg_min);
-                size_t i = 1;
-                if(avg > 0){//에러변인이 양수
-                    for(; i < past.encoder.size() - 1;++i){
-                        if(abs(past.encoder[i] - avg) > InitialEncoderTolerence )
-                            past.encoder[i] = (past.encoder[i-1] + past.encoder[i + 1])/2;
-                    }
-                    if(abs(past.encoder[i] - avg) > InitialEncoderTolerence)
-                        past.encoder[i] = (past.encoder[i-1] + past.encoder[i-2]) / 2;
-                    if(abs(past.encoder[i] - avg) > InitialEncoderTolerence)
-                        past.encoder[0] = (past.encoder[i] + past.encoder[1]) / 2;
+        //scoring
+        int trueCnt;
+        for(size_t i = 0; i < past.encoder.size();++i){
+            trueCnt = 0;
+            for(size_t j = 0 ; j < past.encoder.size();++j){
+                if(abs(past.encoder[i] - past.encoder[j]) < EncoderInitialDataBound){
+                    table[i][j] = true;
+                    trueCnt++;
                 }
             }
+            score[i] = trueCnt;
         }
-    }
 
+        //find highest score
+        int idx = 0;
+        for(size_t i = 0 ; i < past.encoder.size();++i){
+            if(score[idx] < score[i]) idx = i;
+        }
+
+        //reconstruct recent 3 data with most recent valid value
+        int validDataIndex = static_cast<int>(past.encoder.size() - 1);
+        while(!table[idx][--validDataIndex]);
+        past.encoder = std::deque<EncoderDataType>{
+            past.encoder[validDataIndex],
+            past.encoder[validDataIndex],
+            past.encoder[validDataIndex]
+        };
+    }
     ROS_INFO("Initial end!");
     for(size_t i = 0 ; i < past.encoder.size();++i)
         ROS_INFO("[%lu] : %d, real : %d",i, past.encoder[i], debugVec[i]);
@@ -193,7 +187,6 @@ int main (int argc, char** argv){
             delete ser;
             checkSerial(&ser, argc, argv);
         }
-        frequencyBetweenData++;
         if(raw.size() < PlatformRXPacketByte){
             ROS_WARN("Invalid Packet size : %ld needed but Got %ld"
                 , PlatformRXPacketByte, raw.size());
@@ -206,19 +199,21 @@ int main (int argc, char** argv){
             dataArray[i] = raw.c_str()[i];
         } 
 
-        /*--- encoder --- */
+        /*--- distance --- */
         //get Data
         int32_t encoderData = getParsingData<int32_t>(dataArray,EncoderIndex);
-        if((abs(encoderData - past.encoder[0]) > EncoderBound) || (encoderData == 0)
-            || ((encoderData - past.encoder[0]) == 0)){
-            encoderData = 2 * past.encoder[0] - past.encoder[1]; // 평균필터이용
-            ROS_WARN("encoder value has some problem!");
+        if(abs(encoderData - past.encoder[0]) > EncoderBound){
+            ROS_WARN("Got super encoder Value%d!",encoderData);
+            encoderData = handleEncoderValue(past.encoder);
+        }
+        else if ((encoderData - past.encoder[0]) == 0){
+            ROS_WARN("Got same encoder Value : %d!",encoderData);
+            encoderData = handleEncoderValue(past.encoder);
         }
         past.encoder.push_front(encoderData);
         past.encoder.pop_back();
-        msg.speed = calcSpeed(past.encoder, frequencyBetweenData);
-        past.speed = msg.speed;
-        frequencyBetweenData = 0;
+
+        //time
     
         //brake
         uint8_t brakeData = getParsingData<uint8_t>(dataArray,BrakeIndex);
@@ -235,9 +230,10 @@ int main (int argc, char** argv){
 
         #ifdef MY_DEBUG_FLAG
             ROS_INFO("[%ld]encoder : %d",cnt, past.encoder[0]);
-            ROS_INFO("speed : %lf", msg.speed);
             ROS_INFO("brake : %d", msg.brake);
             ROS_INFO("steering : %hd",msg.steering);
+            ROS_INFO("distance : %lf",msg.distance);
+            ROS_INFO("timeInterval : %lf",1 / static_cast<double>(loop));
         #endif
         pub.publish(msg);
         loop_rate.sleep();
