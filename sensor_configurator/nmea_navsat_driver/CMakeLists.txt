@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
     roslint
   )
 add_message_files(FILES
-  nmea_msg.msg NmeaMsg.msg)
+  nmea_msg.msg MyMsg.msg)
 
 catkin_python_setup()
 
