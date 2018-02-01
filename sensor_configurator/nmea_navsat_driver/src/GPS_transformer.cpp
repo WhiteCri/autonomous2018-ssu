@@ -2,6 +2,7 @@
 #include"ros/ros.h"
 #include"sensor_msgs/NavSatFix.h"
 #include"geometry_msgs/Pose.h"
+#include"nav_msgs/Odometry.h"
 //Use math 함수
 #include<math.h>
 
@@ -97,14 +98,17 @@ void Tmtransform (double alt, double lon, double lat, double lonOrg, double latO
 void msgCallback(const sensor_msgs::NavSatFix::ConstPtr& msg){
  
     ros::NodeHandle nh;
-    ros::Publisher caculate_publisher = nh.advertise<geometry_msgs::Pose>("Pose",100);
+    ros::Publisher caculate_publisher = nh.advertise<geometry_msgs::Pose>("raw/GPS/Pose",100);
     geometry_msgs::Pose mypose;
+	nav_msgs::Odometry Finalpose;
 
     double mylongitude = msg->longitude;
     double mylatitude = msg->latitude;
 
 	// testing code : Bessel2TM(mylongitude, mylatitude, 127.051429, 37.275529, &mypose.position.x, &mypose.position.y);
 	Tmtransform(0,mylongitude,mylatitude,KmLongitude, KmLatitude, &mypose.position.x, &mypose.position.y);
+	Finalpose.pose.pose.position.x = mypose.position.x;
+	Finalpose.pose.pose.position.y = mypose.position.y;
 	caculate_publisher.publish(mypose);
    
    // Test 출력문 ROS_INFO("%lf",mylongitude);
@@ -116,8 +120,8 @@ int main(int argc, char *argv[]){
     ros::init(argc, argv, "GPS_transformer");
     ros::NodeHandle nh;
     ros::Subscriber nmea_subscriber = nh.subscribe("fix",100,msgCallback);
-    ros::Publisher caculate_publisher = nh.advertise<geometry_msgs::Pose>("Pose",100);
-	
+    ros::Publisher caculate_publisher = nh.advertise<geometry_msgs::Pose>("raw/GPS/Pose",100);
+
     ros::spin();
          
     return 0;
