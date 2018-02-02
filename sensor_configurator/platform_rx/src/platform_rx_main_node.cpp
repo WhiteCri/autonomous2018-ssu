@@ -7,6 +7,7 @@ static const size_t PlatformRXPacketByte = 18U;
 static constexpr int EncoderIndex = 11;
 static constexpr int SteerIndex = 8;
 static constexpr int BrakeIndex = 10;
+static constexpr int EstopIndex = 4;
 //83 84 88 0 1 0 0 0 0 0 -56 -42 6 0 0 -75 13 10
 typedef int32_t EncoderDataType;
 typedef int16_t SteeringDataType;
@@ -17,10 +18,11 @@ static constexpr EncoderDataType    InitialEncoderLength    = 15;
 static constexpr EncoderDataType    EncoderInitialDataBound = 200;
 
 //handling error encoder value function
-inline double handleEncoderValue(std::deque<EncoderDataType> target){
+inline EncoderDataType handleEncoderValue(std::deque<EncoderDataType> target){
     //[2][1][0]
     //new = [0] + (([1] - [0]) - (([2] - [1]) - ([1] - [0])))
-    double re = 3 * target[0] - 3 * target[1] + target[2];
+    EncoderDataType re = target[0];
+    return re;
 }
 
 static constexpr EncoderDataType    EncoderInitialBound     = 10000000;//1000만.
@@ -59,6 +61,10 @@ serial::Serial *getSerial(const char* path_, int baudrate_){
 
 static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
+
+double calcDistnace(std::deque<EncoderDataType> encoder){
+    double dist = (encoder[0] - encoder[1]) / encoderValuePerCycle * distanceValuePerCycle;
+}
 
 bool checkSerial(serial::Serial **ser, int argc, char **argv);
 //serial에 오버로디드 대입 연산자가 삭제됨
@@ -207,7 +213,7 @@ int main (int argc, char** argv){
             encoderData = handleEncoderValue(past.encoder);
         }
         // e-stop에 대한 처리가 필요
-        else if(getParsingData<bool>(dataArray,4)){
+        else if(getParsingData<bool>(dataArray,EstopIndex)){
             ROS_WARN("e-stop status");
         }
         else if ((encoderData - past.encoder[0]) == 0){
@@ -216,8 +222,8 @@ int main (int argc, char** argv){
         }
         past.encoder.push_front(encoderData);
         past.encoder.pop_back();
-        msg.distance = handleEncoderValue(past.encoder);
-        
+        msg.distance = calcDistnace(past.encoder);
+
         //time
         msg.stamp = ros::Time::now();
 
