@@ -80,8 +80,8 @@ int main (int argc, char** argv){
     if(checkSerial(&ser,argc, argv) == false)
         return -1;
     //open serial
-    
-    
+
+
     ros::init(argc, argv, "platform_rx_main_node");
     ros::NodeHandle nh;
 
@@ -89,9 +89,9 @@ int main (int argc, char** argv){
     platform_rx::PlatformRX_msg msg;
     Past past;
 
-    //initialize   
-    msg.steering = 0;          
-    msg.brake = 0;             
+    //initialize
+    msg.steering = 0;
+    msg.brake = 0;
 
     loop = atoi(argv[2]);
     ros::Rate loop_rate(loop);
@@ -117,7 +117,7 @@ int main (int argc, char** argv){
                 , PlatformRXPacketByte, raw.size());
             //ROS_WARN("wait for 2 second");
             //sleep(2);
-        } 
+        }
         else if (static_cast<int>(cnt) < past.encoder.size()){
             uint8_t dataArray[PlatformRXPacketByte];
             for(int i = 0 ; i < PlatformRXPacketByte;++i){
@@ -132,11 +132,11 @@ int main (int argc, char** argv){
         else break;
         ROS_INFO("receiving initial value : %lu(cnt) need and Got %lu(cnt)",past.encoder.size(),cnt);
         loop_rate.sleep();
-    } 
+    }
 
     {
         //initial algorithm start
-        std::vector<std::vector<bool> > table(past.encoder.size());
+        std::vector<std::vector<bool> > table;
         for(int i = 0 ; i < past.encoder.size();++i)
             table.emplace_back(past.encoder.size()); // fill with FALSE
         std::vector<int> score(past.encoder.size());
@@ -174,7 +174,7 @@ int main (int argc, char** argv){
         ROS_INFO("[%lu] : %d, real : %d",i, past.encoder[i], debugVec[i]);
 
     //init end
- 
+
     cnt = 0;
     while(ros::ok()){
         cnt++;
@@ -197,7 +197,7 @@ int main (int argc, char** argv){
         uint8_t dataArray[PlatformRXPacketByte];
         for(int i = 0 ; i < PlatformRXPacketByte;++i){
             dataArray[i] = raw.c_str()[i];
-        } 
+        }
 
         /*--- distance --- */
         //get Data
@@ -206,34 +206,37 @@ int main (int argc, char** argv){
             ROS_WARN("Got super encoder Value%d!",encoderData);
             encoderData = handleEncoderValue(past.encoder);
         }
+        // e-stop에 대한 처리가 필요
         else if ((encoderData - past.encoder[0]) == 0){
             ROS_WARN("Got same encoder Value : %d!",encoderData);
             encoderData = handleEncoderValue(past.encoder);
         }
         past.encoder.push_front(encoderData);
         past.encoder.pop_back();
-
+        msg.distance = handleEncoderValue(past.encoder);
+        
         //time
-    
+        msg.stamp = ros::Time::now();
+
         //brake
         uint8_t brakeData = getParsingData<uint8_t>(dataArray,BrakeIndex);
-        msg.brake = isDataInBound<int8_t>(brakeData, past.brake, BrakeBound) ? 
+        msg.brake = isDataInBound<int8_t>(brakeData, past.brake, BrakeBound) ?
             brakeData : past.brake;
         past.brake = msg.brake;
-        
+
         //steering
         int16_t steeringData = getParsingData<uint16_t>(dataArray,SteerIndex);
-        msg.steering = isDataInBound<int16_t>(steeringData, past.steering, SteerBound) ? 
+        msg.steering = isDataInBound<int16_t>(steeringData, past.steering, SteerBound) ?
             steeringData : past.steering;
         past.steering = msg.steering;
-        
 
         #ifdef MY_DEBUG_FLAG
             ROS_INFO("[%ld]encoder : %d",cnt, past.encoder[0]);
             ROS_INFO("brake : %d", msg.brake);
             ROS_INFO("steering : %hd",msg.steering);
             ROS_INFO("distance : %lf",msg.distance);
-            ROS_INFO("timeInterval : %lf",1 / static_cast<double>(loop));
+            ROS_INFO("stamp.nsec: %u",msg.stamp.nsec);
+            ROS_INFO("stamp.sec : %u",msg.stamp.sec);
         #endif
         pub.publish(msg);
         loop_rate.sleep();
@@ -247,7 +250,7 @@ bool checkSerial(serial::Serial **ser, int argc, char **argv){
         try{
             if(argc <3)
                 throw std::runtime_error("argument error. Give me [path] [frequency]");
-            
+
             *ser = getSerial(argv[1],115200);
 
             return true;
