@@ -207,6 +207,9 @@ int main (int argc, char** argv){
             encoderData = handleEncoderValue(past.encoder);
         }
         // e-stop에 대한 처리가 필요
+        else if(getParsingData<bool>(dataArray,4)){
+            ROS_WARN("e-stop status");
+        }
         else if ((encoderData - past.encoder[0]) == 0){
             ROS_WARN("Got same encoder Value : %d!",encoderData);
             encoderData = handleEncoderValue(past.encoder);
