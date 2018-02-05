@@ -11,7 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
     roslint
   )
 add_message_files(FILES
-  nmea_msg.msg MyMsg.msg)
+  nmea_msg.msg MyMsg.msg
+)
 
 catkin_python_setup()
 
@@ -51,5 +52,13 @@ add_executable(GPS_transformer
 )
 add_dependencies(GPS_transformer ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(GPS_transformer
+  ${catkin_LIBRARIES}
+)
+
+add_executable(GPS_test
+  src/GPS_test.cpp
+)
+add_dependencies(GPS_test ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(GPS_test
   ${catkin_LIBRARIES}
 )

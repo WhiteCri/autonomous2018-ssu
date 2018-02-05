@@ -1,0 +1,3 @@
+<launch>
+ <node pkg="gps_common" type="utm_odometry_node" name="utm_odometry_node" />
+</launch>
