@@ -55,36 +55,24 @@ serial::Serial *getSerial(const char* path_, int baudrate_){
 static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
 
-inline double calcErrorSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double speed){
-    size_t i = 0;
-    EncoderDataType recent = -1, late = -1;
-    //find first valid encoder data 
-    while(true){
-        if(i == encoder.size()) break;        
-        if(encoder[i].second == true) recent = encoder[i].first;
-        i++;
-    }
-    size_t j = i + 1;
-    //find second valid encoder data
-    while(true){
-        if(j == encoder.size()) break;        
-        if(encoder[i].second == true) late = encoder[j].first;
-        j++;
-    }
-    if(late == -1) {
-        ROS_WARN("ErrorSpeedHandling Fail. return past speed.");
-        return speed;
-    }
+inline double calcErrorSpeed(std::deque<std::pair<EncoderDataType,bool> >& encoder, double speed){
+    encoder[0].first = encoder[1].first + encoder[1].first - encoder[2].first;
     double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
     double re_speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
         / timeInterval;
     return re_speed;
 }
 
-inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder){
+inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double past){
     double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
-    double speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
-        / timeInterval;
+    double speed = past;
+    try{
+        speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
+            / timeInterval;
+    }
+    catch(...){
+        ROS_WARN("divide by zero. use past value");
+    }
     return speed;
 }
 
@@ -175,7 +163,7 @@ int main (int argc, char** argv){
         int trueCnt;
         for(size_t i = 0; i < past.encoder.size();++i){
             trueCnt = 0;
-            for(size_t j = 0 ; j < past.encoder.size();++j){
+            for(size_t j = 0 ; j < past.encoder.size(); ++j){
                 if(abs(past.encoder[i].first - past.encoder[j].first) < EncoderInitialDataBound){
                     table[i][j] = true;
                     trueCnt++;
@@ -240,6 +228,8 @@ int main (int argc, char** argv){
         // e-stop에 대한 처리가 필요
         else if(getParsingData<bool>(dataArray,EstopIndex)){
             ROS_WARN("e-stop status");
+            loop_rate.sleep();
+            continue;
         }
         else if ((encoderData - past.encoder[0].first) == 0){
             ROS_WARN("Got same encoder Value : %d!",encoderData);
@@ -248,10 +238,12 @@ int main (int argc, char** argv){
 
         past.encoder.emplace_front(encoderData, !encoderErrorFlag);
         past.encoder.pop_back();
-        if(encoderErrorFlag == true)
-            msg.speed = calcSpeed(past.encoder);
+        if(encoderErrorFlag == false)
+            msg.speed = calcSpeed(past.encoder, past.speed);
         else
             msg.speed = calcErrorSpeed(past.encoder, past.speed);
+        if(msg.speed < 0.0)
+            msg.speed = past.speed;
         past.speed = msg.speed;
         
         //brake
