@@ -1,7 +1,8 @@
 #include <ros/ros.h>
 #include <deque>
 #include <serial/serial.h>
-#include "platform_rx/PlatformRX_msg.h"
+#include <utility>
+#include "platform_rx_msg/platform_rx_msg.h"
 
 static const size_t PlatformRXPacketByte = 18U;
 static constexpr int EncoderIndex = 11;
@@ -16,14 +17,6 @@ typedef int8_t BrakeDataType;
 //initializing macro
 static constexpr EncoderDataType    InitialEncoderLength    = 15;
 static constexpr EncoderDataType    EncoderInitialDataBound = 200;
-
-//handling error encoder value function
-inline EncoderDataType handleEncoderValue(std::deque<EncoderDataType> target){
-    //[2][1][0]
-    //new = [0] + (([1] - [0]) - (([2] - [1]) - ([1] - [0])))
-    EncoderDataType re = target[0];
-    return re;
-}
 
 static constexpr EncoderDataType    EncoderInitialBound     = 10000000;//1000만.
 //바퀴당 100씩 엔코더가 변화하므로 1000만 / 100 * 1.655m = 165500m, 165km임
@@ -62,8 +55,37 @@ serial::Serial *getSerial(const char* path_, int baudrate_){
 static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
 
-double calcDistnace(std::deque<EncoderDataType> encoder){
-    double dist = (encoder[0] - encoder[1]) / encoderValuePerCycle * distanceValuePerCycle;
+inline double calcErrorSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double speed){
+    size_t i = 0;
+    EncoderDataType recent = -1, late = -1;
+    //find first valid encoder data 
+    while(true){
+        if(i == encoder.size()) break;        
+        if(encoder[i].second == true) recent = encoder[i].first;
+        i++;
+    }
+    size_t j = i + 1;
+    //find second valid encoder data
+    while(true){
+        if(j == encoder.size()) break;        
+        if(encoder[i].second == true) late = encoder[j].first;
+        j++;
+    }
+    if(late == -1) {
+        ROS_WARN("ErrorSpeedHandling Fail. return past speed.");
+        return speed;
+    }
+    double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
+    double re_speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
+        / timeInterval;
+    return re_speed;
+}
+
+inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder){
+    double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
+    double speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
+        / timeInterval;
+    return speed;
 }
 
 bool checkSerial(serial::Serial **ser, int argc, char **argv);
@@ -71,10 +93,12 @@ bool checkSerial(serial::Serial **ser, int argc, char **argv);
 //따라서 포인터로 객체를 만들어옴
 
 struct Past{
-    Past() : encoder(std::deque<EncoderDataType>(InitialEncoderLength)), steering(0), brake(0) {}
-    std::deque<EncoderDataType> encoder;
-    SteeringDataType      steering;
+    Past() : encoder(std::deque<std::pair<EncoderDataType,bool> >(InitialEncoderLength)), steer(0), brake(0) {}
+    //encoder deque는 엔코더의 값과 유효성을 동시에 저장함
+    std::deque<std::pair<EncoderDataType,bool> > encoder;
+    SteeringDataType      steer;
     BrakeDataType         brake;
+    double                speed;
 };
 
 #define MY_DEBUG_FLAG 1
@@ -91,12 +115,12 @@ int main (int argc, char** argv){
     ros::init(argc, argv, "platform_rx_main_node");
     ros::NodeHandle nh;
 
-    ros::Publisher pub = nh.advertise<platform_rx::PlatformRX_msg>("raw/platform_rx",100);
-    platform_rx::PlatformRX_msg msg;
+    ros::Publisher pub = nh.advertise<platform_rx_msg::platform_rx_msg>("raw/platform_rx",100);
+    platform_rx_msg::platform_rx_msg msg;
     Past past;
 
     //initialize
-    msg.steering = 0;
+    msg.steer = 0;
     msg.brake = 0;
 
     loop = atoi(argv[2]);
@@ -133,7 +157,7 @@ int main (int argc, char** argv){
             debugVec[cnt] = encoderData;
             //초기값의 인코더 bound를 설정해 너무 큰 잡음을 걸러낸다.
             if(abs(encoderData) > EncoderInitialBound) continue;
-            past.encoder[cnt++] = encoderData;
+            past.encoder[cnt++].first = encoderData;
         }
         else break;
         ROS_INFO("receiving initial value : %lu(cnt) need and Got %lu(cnt)",past.encoder.size(),cnt);
@@ -152,7 +176,7 @@ int main (int argc, char** argv){
         for(size_t i = 0; i < past.encoder.size();++i){
             trueCnt = 0;
             for(size_t j = 0 ; j < past.encoder.size();++j){
-                if(abs(past.encoder[i] - past.encoder[j]) < EncoderInitialDataBound){
+                if(abs(past.encoder[i].first - past.encoder[j].first) < EncoderInitialDataBound){
                     table[i][j] = true;
                     trueCnt++;
                 }
@@ -169,7 +193,7 @@ int main (int argc, char** argv){
         //reconstruct recent 3 data with most recent valid value
         int validDataIndex = static_cast<int>(past.encoder.size() - 1);
         while(!table[idx][--validDataIndex]);
-        past.encoder = std::deque<EncoderDataType>{
+        past.encoder = std::deque<std::pair<EncoderDataType,bool> >{
             past.encoder[validDataIndex],
             past.encoder[validDataIndex],
             past.encoder[validDataIndex]
@@ -177,7 +201,7 @@ int main (int argc, char** argv){
     }
     ROS_INFO("Initial end!");
     for(size_t i = 0 ; i < past.encoder.size();++i)
-        ROS_INFO("[%lu] : %d, real : %d",i, past.encoder[i], debugVec[i]);
+        ROS_INFO("[%lu] : %d, real : %d",i, past.encoder[i].first, debugVec[i]);
 
     //init end
 
@@ -205,47 +229,48 @@ int main (int argc, char** argv){
             dataArray[i] = raw.c_str()[i];
         }
 
-        /*--- distance --- */
+        /*--- speed --- */
         //get Data
         int32_t encoderData = getParsingData<int32_t>(dataArray,EncoderIndex);
-        if(abs(encoderData - past.encoder[0]) > EncoderBound){
+        bool encoderErrorFlag = false;
+        if(abs(encoderData - past.encoder[0].first) > EncoderBound){
             ROS_WARN("Got super encoder Value%d!",encoderData);
-            encoderData = handleEncoderValue(past.encoder);
+            encoderErrorFlag = true;
         }
         // e-stop에 대한 처리가 필요
         else if(getParsingData<bool>(dataArray,EstopIndex)){
             ROS_WARN("e-stop status");
         }
-        else if ((encoderData - past.encoder[0]) == 0){
+        else if ((encoderData - past.encoder[0].first) == 0){
             ROS_WARN("Got same encoder Value : %d!",encoderData);
-            encoderData = handleEncoderValue(past.encoder);
+            encoderErrorFlag = true;
         }
-        past.encoder.push_front(encoderData);
+
+        past.encoder.emplace_front(encoderData, !encoderErrorFlag);
         past.encoder.pop_back();
-        msg.distance = calcDistnace(past.encoder);
-
-        //time
-        msg.stamp = ros::Time::now();
-
+        if(encoderErrorFlag == true)
+            msg.speed = calcSpeed(past.encoder);
+        else
+            msg.speed = calcErrorSpeed(past.encoder, past.speed);
+        past.speed = msg.speed;
+        
         //brake
         uint8_t brakeData = getParsingData<uint8_t>(dataArray,BrakeIndex);
         msg.brake = isDataInBound<int8_t>(brakeData, past.brake, BrakeBound) ?
             brakeData : past.brake;
         past.brake = msg.brake;
 
-        //steering
+        //steer
         int16_t steeringData = getParsingData<uint16_t>(dataArray,SteerIndex);
-        msg.steering = isDataInBound<int16_t>(steeringData, past.steering, SteerBound) ?
-            steeringData : past.steering;
-        past.steering = msg.steering;
+        msg.steer = isDataInBound<int16_t>(steeringData, past.steer, SteerBound) ?
+            steeringData : past.steer;
+        past.steer = msg.steer;
 
         #ifdef MY_DEBUG_FLAG
-            ROS_INFO("[%ld]encoder : %d",cnt, past.encoder[0]);
+            ROS_INFO("[%ld]encoder : %d",cnt, past.encoder[0].first);
+            ROS_INFO("speed : %lf",msg.speed);
             ROS_INFO("brake : %d", msg.brake);
-            ROS_INFO("steering : %hd",msg.steering);
-            ROS_INFO("distance : %lf",msg.distance);
-            ROS_INFO("stamp.nsec: %u",msg.stamp.nsec);
-            ROS_INFO("stamp.sec : %u",msg.stamp.sec);
+            ROS_INFO("steering : %hd",msg.steer);
         #endif
         pub.publish(msg);
         loop_rate.sleep();
