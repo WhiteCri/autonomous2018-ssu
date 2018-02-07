@@ -14,7 +14,7 @@ using namespace gps_common;
 
 static ros::Publisher odom_pub;
 std::string frame_id, child_frame_id;
-double rot_cov;
+static double rot_cov;
 
 void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
   if (fix->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
