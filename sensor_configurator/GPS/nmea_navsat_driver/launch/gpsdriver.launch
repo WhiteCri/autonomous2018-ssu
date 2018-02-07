@@ -1,0 +1,6 @@
+<launch>
+
+ <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB0 38400"/>
+
+
+</launch>

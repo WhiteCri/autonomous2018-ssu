@@ -125,7 +125,7 @@ class RosNMEADriver(object):
 
             if not math.isnan(data['utc_time']):
                 current_time_ref.time_ref = rospy.Time.from_sec(data['utc_time'])
-                self.time_ref_pub.publish(current_time_ref)
+             #   self.time_ref_pub.publish(current_time_ref)
 
         elif 'RMC' in parsed_sentence:
             data = parsed_sentence['RMC']
@@ -168,7 +168,7 @@ class RosNMEADriver(object):
                     math.sin(data['true_course'])
                 current_vel.twist.linear.y = data['speed'] * \
                     math.cos(data['true_course'])
-                self.vel_pub.publish(current_vel)
+               # self.vel_pub.publish(current_vel)
         else:
             return False
 
