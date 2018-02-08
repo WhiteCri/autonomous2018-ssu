@@ -3,14 +3,10 @@ project(platform_rx)
 add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
-  message_generation
   roscpp
   serial
+  platform_rx_msg
 )
-
-add_message_files(FILES PlatformRX_msg.msg)
-
-generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(
   CATKIN_DEPENDS
@@ -19,20 +15,16 @@ catkin_package(
 
 include_directories(
   include ${catkin_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-  include
 )
 
-add_executable(platformRx_test_main_node
-  src/platformrx_main_node.cpp 
-  src/PlatformRX.cpp
+add_executable(platform_rx_main_node
+  src/platform_rx_main_node.cpp 
 )
 
-target_link_libraries(platformRx_test_main_node
+add_dependencies(platform_rx_main_node
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(platform_rx_main_node
   ${catkin_LIBRARIES}
 )
-
-#add_executable(platformRx_test_main_node
-#  src/platformRx_test_main_node.cpp
-#)
-#add_dependencies(platformRx_test_main_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

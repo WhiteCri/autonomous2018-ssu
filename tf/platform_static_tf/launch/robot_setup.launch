@@ -10,6 +10,6 @@
 <node pkg="tf" type="static_transform_publisher" name="camera_rear_tf"  args="-2 0 0 3.141592 0 0 base_link camera_rear 100" />
 <node pkg="tf" type="static_transform_publisher" name="camera_left_tf"  args="2 1 0 0.8 0 0 base_link camera_left 100" />
 <node pkg="tf" type="static_transform_publisher" name="camera_right_tf" args="2 -1 0 -0.8 0 0 base_link camera_right 100" />
-<node pkg="tf" type="static_transform_publisher" name="lidar_tf"        args="4 0 0 0 0 0 base_link laser 100" />
+<node pkg="tf" type="static_transform_publisher" name="lidar_tf"        args="3 0 0 0 0 0 base_link laser 100" />
 <rosparam command="load" file="$(find platform_static_tf)/my_laser_config.yaml" />
 </launch>
