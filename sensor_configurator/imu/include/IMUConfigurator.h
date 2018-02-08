@@ -1,19 +1,19 @@
 #include <serial/serial.h>
+#include <string>
 #include "sensor_msgs/Imu.h"
+#include "imu/imu_msgs.h"
 
-#define IMUFRE 5
-    
 static uint32_t m = 0;
 
 class IMUConfigurator
 {
 public:
     std::string parse();
-    int serialCommucation(char* path_);
-    void RPY(std::string parse,ros::NodeHandle nh);
-    sensor_msgs::Imu imu_msg;
+    bool serialCommucation(char* path_);
+    imu::imu_msgs RPY(std::string parse,ros::NodeHandle nh);
 
 private:
     serial::Serial ser;
+    sensor_msgs::Imu imu_msg;
 
 };
