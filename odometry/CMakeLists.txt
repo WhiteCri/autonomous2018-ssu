@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(platform_static_tf)
+project(odometry)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -7,7 +7,7 @@ project(platform_static_tf)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp tf geometry_msgs sensor_msgs tf2 tf2_ros)
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -34,7 +34,13 @@ find_package(catkin REQUIRED COMPONENTS roscpp tf geometry_msgs sensor_msgs tf2 
 ##     * add a run_depend tag for "message_runtime"
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
-##     find_package(catkin REQUIRED COMPONENTS ...)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  platform_rx_msg
+  tf
+  nav_msgs
+  geometry_msgs
+)
 ##   * add "message_runtime" and every package in MSG_DEP_SET to
 ##     catkin_package(CATKIN_DEPENDS ...)
 ##   * uncomment the add_*_files sections below as needed
@@ -100,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp tf geometry_msgs sensor_msgs tf2 
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES platform_static_tf
+#  LIBRARIES odometry
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -119,7 +125,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/platform_static_tf.cpp
+#   src/${PROJECT_NAME}/odometry.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -130,7 +136,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/platform_static_tf_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/odometry_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -187,7 +193,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_platform_static_tf.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_odometry.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
@@ -196,10 +202,19 @@ include_directories(
 # catkin_add_nosetests(test)
 
 
-add_executable(move_base
-  src/move_base.cpp
+#add_library(ackermann
+#  include/odometry/ackermann.h
+#)
+#add_dependencies(ackermann ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(ackermann
+#  ${catkin_LIBRARIES}
+#)
+
+add_executable(odom_pub
+  src/odom_pub.cpp
+  src/ackermann.cpp
 )
-add_dependencies(move_base ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(move_base
+add_dependencies(odom_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(odom_pub
   ${catkin_LIBRARIES}
 )
