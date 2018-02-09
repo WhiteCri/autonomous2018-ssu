@@ -1,0 +1,10 @@
+<launch>
+ <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node"
+    args="/dev/ttyUSB0 10"/>
+
+ <node pkg="imu" type="imu_main" name="imu_main"
+   args="/dev/ttyUSB2 12"/>
+
+ <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB1 38400"/>
+ <include file="$(find gps_common)/launch/LL_UTM.launch"/>
+</launch>
