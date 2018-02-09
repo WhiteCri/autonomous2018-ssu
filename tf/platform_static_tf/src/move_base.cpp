@@ -26,7 +26,15 @@ void callback(const nav_msgs::OdometryConstPtr& odom){ // map와 base_link은 �
                                         odom->pose.pose.orientation.z, 
                                         odom->pose.pose.orientation.w) );
 
-  broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "base_link"));
+  broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "odom"));
+
+
+
+
+  transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+  transform.setRotation( tf::Quaternion(0.0, 0.0, 0.0, 1.0) );
+
+  broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_link"));
 }
 
 
