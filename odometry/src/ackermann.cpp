@@ -117,7 +117,7 @@ void Odometry::Odom_Set(nav_msgs::Odometry& odom,
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
     
     odom.header.stamp = time;
-    odom.header.frame_id = "odom";
+    odom.header.frame_id = "odom"; // "odom"
     odom.pose.pose.position.x = x_;
     odom.pose.pose.position.y = y_;
     odom.pose.pose.position.z = 0.0;
@@ -138,7 +138,7 @@ void Odometry::Odom_Transform(geometry_msgs::TransformStamped& odom_trans,
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
          
     odom_trans.header.stamp = time;
-    odom_trans.header.frame_id = "odom";
+    odom_trans.header.frame_id = "odom"; // "odom"
     odom_trans.child_frame_id = "base_link";    
     odom_trans.transform.translation.x = dx_;
     odom_trans.transform.translation.y = dy_;
