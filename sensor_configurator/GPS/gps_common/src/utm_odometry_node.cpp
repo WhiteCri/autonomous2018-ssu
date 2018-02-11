@@ -87,7 +87,7 @@ int main (int argc, char **argv) {
 
   odom_pub = node.advertise<nav_msgs::Odometry>("vo", 10);
 
-  ros::Subscriber fix_sub = node.subscribe("raw/GPS/data", 10, callback);
+  ros::Subscriber fix_sub = node.subscribe("fix", 10, callback);
 
   ros::spin();
 }
