@@ -7,6 +7,8 @@
 #define CURVATURE_NEER_ZERO 0.0001
 #define STEER_PLATFORM_TO_RAD 1/100.0*(PI/180.0)
 #define TIME_GAIN 1
+#define TRANS_COV 5
+#define ROT_COV 5
 
 namespace odometry_ackermann{
 
@@ -127,6 +129,18 @@ void Odometry::Odom_Set(nav_msgs::Odometry& odom,
     odom.twist.twist.linear.y = dy_;
     odom.twist.twist.angular.z = dth_;
     ROS_INFO("OdomSet FINISHED!");
+
+    boost::array<double, 36> covariance = {{
+    TRANS_COV, 0, 0, 0, 0, 0,
+    0, TRANS_COV, 0, 0, 0, 0,
+    0, 0, TRANS_COV, 0, 0, 0,
+    0, 0, 0, ROT_COV, 0, 0,
+    0, 0, 0, 0, ROT_COV, 0,
+    0, 0, 0, 0, 0, ROT_COV
+    }};
+
+    odom.pose.covariance = covariance;
+
 }
 
 
