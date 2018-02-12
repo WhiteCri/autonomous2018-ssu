@@ -34,6 +34,14 @@ void Odometry::init(const ros::Time &time)
     ROS_INFO("OdomINIT START!");
     timestamp_ = time;
     pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
+    //init odom
+    odom.header.stamp = time;
+    odom.header.frame_id = "odom"; // "odom"
+    odom.child_frame_id = "base_link";
+    //init tf
+    odom_trans.header.frame_id = "odom"; // "odom"
+    odom_trans.child_frame_id = "base_link";
+    
     ROS_INFO("OdomINIT FINISHED!");
 }
 
