@@ -35,12 +35,12 @@ void Odometry::init(const ros::Time &time)
     timestamp_ = time;
     pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
     //init odom
-    odom.header.stamp = time;
-    odom.header.frame_id = "odom"; // "odom"
-    odom.child_frame_id = "base_link";
+    odom_.header.stamp = time;
+    odom_.header.frame_id = "odom";
+    odom_.child_frame_id = "base_link";
     //init tf
-    odom_trans.header.frame_id = "odom"; // "odom"
-    odom_trans.child_frame_id = "base_link";
+    odom_trans_.header.frame_id = "odom";
+    odom_trans_.child_frame_id = "base_link";
     
     ROS_INFO("OdomINIT FINISHED!");
 }
@@ -123,16 +123,16 @@ void Odometry::Odom_Set(const ros::Time& time)
     ROS_INFO("OdomSet STARTS!");
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
     
-    odom.header.stamp = time;
-    odom.header.frame_id = "odom"; // "odom"
-    odom.pose.pose.position.x = x_;
-    odom.pose.pose.position.y = y_;
-    odom.pose.pose.position.z = 0.0;
-    odom.pose.pose.orientation = odom_quat;
-    odom.child_frame_id = "base_link";
-    odom.twist.twist.linear.x = dx_;
-    odom.twist.twist.linear.y = dy_;
-    odom.twist.twist.angular.z = dth_;
+    odom_.header.stamp = time;
+    odom_.header.frame_id = "odom";
+    odom_.pose.pose.position.x = x_;
+    odom_.pose.pose.position.y = y_;
+    odom_.pose.pose.position.z = 0.0;
+    odom_.pose.pose.orientation = odom_quat;
+    odom_.child_frame_id = "base_link";
+    odom_.twist.twist.linear.x = dx_;
+    odom_.twist.twist.linear.y = dy_;
+    odom_.twist.twist.angular.z = dth_;
     ROS_INFO("OdomSet FINISHED!");
 
     boost::array<double, 36> covariance = {{
@@ -144,7 +144,7 @@ void Odometry::Odom_Set(const ros::Time& time)
     0, 0, 0, 0, 0, ROT_COV
     }};
 
-    odom.pose.covariance = covariance;
+    odom_.pose.covariance = covariance;
 
 }
 
@@ -153,20 +153,22 @@ void Odometry::Odom_Transform(const ros::Time& time)
     ROS_INFO("OdomTransform STARTS!");
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
          
-    odom_trans.header.stamp = time;
-    odom_trans.header.frame_id = "odom"; // "odom"
-    odom_trans.child_frame_id = "base_link";    
-    odom_trans.transform.translation.x = x_;
-    odom_trans.transform.translation.y = y_;
-    odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.rotation = odom_quat;
+    odom_trans_.header.stamp = time;
+    odom_trans_.header.frame_id = "odom";
+    odom_trans_.child_frame_id = "base_link";    
+    odom_trans_.transform.translation.x = x_;
+    odom_trans_.transform.translation.y = y_;
+    odom_trans_.transform.translation.z = 0.0;
+    odom_trans_.transform.rotation = odom_quat;
     ROS_INFO("OdomTransform FINISHED!");
 }
 
 void Odometry::sendTransform(){
-    odom_broadcaster.sendTransform(odom_trans);
+    odom_broadcaster_.sendTransform(odom_trans_);
 }
+
 void Odometry::publish(){
-    pub_.publish(odom);
+    pub_.publish(odom_);
 }
+
 }
