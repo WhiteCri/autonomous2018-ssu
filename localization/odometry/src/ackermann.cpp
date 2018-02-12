@@ -33,6 +33,15 @@ void Odometry::init(const ros::Time &time)
 {
     ROS_INFO("OdomINIT START!");
     timestamp_ = time;
+    pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
+    //init odom
+    odom.header.stamp = time;
+    odom.header.frame_id = "odom"; // "odom"
+    odom.child_frame_id = "base_link";
+    //init tf
+    odom_trans.header.frame_id = "odom"; // "odom"
+    odom_trans.child_frame_id = "base_link";
+    
     ROS_INFO("OdomINIT FINISHED!");
 }
 
@@ -41,21 +50,22 @@ void Odometry::init(const ros::Time &time)
 void Odometry::callback(const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data)
 {  
     ROS_INFO("OdomCallback START!");
-    pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
-    tf::TransformBroadcaster odom_broadcaster;                     // tf broadcast
-    nav_msgs::Odometry odom;                                       // publish할 odometry
-    geometry_msgs::TransformStamped odom_trans;                    // tf으로 날릴 odometry transform
+
+    //tf::TransformBroadcaster odom_broadcaster;                     // tf broadcast
+    //nav_msgs::Odometry odom;                                       // publish할 odometry
+    //geometry_msgs::TransformStamped odom_trans;                    // tf으로 날릴 odometry transform
        
     /*---  Odometry Loop의 주기 측정 -> dt -> Odometry 계산  ---*/   
     ros::Time time = ros::Time::now();                             // 현재 주기의 시간 측정
-   
+    
 
     Calc_Odom(PlatformRX_data, time);                              // odometry 계산
-    Odom_Transform(odom_trans, time);                              // odometry transform 계산
-    odom_broadcaster.sendTransform(odom_trans);                    // tf에 odometry transform을 broadcast
-    Odom_Set(odom, time);                                          // odometry 정보 입력
+    Odom_Transform(time);                              // odometry transform 계산
+    //odom_broadcaster.sendTransform(odom_trans);                    // tf에 odometry transform을 broadcast
+
+    Odom_Set(time);                                          // odometry 정보 입력
     
-    pub_.publish(odom);                                            // odometry 메세지 publish
+    //pub_.publish(odom);                                            // odometry 메세지 publish
     ROS_INFO("OdomCallback FINISHED!");
 }
 
@@ -108,8 +118,7 @@ bool Odometry::Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& Platf
     ROS_INFO("OdomCalc FINISHED!");
 }
 
-void Odometry::Odom_Set(nav_msgs::Odometry& odom, 
-                        const ros::Time& time)
+void Odometry::Odom_Set(const ros::Time& time)
 {
     ROS_INFO("OdomSet STARTS!");
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
@@ -139,8 +148,7 @@ void Odometry::Odom_Set(nav_msgs::Odometry& odom,
 
 }
 
-void Odometry::Odom_Transform(geometry_msgs::TransformStamped& odom_trans, 
-                              const ros::Time& time)
+void Odometry::Odom_Transform(const ros::Time& time)
 {   
     ROS_INFO("OdomTransform STARTS!");
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
@@ -148,10 +156,17 @@ void Odometry::Odom_Transform(geometry_msgs::TransformStamped& odom_trans,
     odom_trans.header.stamp = time;
     odom_trans.header.frame_id = "odom"; // "odom"
     odom_trans.child_frame_id = "base_link";    
-    odom_trans.transform.translation.x = dx_;
-    odom_trans.transform.translation.y = dy_;
+    odom_trans.transform.translation.x = x_;
+    odom_trans.transform.translation.y = y_;
     odom_trans.transform.translation.z = 0.0;
     odom_trans.transform.rotation = odom_quat;
     ROS_INFO("OdomTransform FINISHED!");
+}
+
+void Odometry::sendTransform(){
+    odom_broadcaster.sendTransform(odom_trans);
+}
+void Odometry::publish(){
+    pub_.publish(odom);
 }
 }

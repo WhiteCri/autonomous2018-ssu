@@ -12,7 +12,14 @@ int main(int argc, char** argv){
   ROS_INFO("Subscribe START!");
   ros::Subscriber sub = nh.subscribe("raw/platform_rx", 100, &Odometry::callback, &odom);
   ROS_INFO("Subscribe FINISHED!");
-  
-  ros::spin();
+
+  ros::Rate loop_rate(10);
+
+  while(ros::ok()){
+    ros::spinOnce();
+    odom.sendTransform();
+    odom.publish();
+    loop_rate.sleep();
+  }
   return 0;
 }
