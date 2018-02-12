@@ -8,12 +8,35 @@
   - rviz view
  -->
 
+ <!-- 
+	1. TF broadcaster node (robot_setup)
+	2. sensor nodes (gps, camera, lidar, imu, platform(RX/TX))
+	3. ekf pose estimation node (odometry publisher node)
+	4. AMCL
+		-amcl_params.yaml
+	5. map server node
+	6. move_base node (global/local planner 세팅) → 얘가 메인으로 여기에 plugin형태로 planner 설정
+		- local_costmap_params.yaml
+	 	- global_costmap_params.yaml
+		- teb_local_planner_params.yaml
+		(여기 3개의 .yaml파일에서 footprint 입력 가능)
+		
+	<param name="base_global_planner" value="global_planner/GlobalPlanner" />
+	<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />	
+
+	*** 추가(참고) ***
+	Topic 명이 다른 경우,
+	<remap form=’원래 토픽이름’to=’원하는 토픽이름’>  으로 mapping가능
+
+
+-->
+
 
 <launch>
  	<!--  ************** Robot Coordinate System (tf nodes) 차량좌표계 설정 (정확한 마운트 후 수정 필요, 그 이후 건들 필요 없음) ***************  -->
 	 	<!--
 		해야할일(18.2.12 기준)
-			1. map - odom - odom_combined - base_footprint - base_link 순으로 tf 수정해야 함
+			1. map - odom_combined - base_footprint - base_link 순으로 tf 수정해야 함
 			2. odom 관련 covariance 세팅 (#define으로 해놓았음)
 			3. footprint (static_tf)
 			4. robot_pose_ekf package에서 IMU를 off하면 orientation이 아예 안바뀜 -> 어떻게 할 지 생각해야 함
@@ -78,12 +101,10 @@
 
 
 
-
 	<!--  ****** Maps *****  -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find teb_local_planner_tutorials)/maps/maze.yaml" output="screen">
 		<param name="frame_id" value="/map"/>
-	</node>
-
+	</node>>
 
 
 
