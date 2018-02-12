@@ -59,8 +59,6 @@ void Odometry::callback(const platform_rx_msg::platform_rx_msg::ConstPtr& Platfo
     ROS_INFO("OdomCallback FINISHED!");
 }
 
-
-
 bool Odometry::Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data,
                          const ros::Time& time)
 {
@@ -110,8 +108,6 @@ bool Odometry::Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& Platf
     ROS_INFO("OdomCalc FINISHED!");
 }
 
-
-
 void Odometry::Odom_Set(nav_msgs::Odometry& odom, 
                         const ros::Time& time)
 {
@@ -142,8 +138,6 @@ void Odometry::Odom_Set(nav_msgs::Odometry& odom,
     odom.pose.covariance = covariance;
 
 }
-
-
 
 void Odometry::Odom_Transform(geometry_msgs::TransformStamped& odom_trans, 
                               const ros::Time& time)
