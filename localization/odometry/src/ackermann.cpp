@@ -53,6 +53,7 @@ void Odometry::callback(const platform_rx_msg::platform_rx_msg::ConstPtr& Platfo
     Calc_Odom(PlatformRX_data, time);                              // odometry 계산
     Odom_Transform(odom_trans, time);                              // odometry transform 계산
     odom_broadcaster.sendTransform(odom_trans);                    // tf에 odometry transform을 broadcast
+
     Odom_Set(odom, time);                                          // odometry 정보 입력
     
     pub_.publish(odom);                                            // odometry 메세지 publish
@@ -148,8 +149,8 @@ void Odometry::Odom_Transform(geometry_msgs::TransformStamped& odom_trans,
     odom_trans.header.stamp = time;
     odom_trans.header.frame_id = "odom"; // "odom"
     odom_trans.child_frame_id = "base_link";    
-    odom_trans.transform.translation.x = dx_;
-    odom_trans.transform.translation.y = dy_;
+    odom_trans.transform.translation.x = x_;
+    odom_trans.transform.translation.y = y_;
     odom_trans.transform.translation.z = 0.0;
     odom_trans.transform.rotation = odom_quat;
     ROS_INFO("OdomTransform FINISHED!");
