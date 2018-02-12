@@ -53,8 +53,7 @@ public:
      <Odom_Set 함수>
         odom을 참조하여 Odom_Set 함수를 통해 odometry 정보를 저장
     */
-    void Odom_Set(nav_msgs::Odometry& odom, 
-                  const ros::Time& time);
+    void Odom_Set(const ros::Time& time);
 
 
 
@@ -62,11 +61,11 @@ public:
      <Odom_Transform 함수>
         odom_trans을 참조하여 Odom_Transform 함수를 통해 transform 정보를 저장
     */
-    void Odom_Transform(geometry_msgs::TransformStamped& odom_trans, 
-                        const ros::Time& time);
+    void Odom_Transform(const ros::Time& time);
 
 
-
+    void sendTransform();
+    void publish();
 
     /*---  topic(sub/pub)관련 객체 선언 및 Odometry Calculation에 이용할 변수 선언  ---*/
     private:
@@ -78,5 +77,9 @@ public:
         double wheelbase_, curvature_, ignore_;
         double velocity_, steering_, heading_;
         double ds_, dth_, dx_, dy_, x_, y_;
+
+        tf::TransformBroadcaster odom_broadcaster;                     // tf broadcast
+        nav_msgs::Odometry odom;                                       // publish할 odometry
+        geometry_msgs::TransformStamped odom_trans;                    // tf으로 날릴 odometry transform
 };
 }   
