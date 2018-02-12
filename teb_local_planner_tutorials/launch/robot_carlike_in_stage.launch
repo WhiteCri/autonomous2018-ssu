@@ -42,12 +42,18 @@
 			4. robot_pose_ekf package에서 IMU를 off하면 orientation이 아예 안바뀜 -> 어떻게 할 지 생각해야 함
 		-->
 	<!--node pkg="platform_static_tf"  type="move_base"  name="move_base" /-->
+
+<!--
 	<node pkg="tf" type="static_transform_publisher" name="camera_main_tf"  args="-1 0 0 0 0 0 base_link camera_main 100" />
 	<node pkg="tf" type="static_transform_publisher" name="camera_rear_tf"  args="-2 0 0 3.141592 0 0 base_link camera_rear 100" />
 	<node pkg="tf" type="static_transform_publisher" name="camera_left_tf"  args="2 1 0 0.8 0 0 base_link camera_left 100" />
 	<node pkg="tf" type="static_transform_publisher" name="camera_right_tf" args="2 -1 0 -0.8 0 0 base_link camera_right 100" />
 	<node pkg="tf" type="static_transform_publisher" name="lidar_tf"        args="4 0 0 0 0 0 base_link laser 100" />
-       
+
+	<node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0 0 0 0 base_link laser 100" />
+-->
+
+
 	   
 
 	    <!--  ************** Global Parameters (시뮬레이션 시간) ***************  -->
