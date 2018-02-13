@@ -7,7 +7,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;                          
 
 
-  ros::Publisher ros_tutorial_pub = nh.advertise<sensor_msgs::NavSatFix>("raw/GPS/data", 100);
+  ros::Publisher ros_tutorial_pub = nh.advertise<sensor_msgs::NavSatFix>("fix", 100);
 
   // 루프 주기를 설정한다. "10" 이라는 것은 10Hz를 말하는 것으로 0.1초 간격으로 반복된다
   ros::Rate loop_rate(10);
