@@ -8,5 +8,5 @@
  <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
  <include file="$(find gps_common)/launch/LL_UTM.launch"/>
 
- <include file="$(find LMS1xx-master)/launch/LMS1xx.launch"/>
+ <include file="$(find lms1xx)/launch/LMS1xx.launch"/>
 </launch>
