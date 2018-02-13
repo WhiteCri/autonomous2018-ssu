@@ -1,4 +1,5 @@
 <launch>
   <include file="$(find sensor_launch)/launch/sensor_launch.launch" />
   <include file="$(find localization_launch)/launch/localization_launch.launch" />
+  <include file="$(find platform_static_tf)/launch/robot_setup.launch">
 </launch>
