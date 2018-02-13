@@ -1,6 +1,0 @@
-<launch>
-
-  <include file="$(find nmea_navsat_driver)/launch/gpsdriver.launch" />
-  <include file="$(find nmea_navsat_driver)/launch/gpssubscriber.launch" />
-
-</launch>

@@ -65,13 +65,14 @@ inline double calcErrorSpeed(std::deque<std::pair<EncoderDataType,bool> >& encod
 
 inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double past){
     double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
-    double speed = past;
+    double speed = 0;
     try{
         speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
             / timeInterval;
     }
     catch(...){
         ROS_WARN("divide by zero. use past value");
+        speed = past;
     }
     return speed;
 }
@@ -231,10 +232,10 @@ int main (int argc, char** argv){
             loop_rate.sleep();
             continue;
         }
-        else if ((encoderData - past.encoder[0].first) == 0){
-            ROS_WARN("Got same encoder Value : %d!",encoderData);
-            encoderErrorFlag = true;
-        }
+        //else if ((encoderData - past.encoder[0].first) == 0){
+        //    ROS_WARN("Got same encoder Value : %d!",encoderData);
+        //    //encoderErrorFlag = true;
+        //}
 
         past.encoder.emplace_front(encoderData, !encoderErrorFlag);
         past.encoder.pop_back();
@@ -242,8 +243,6 @@ int main (int argc, char** argv){
             msg.speed = calcSpeed(past.encoder, past.speed);
         else
             msg.speed = calcErrorSpeed(past.encoder, past.speed);
-        if(msg.speed < 0.0)
-            msg.speed = past.speed;
         past.speed = msg.speed;
         
         //brake

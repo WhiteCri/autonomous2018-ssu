@@ -1,0 +1,8 @@
+<launch>
+
+<node pkg="odometry" type="odom_pub" name="odom_pub" output="screen"/>
+<param name="wheelbase" value="1"/>
+
+
+</launch>
+
