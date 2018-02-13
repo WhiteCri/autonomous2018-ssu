@@ -15,8 +15,8 @@ void SubCallback(nav_msgs::Odometry& odom){
 
 bool SrvCallback(initialize_pose::init_pose::Request &req, initialize_pose::init_pose::Response &res){
 
-        //ros::NodeHandle Sub_NH;
-        //ros::Publisher pub = Sub_NH.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose",100);
+        ros::NodeHandle Sub_NH;
+        ros::Publisher pub = Sub_NH.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose",100);
         
         if(req.Req_Flag == 1){
         ROS_INFO("Flag Set!");
@@ -42,14 +42,14 @@ int main(int argc, char *argv[]){
   ros::NodeHandle nh_srv;
 
   ros::ServiceServer ros_tutorials_service_server = nh_srv.advertiseService("init_pose_srv", SrvCallback);
-
+  
   ROS_INFO("ready srv server!");
 
   ros::Rate r(1);
-
+  
   while(1){
-
-
+    
+  
     ros::spinOnce();
     r.sleep();
   }
