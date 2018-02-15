@@ -6,9 +6,9 @@
 #define TIME_NEER_ZERO 0.0001
 #define CURVATURE_NEER_ZERO 0.0001
 #define STEER_PLATFORM_TO_RAD 1/100.0*(PI/180.0)
-#define TIME_GAIN 1
-#define TRANS_COV 5
-#define ROT_COV 99999
+#define TIME_GAIN 1.0
+#define TRANS_COV 5.0
+#define ROT_COV 99999.0
 
 namespace odometry_ackermann{
 
