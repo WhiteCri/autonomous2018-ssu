@@ -8,7 +8,7 @@
 #define STEER_PLATFORM_TO_RAD 1/100.0*(PI/180.0)
 #define TIME_GAIN 1
 #define TRANS_COV 5
-#define ROT_COV 5
+#define ROT_COV 99999
 
 namespace odometry_ackermann{
 

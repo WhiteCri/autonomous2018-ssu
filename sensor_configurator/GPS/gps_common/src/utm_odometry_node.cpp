@@ -16,6 +16,7 @@ static double base_latitude = 37.2323;
 static ros::Publisher odom_pub;
 std::string frame_id, child_frame_id;
 static double rot_cov;
+static double easting_shift, northing_shift;
 
 
 void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
@@ -46,12 +47,17 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
       odom.header.frame_id = frame_id;
 
     odom.child_frame_id = child_frame_id;
-    if(parameter)
-    { odom.pose.pose.position.x = easting;
-      odom.pose.pose.position.y = northing;}
-    else
-    { odom.pose.pose.position.x = easting - 319000;
-      odom.pose.pose.position.y = northing - 4151000; }
+    node.getParam("/gps/easting_shift", easting_shift);   // easting_shift 됨값 세팅해주면 됨
+    node.getParam("/gps/northing_shift", northing_shift); // northing_shift 값 세팅해주면 됨
+    odom.pose.pose.position.x = easting - easting_shift;
+    odom.pose.pose.position.y = northing - northing_shift;
+
+//  if(parameter)
+//  { odom.pose.pose.position.x = easting;
+//    odom.pose.pose.position.y = northing;}
+//  else
+//  { odom.pose.pose.position.x = easting - 319000;
+//    odom.pose.pose.position.y = northing - 4151000; }
 
     odom.pose.pose.position.z = fix->altitude;
     
