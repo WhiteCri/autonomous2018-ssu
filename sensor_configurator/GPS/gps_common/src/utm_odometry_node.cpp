@@ -42,11 +42,12 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
     nav_msgs::Odometry odom;
     odom.header.stamp = fix->header.stamp;
 
-    if (frame_id.empty())
-      odom.header.frame_id = fix->header.frame_id;
-    else
-      odom.header.frame_id = "gps";
-
+//    if (frame_id.empty())
+//      odom.header.frame_id = fix->header.frame_id;
+//    else
+//    
+    odom.header.frame_id = "gps";
+//
 //
     odom.child_frame_id = "base_link";
     node.getParam("/gps/easting_shift", easting_shift);   // easting_shift 됨값 세팅해주면 됨
