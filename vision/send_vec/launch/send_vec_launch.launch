@@ -1,0 +1,5 @@
+<launch>
+
+        <node pkg="send_vec" type="send_vec" name="send_vec0" output="screen"/>
+        
+</launch>
