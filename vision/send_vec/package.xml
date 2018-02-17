@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>cal_distance</name>
+  <name>send_vec</name>
   <version>0.0.0</version>
-  <description>The cal_distance package</description>
+  <description>The send_vec package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/cal_distance</url> -->
+  <!-- <url type="website">http://wiki.ros.org/send_vec</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->

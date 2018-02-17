@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(cal_distance)
+project(send_vec)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,6 +8,7 @@ project(cal_distance)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
+find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -102,7 +103,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES cal_distance
+#  LIBRARIES send_vec
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -115,13 +116,15 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include ${catkin_INCLUDE_DIRS}
+  include ${OpenCV_INCLUDE_DIRS}
+
 # include
 # ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/cal_distance.cpp
+#   src/${PROJECT_NAME}/send_vec.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -132,7 +135,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/cal_distance_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/send_vec_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -189,7 +192,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_cal_distance.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_send_vec.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
@@ -198,10 +201,11 @@ include_directories(
 # catkin_add_nosetests(test)
 
 
-add_executable(cal_distance
-  src/cal_distance.cpp
+add_executable(send_vec
+  src/send_vec.cpp
 )
-add_dependencies(cal_distance ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(cal_distance
+add_dependencies(send_vec ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(send_vec
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
 )
