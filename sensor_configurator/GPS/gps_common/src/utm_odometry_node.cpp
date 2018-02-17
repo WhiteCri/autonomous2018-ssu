@@ -11,12 +11,17 @@
 #include <nav_msgs/Odometry.h>
 
 using namespace gps_common;
-
+static double base_longitude = 126.7689;
+static double base_latitude = 37.2323;
 static ros::Publisher odom_pub;
-std::string frame_id, child_frame_id;
+//std::string frame_id, child_frame_id;
 static double rot_cov;
+//
+static double easting_shift, northing_shift;
+//
 
 void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
+  ros::NodeHandle node;
   if (fix->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
     ROS_INFO("No fix.");
     return;
@@ -28,6 +33,8 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
   double northing, easting;
   std::string zone;
+//  bool parameter;
+//  node.getParam("GPS_Odometry_initial",parameter);
 
   LLtoUTM(fix->latitude, fix->longitude, northing, easting, zone);
 
@@ -35,15 +42,28 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
     nav_msgs::Odometry odom;
     odom.header.stamp = fix->header.stamp;
 
-    if (frame_id.empty())
-      odom.header.frame_id = fix->header.frame_id;
-    else
-      odom.header.frame_id = frame_id;
+//    if (frame_id.empty())
+//      odom.header.frame_id = fix->header.frame_id;
+//    else
+//    
+    odom.header.frame_id = "gps";
+//
+//
+    odom.child_frame_id = "base_link";
+    node.getParam("/gps/easting_shift", easting_shift);   // easting_shift 됨값 세팅해주면 됨
+    node.getParam("/gps/northing_shift", northing_shift); // northing_shift 값 세팅해주면 됨
+    odom.pose.pose.position.x = easting - easting_shift;
+    odom.pose.pose.position.y = northing - northing_shift;
+//
 
-    odom.child_frame_id = child_frame_id;
 
-    odom.pose.pose.position.x = easting;
-    odom.pose.pose.position.y = northing;
+//  if(parameter)
+//  { odom.pose.pose.position.x = easting;
+//    odom.pose.pose.position.y = northing;}
+//  else
+//  { odom.pose.pose.position.x = easting - 319000;
+//    odom.pose.pose.position.y = northing - 4151000; }
+
     odom.pose.pose.position.z = fix->altitude;
     
     odom.pose.pose.orientation.x = 0;
@@ -78,13 +98,11 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
 int main (int argc, char **argv) {
   ros::init(argc, argv, "utm_odometry_node");
-  ros::NodeHandle node;
   ros::NodeHandle priv_node("~");
-
-  priv_node.param<std::string>("frame_id", frame_id, "");
-  priv_node.param<std::string>("child_frame_id", child_frame_id, "");
+  ros::NodeHandle node;
+//  priv_node.param<std::string>("frame_id", frame_id, "");
+//  priv_node.param<std::string>("child_frame_id", child_frame_id, "");
   priv_node.param<double>("rot_covariance", rot_cov, 99999.0);
-
   odom_pub = node.advertise<nav_msgs::Odometry>("vo", 10);
 
   ros::Subscriber fix_sub = node.subscribe("fix", 10, callback);

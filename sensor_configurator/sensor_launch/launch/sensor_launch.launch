@@ -3,9 +3,10 @@
     args="/dev/ttyUSB0 10"/>
 
  <node pkg="imu" type="imu_main" name="imu_main"
-   args="/dev/ttyUSB2 12"/>
+   args="/dev/ttyUSB1 10"/>
 
- <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB1 38400"/>
+ <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
  <include file="$(find gps_common)/launch/LL_UTM.launch"/>
 
+ <include file="$(find lms1xx)/launch/LMS1xx.launch"/>
 </launch>
