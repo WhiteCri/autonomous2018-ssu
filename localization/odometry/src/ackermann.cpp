@@ -37,10 +37,11 @@ void Odometry::init(const ros::Time &time)
     pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
     /*    init odom    */
     odom_.header.stamp = time;
-    odom_.header.frame_id = "odom";
+    odom_.header.frame_id = "odom_raw";
     odom_.child_frame_id = "base_link";
     /*     init tf     */
-    odom_trans_.header.frame_id = "odom";
+    odom_trans_.header.stamp = time;
+    odom_trans_.header.frame_id = "odom_raw";
     odom_trans_.child_frame_id = "base_link";
 }
 
@@ -112,8 +113,6 @@ void Odometry::Odom_Set(const ros::Time& time)
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
     
     odom_.header.stamp = time;
-    odom_.header.frame_id = "odom";
-    odom_.child_frame_id = "base_link";
 
     boost::array<double, 36> covariance = {{
     TRANS_COV, 0, 0, 0, 0, 0,
@@ -142,8 +141,6 @@ void Odometry::Odom_Transform(const ros::Time& time)
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
          
     odom_trans_.header.stamp = time;
-    odom_trans_.header.frame_id = "odom";
-    odom_trans_.child_frame_id = "base_link";    
     odom_trans_.transform.translation.x = x_;
     odom_trans_.transform.translation.y = y_;
     odom_trans_.transform.translation.z = 0.0;
