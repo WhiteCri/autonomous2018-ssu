@@ -5,5 +5,9 @@
     <include file="$(find robot_pose_ekf)/robot_pose_ekf.launch"/>
     <node pkg="imu_maker" type="imu_maker" name="imu_maker"/>
     <include file="$(find platform_static_tf)/launch/robot_setup.launch"/>
-    <include file="$(find gmapping)/launch/global_autonomous2018.launch"/>
+    <!--include file="$(find gmapping)/launch/global_autonomous2018.launch"/-->
+
+    <arg name="map_file" default="$(find globalmap_example)/third_1.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
 </launch>
