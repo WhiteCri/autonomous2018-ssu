@@ -2,12 +2,13 @@
 
 
 #define PI 3.141592
-#define IGNORE_STEER 0.001 // IGNORE_STEER 이하의 각도[deg]에서는 직진으로 odometry 계산(singularity point 때문에)
+#define IGNORE_STEER_LOWER 0.0001 * (PI/180.0)
+#define IGNORE_STEER_UPPER 20.0 * (PI/180.0)
 #define TIME_NEER_ZERO 0.0001
 #define CURVATURE_NEER_ZERO 0.0001
-#define STEER_PLATFORM_TO_RAD 1/100.0*(PI/180.0)
+#define STEER_PLATFORM_TO_RAD 20.0/2000.0*(PI/180.0)
 #define TIME_GAIN 1.0
-#define TRANS_COV 5.0
+#define TRANS_COV 3.0
 #define ROT_COV 99999.0
 
 namespace odometry_ackermann{
@@ -19,7 +20,8 @@ Odometry::Odometry()
     , steering_(0.0)
     , heading_(0.0)
     , curvature_(0.0)
-    , ignore_(0.0)
+    , ignore_low_(0.0)
+    , ignore_up_(0.0)
     , ds_(0.0)
     , dth_(0.0)
     , dx_(0.0)
@@ -31,63 +33,51 @@ Odometry::Odometry()
 
 void Odometry::init(const ros::Time &time)
 {
-    ROS_INFO("OdomINIT START!");
     timestamp_ = time;
     pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
-    //init odom
-    odom.header.stamp = time;
-    odom.header.frame_id = "odom"; // "odom"
-    odom.child_frame_id = "base_link";
-    //init tf
-    odom_trans.header.frame_id = "odom"; // "odom"
-    odom_trans.child_frame_id = "base_link";
-    
-    ROS_INFO("OdomINIT FINISHED!");
+    /*    init odom    */
+    odom_.header.stamp = time;
+    odom_.header.frame_id = "odom";
+    odom_.child_frame_id = "base_link";
+    /*     init tf     */
+    odom_trans_.header.frame_id = "odom";
+    odom_trans_.child_frame_id = "base_link";
 }
 
 
 
 void Odometry::callback(const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data)
-{  
-    ROS_INFO("OdomCallback START!");
+{         
+    ros::Time time = ros::Time::now(); // 현재 주기의 시간 측정 (Odometry Loop의 주기 측정 -> dt -> Odometry 계산)
 
-    //tf::TransformBroadcaster odom_broadcaster;                     // tf broadcast
-    //nav_msgs::Odometry odom;                                       // publish할 odometry
-    //geometry_msgs::TransformStamped odom_trans;                    // tf으로 날릴 odometry transform
-       
-    /*---  Odometry Loop의 주기 측정 -> dt -> Odometry 계산  ---*/   
-    ros::Time time = ros::Time::now();                             // 현재 주기의 시간 측정
-    
+    Calc_Odom(PlatformRX_data, time);  // odometry 계산
+   
+    Odom_Transform(time);              // odometry transform 계산
 
-    Calc_Odom(PlatformRX_data, time);                              // odometry 계산
-    Odom_Transform(time);                              // odometry transform 계산
-    //odom_broadcaster.sendTransform(odom_trans);                    // tf에 odometry transform을 broadcast
-
-    Odom_Set(time);                                          // odometry 정보 입력
-    
-    //pub_.publish(odom);                                            // odometry 메세지 publish
-    ROS_INFO("OdomCallback FINISHED!");
+    Odom_Set(time);                    // odometry 정보 입력
 }
 
 bool Odometry::Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data,
                          const ros::Time& time)
 {
-    ROS_INFO("OdomCalc STARTS!");
     const double dt = (time - timestamp_).toSec();                  // Calc_Odom 함수가 호출되는 주기 계산 dt
     timestamp_ = time;                                              // timestamp 갱신
     
     velocity_ = PlatformRX_data->speed;
-    steering_ = PlatformRX_data->steer/STEER_PLATFORM_TO_RAD;
-    
-    //TEST
-    //velocity_ = 1;
-    //steering_ = PI/6;
+    steering_ = PlatformRX_data->steer * STEER_PLATFORM_TO_RAD;
 
     nh_.getParam("wheelbase", wheelbase_);
     curvature_ = wheelbase_ / cos( PI/2 - steering_ );
-    ignore_    = wheelbase_ / cos( PI/2 - IGNORE_STEER*(PI/180) );   
-       
-    if(fabs(curvature_) > CURVATURE_NEER_ZERO && fabs(curvature_) < ignore_){
+    
+    /*     curvature 범위 설정 (일종의 필터)    */
+    //ignore_low_    = wheelbase_ / cos( PI/2 - IGNORE_STEER_LOWER );
+    //ignore_up_     = wheelbase_ / cos( PI/2 - IGNORE_STEER_UPPER );   
+    
+    //ROS_INFO("Max: %lf", ignore_low_);
+    ROS_INFO("Curvature: %lf [m]", curvature_);
+    //ROS_INFO("Min: %lf", ignore_up_);
+
+    //if(fabs(curvature_) > ignore_up_ && fabs(curvature_) < ignore_low_){
         ds_ = velocity_ * dt * TIME_GAIN;
         dth_ = ds_ / curvature_;
         const double x_curvature = curvature_ * sin(dth_);
@@ -99,41 +89,31 @@ bool Odometry::Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& Platf
         x_ += dx_;
         y_ += dy_;
         heading_ += dth_;
-    }
-    else{
-        ds_ = velocity_ * dt;
-        dth_ = 0.0;
-        dx_ = ds_;
-        dy_ = 0.0;
-        x_ += dx_;
-        y_ += dy_;
-        heading_ += dth_;
-    }
-
+    //}
+    //else{
+    //    ds_ = velocity_ * dt;
+    //    dth_ = 0.0;
+    //    dx_ = ds_;
+    //    dy_ = 0.0;
+    //    x_ += dx_;
+    //    y_ += dy_;
+    //    heading_ += dth_;
+    //}
     
     if (dt < TIME_NEER_ZERO)
         return false;
     else
         return true;
-    ROS_INFO("OdomCalc FINISHED!");
 }
+
 
 void Odometry::Odom_Set(const ros::Time& time)
 {
-    ROS_INFO("OdomSet STARTS!");
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
     
-    odom.header.stamp = time;
-    odom.header.frame_id = "odom"; // "odom"
-    odom.pose.pose.position.x = x_;
-    odom.pose.pose.position.y = y_;
-    odom.pose.pose.position.z = 0.0;
-    odom.pose.pose.orientation = odom_quat;
-    odom.child_frame_id = "base_link";
-    odom.twist.twist.linear.x = dx_;
-    odom.twist.twist.linear.y = dy_;
-    odom.twist.twist.angular.z = dth_;
-    ROS_INFO("OdomSet FINISHED!");
+    odom_.header.stamp = time;
+    odom_.header.frame_id = "odom";
+    odom_.child_frame_id = "base_link";
 
     boost::array<double, 36> covariance = {{
     TRANS_COV, 0, 0, 0, 0, 0,
@@ -144,29 +124,40 @@ void Odometry::Odom_Set(const ros::Time& time)
     0, 0, 0, 0, 0, ROT_COV
     }};
 
-    odom.pose.covariance = covariance;
-
+    odom_.pose.pose.position.x = x_;
+    odom_.pose.pose.position.y = y_;
+    odom_.pose.pose.position.z = 0.0;
+    odom_.pose.pose.orientation = odom_quat;
+    odom_.pose.covariance = covariance;
+    
+    odom_.twist.twist.linear.x = dx_;
+    odom_.twist.twist.linear.y = dy_;
+    odom_.twist.twist.angular.z = dth_;
+    //odom_.twist.covariance = covariance;
 }
+
 
 void Odometry::Odom_Transform(const ros::Time& time)
 {   
-    ROS_INFO("OdomTransform STARTS!");
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
          
-    odom_trans.header.stamp = time;
-    odom_trans.header.frame_id = "odom"; // "odom"
-    odom_trans.child_frame_id = "base_link";    
-    odom_trans.transform.translation.x = x_;
-    odom_trans.transform.translation.y = y_;
-    odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.rotation = odom_quat;
-    ROS_INFO("OdomTransform FINISHED!");
+    odom_trans_.header.stamp = time;
+    odom_trans_.header.frame_id = "odom";
+    odom_trans_.child_frame_id = "base_link";    
+    odom_trans_.transform.translation.x = x_;
+    odom_trans_.transform.translation.y = y_;
+    odom_trans_.transform.translation.z = 0.0;
+    odom_trans_.transform.rotation = odom_quat;
 }
 
+
 void Odometry::sendTransform(){
-    odom_broadcaster.sendTransform(odom_trans);
+    odom_broadcaster_.sendTransform(odom_trans_);
 }
+
+
 void Odometry::publish(){
-    pub_.publish(odom);
+    pub_.publish(odom_);
 }
+
 }

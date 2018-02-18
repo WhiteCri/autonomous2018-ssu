@@ -10,7 +10,7 @@
 #define PI 3.141592
 #define R_COVAR 99999.0
 #define P_COVAR 99999.0
-#define Y_COVAR 1000.0
+#define Y_COVAR 0.5
 #define DEG2RAD PI/180.0
 
 static ros::Publisher pub_imu;
