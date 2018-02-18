@@ -1,5 +1,5 @@
 <launch>
-    <node pkg="odometry" type="odom_pub" name="odom_pub" output="screen"/>
+    <node pkg="odometry" type="odom_pub" name="odom_pub"/>
     <param name="wheelbase" value="1.0"/>
 </launch>
 
