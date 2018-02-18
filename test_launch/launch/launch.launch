@@ -9,5 +9,5 @@
 
     <arg name="map_file" default="$(find globalmap_example)/third_1.yaml"/>
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
-
+    <include file="$(find amcl)/launch/amcl.launch"/>
 </launch>
