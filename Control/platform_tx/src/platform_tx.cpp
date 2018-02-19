@@ -4,10 +4,11 @@
 #include "platform_rx_msg/platform_rx_msg.h"
 #include <deque>
 
-
+#define frequency 10
 #define TX_PACKET_LENGTH 14
 #define ackermannTopicName "whereeeeeeee"
 
+#define TX_DEBUG
 //rx log variable
 std::deque<platform_rx_msg::platform_rx_msg> rxMsgdeq(10);
 
@@ -21,8 +22,8 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
     packet[1] = static_cast<uint8_t>(0x54);
     packet[2] = static_cast<uint8_t>(0x58);
     //manual OR auto. 0x00 - manual/0x01 - auto
-    packet[3] = static_cast<uint8_t>(0x1);
-    //estop ON. 0x01 - off/0x00 - on
+    packet[3] = static_cast<uint8_t>(0x01);
+    //estop. 0x00 - off/0x01 - on
     packet[4] = static_cast<uint8_t>(0x00);
     
     /*  gear
@@ -30,25 +31,30 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
         0x01 : neutral
         0x02 : backward
     */
-    if(msg->drive.speed >= 0 )
+    //if(msg->drive.speed >= 0 )
         packet[5] = static_cast<uint8_t>(0x00);
-    else packet[5] = static_cast<uint8_t>(0x02);
+    //else packet[5] = static_cast<uint8_t>(0x02);
 
 //  //speed. should put value (KPH * 10);
     //1 m/s = 3.6 kph
-    uint16_t serialSpeed = msg->drive.speed * 3.6 * 10;
-    *(uint16_t*)(packet + 6) = static_cast<uint16_t>(serialSpeed);
-
+    //uint16_t serialSpeed = msg->drive.speed * 3.6 * 10;
+    //*(uint16_t*)(packet + 6) = static_cast<uint16_t>(0x10);
+    /*
+        떠있는 상태에서 플랫폼 테스트->10정도가 적당함
+        바닥면과 닿아있을때 : 테스트 필요. 분명한건 이건 쓰레기야..
+    */
+    *(uint16_t*)(packet + 7) = static_cast<uint16_t>(0x0);
+    
 //  //steer. should put value (actual steering degree * 71)
-    uint16_t serialSteeringAngle = msg->drive.steering_angle * 71;
-    *(uint16_t*)(packet + 8) = static_cast<uint16_t>(serialSteeringAngle * 71);
+    //uint16_t serialSteeringAngle = msg->drive.steering_angle * 71;
+    *(uint16_t*)(packet + 8) = static_cast<uint16_t>(0x1000);
 
-//  //brake. low number is low braking. 1 ~ 33
-    packet[10] = static_cast<uint8_t>(0x01);
-
-    alive = (alive + 1) % 256;
+//  //brake. low number is low braking. 1 ~ 200
+    packet[10] = static_cast<uint8_t>(1);
     packet[11] = static_cast<uint8_t>(alive);//alive
+    
     packet[12] = static_cast<uint8_t>(0x0D);//0x0D
+    alive = (alive + 1) % 256;
     packet[13] = static_cast<uint8_t>(0x0A);//0x0A
 }
 //for pid. I'm not sure but maybe this will be needed in the future
@@ -70,10 +76,11 @@ void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
 int main(int argc, char *argv[]){
     ros::init(argc, argv, "platform_tx");
     ros::NodeHandle nh;
+        ROS_INFO("control..");
 
     //subscribe rx msg
-    ros::Subscriber sub = nh.subscribe(ackermannTopicName, 100, &ackermannCallBack_);
-
+    //ros::Subscriber sub = nh.subscribe(ackermannTopicName, 100, &ackermannCallBack_);
+    
     //open serial
     serial::Serial *ser = new serial::Serial();
     ser->setPort(argv[1]);
@@ -82,15 +89,26 @@ int main(int argc, char *argv[]){
     ser->setTimeout(to);
     ser->open();
     if(!ser->isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,"ser.isOpen() error!");
+        ROS_INFO("control..");
 
-    //ros::spin();
-    
+#ifndef TX_DEBUG
+    ros::spin();
+#else
     //for tx debuging
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(50);
+    //5hz->9.75
+    //10hz->9.95
+    //15hz->9.56
+    //20hz->9.68
+    //50hz->9.02
     while(true){
+        ROS_INFO("control..");
         ackermann_msgs::AckermannDriveStamped::ConstPtr msg;
         createSerialPacket(msg);
-        ser->write(packet, TX_PACKET_LENGTH);    
+        ROS_INFO("write : %ld",ser->write(packet, TX_PACKET_LENGTH));
+        for(int i = 0 ; i < TX_PACKET_LENGTH;++i)
+            ROS_INFO("[%d] : %#x",i,packet[i]);
         loop_rate.sleep();
     }
+#endif
 }
