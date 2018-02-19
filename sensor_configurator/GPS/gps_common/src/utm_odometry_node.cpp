@@ -9,17 +9,37 @@
 #include <sensor_msgs/NavSatFix.h>
 #include <gps_common/conversions.h>
 #include <nav_msgs/Odometry.h>
+#include "nmea_navsat_driver/MyMsg.h"
+#include <geometry_msgs/Quaternion.h>
+#include <tf/transform_datatypes.h>
+#include "gps_common/Initial_UTM.h"
 
 using namespace gps_common;
+
 static double base_longitude = 126.7689;
 static double base_latitude = 37.2323;
 static ros::Publisher odom_pub;
-//std::string frame_id, child_frame_id;
+std::string frame_id, child_frame_id;
 static double rot_cov;
 //
 static double easting_shift, northing_shift;
 //
+static double x,y,z,w;
+static bool parameter;
 
+static class Initial Initpose;
+
+void callback2(const nmea_navsat_driver::MyMsgPtr& GPSmsg)
+{
+  ros::NodeHandle node;
+  geometry_msgs::Quaternion q = tf::createQuaternionMsgFromYaw(GPSmsg->Course);
+
+  x = q.x;
+  y = q.y;
+  z = q.z;
+  w = q.w;
+  
+}
 void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
   ros::NodeHandle node;
   if (fix->status.status == sensor_msgs::NavSatStatus::STATUS_NO_FIX) {
@@ -33,8 +53,6 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
 
   double northing, easting;
   std::string zone;
-//  bool parameter;
-//  node.getParam("GPS_Odometry_initial",parameter);
 
   LLtoUTM(fix->latitude, fix->longitude, northing, easting, zone);
 
@@ -42,34 +60,37 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
     nav_msgs::Odometry odom;
     odom.header.stamp = fix->header.stamp;
 
-//    if (frame_id.empty())
-//      odom.header.frame_id = fix->header.frame_id;
-//    else
-//    
-    odom.header.frame_id = "gps";
-//
-//
-    odom.child_frame_id = "base_link";
-    node.getParam("/gps/easting_shift", easting_shift);   // easting_shift 됨값 세팅해주면 됨
-    node.getParam("/gps/northing_shift", northing_shift); // northing_shift 값 세팅해주면 됨
-    odom.pose.pose.position.x = easting - easting_shift;
-    odom.pose.pose.position.y = northing - northing_shift;
-//
+    if (frame_id.empty())
+      odom.header.frame_id = fix->header.frame_id;
+    else    
+      odom.header.frame_id = frame_id;
 
+  
+    if(!Initpose.testExist())
+    {
+      Initpose.input(easting, northing);
+    }
+    else
+    {
+     node.getParam("GPS_Odometry_initial",parameter);
+     Initpose.paraminput(parameter);
+     node.setParam("GPS_Odometry_initial",false);
+    }
 
-//  if(parameter)
-//  { odom.pose.pose.position.x = easting;
-//    odom.pose.pose.position.y = northing;}
-//  else
-//  { odom.pose.pose.position.x = easting - 319000;
-//    odom.pose.pose.position.y = northing - 4151000; }
-
+    odom.child_frame_id = child_frame_id;
+ //   node.getParam("/gps/easting_shift", easting_shift);   // easting_shift 됨값 세팅해주면 됨
+ //   node.getParam("/gps/northing_shift", northing_shift); // northing_shift 값 세팅해주면 됨
+    odom.pose.pose.position.x = easting - Initpose.getX();
+    odom.pose.pose.position.y = northing - Initpose.getY();
     odom.pose.pose.position.z = fix->altitude;
     
-    odom.pose.pose.orientation.x = 0;
-    odom.pose.pose.orientation.y = 0;
-    odom.pose.pose.orientation.z = 0;
-    odom.pose.pose.orientation.w = 1;
+    ros::Subscriber GPS_sub = node.subscribe("raw/GPS",10,callback2);
+    ros::spinOnce();
+
+    odom.pose.pose.orientation.x = x;
+    odom.pose.pose.orientation.y = y;
+    odom.pose.pose.orientation.z = z;
+    odom.pose.pose.orientation.w = w;
     
     // Use ENU covariance to build XYZRPY covariance
     boost::array<double, 36> covariance = {{
@@ -96,17 +117,18 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
   }
 }
 
+
 int main (int argc, char **argv) {
   ros::init(argc, argv, "utm_odometry_node");
   ros::NodeHandle priv_node("~");
   ros::NodeHandle node;
-//  priv_node.param<std::string>("frame_id", frame_id, "");
-//  priv_node.param<std::string>("child_frame_id", child_frame_id, "");
+  priv_node.param<std::string>("frame_id", frame_id, "odom_combined");
+  priv_node.param<std::string>("child_frame_id", child_frame_id, "base_link");
   priv_node.param<double>("rot_covariance", rot_cov, 99999.0);
   odom_pub = node.advertise<nav_msgs::Odometry>("vo", 10);
 
   ros::Subscriber fix_sub = node.subscribe("fix", 10, callback);
-
+  ros::Subscriber GPS_sub = node.subscribe("raw/GPS",10,callback2);
   ros::spin();
 }
 
