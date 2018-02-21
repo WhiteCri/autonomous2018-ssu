@@ -264,8 +264,8 @@ int main (int argc, char** argv){
             ROS_INFO("steering : %hd",msg.steer);
             for(int i = 0 ; i < 18; ++i)
                 msg.raw.push_back(dataArray[i]);
-            for(int i = 0 ; i < 18; ++i)
-                ROS_INFO("[%d] : %#x",i,msg.raw[i]);
+           // for(int i = 0 ; i < 18; ++i)
+           //     ROS_INFO("[%d] : %#x",i,msg.raw[i]);
         #endif
         pub.publish(msg);
         loop_rate.sleep();
