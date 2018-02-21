@@ -97,19 +97,24 @@ void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
 }
 
 int main(int argc, char *argv[]){
+    if(argc < 2){
+        ROS_ERROR("give me [path]");
+        return -1;
+    }
     ros::init(argc, argv, "platform_tx");
     ros::NodeHandle nh;
     
     ros::Subscriber sub = nh.subscribe(ACKERMANN_TOPIC_NAME, 100, &ackermannCallBack_);
     
     //open serial
-    serial::Serial *ser = new serial::Serial();
+    ser = new serial::Serial();
     ser->setPort(argv[1]);
     ser->setBaudrate(115200);
     serial::Timeout to = serial::Timeout::simpleTimeout(1000);
     ser->setTimeout(to);
     ser->open();
     if(!ser->isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,"ser.isOpen() error!");
+    ROS_INFO("serial setting done");
     
     ros::Rate loop_rate(FREQUENCY);
     
