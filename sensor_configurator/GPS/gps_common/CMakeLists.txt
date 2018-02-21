@@ -29,6 +29,7 @@ add_message_files(
     GPSFix.msg
 )
 
+
 generate_messages(DEPENDENCIES 
   nav_msgs
   sensor_msgs
@@ -76,3 +77,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 catkin_install_python(PROGRAMS nodes/fix_translator
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+
+
