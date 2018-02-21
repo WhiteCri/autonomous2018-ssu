@@ -43,8 +43,7 @@ public:
      <Calc_Odom 함수>
         Car-like Robot의 Odometry를 계산수
     */
-    bool Calc_Odom(
-                   const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data,
+    bool Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data,
                    const ros::Time& time);
 
 
@@ -64,22 +63,38 @@ public:
     void Odom_Transform(const ros::Time& time);
 
 
+
+    /*
+     <sendTransform 함수>
+        odom_trans_를 broadcast하는 함수 (sendTransform)
+    */
     void sendTransform();
+
+
+
+    /*
+     <publish 함수>
+        odom_를 publish하는 함수
+    */
     void publish();
 
-    /*---  topic(sub/pub)관련 객체 선언 및 Odometry Calculation에 이용할 변수 선언  ---*/
-    private:
-        ros::NodeHandle nh_;
-        ros::Publisher pub_;
-        ros::Subscriber sub_;
-        ros::Time timestamp_;
-    
-        double wheelbase_, curvature_, ignore_;
-        double velocity_, steering_, heading_;
-        double ds_, dth_, dx_, dy_, x_, y_;
 
-        tf::TransformBroadcaster odom_broadcaster;                     // tf broadcast
-        nav_msgs::Odometry odom;                                       // publish할 odometry
-        geometry_msgs::TransformStamped odom_trans;                    // tf으로 날릴 odometry transform
+
+
+/*---  topic(sub/pub)관련 객체 선언 및 Odometry Calculation에 이용할 변수 선언  ---*/
+private:
+    ros::NodeHandle nh_;
+    ros::Publisher pub_;
+    ros::Subscriber sub_;
+    ros::Time timestamp_;
+    
+    tf::TransformBroadcaster odom_broadcaster_;       // tf broadcast
+    nav_msgs::Odometry odom_;                         // publish할 odometry
+    geometry_msgs::TransformStamped odom_trans_;      // tf으로 날릴 odometry transform
+
+    double wheelbase_, curvature_, ignore_up_, ignore_low_;
+    double velocity_, steering_, heading_;
+    double ds_, dth_, dx_, dy_, x_, y_;
+
 };
 }   

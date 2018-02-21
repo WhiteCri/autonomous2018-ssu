@@ -1,0 +1,10 @@
+<launch>
+
+<node pkg="gps_shifter" type="gps_shifter" name="gps_shifter"/>
+  <param name="gps/easting_shift" value="319450"/>
+  <param name="gps/northing_shift" value="4151870"/>
+  <param name="use_sim_time" value="true"/>
+  <param name="wheelbase" value="1.0"/>
+
+
+</launch>
