@@ -27,7 +27,10 @@ Odometry::Odometry()
     , dx_(0.0)
     , dy_(0.0)
     , x_(0.0)
-    , y_(0.0){}
+    , y_(0.0)
+{
+    nh_.getParam("odom_init_heading",heading_);
+}
 
 
 
