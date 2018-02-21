@@ -32,14 +32,6 @@ T getParsingData(const uint8_t *dataArray, int startIndex){
     return re_;
 }
 
-template <typename __T>
-bool isDataInBound(__T value_cur, __T value_past, __T bound){
-    if((value_past - bound) < value_cur && value_cur < (value_past + bound))
-        return true;
-    else return false;
-}
-
-
 serial::Serial *getSerial(const char* path_, int baudrate_){
     serial::Serial *ser = new serial::Serial();
 
@@ -54,14 +46,6 @@ serial::Serial *getSerial(const char* path_, int baudrate_){
 
 static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
-
-inline double calcErrorSpeed(std::deque<std::pair<EncoderDataType,bool> >& encoder, double speed){
-    encoder[0].first = encoder[1].first + encoder[1].first - encoder[2].first;
-    double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
-    double re_speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
-        / timeInterval;
-    return re_speed;
-}
 
 inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double past){
     double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
@@ -237,23 +221,16 @@ int main (int argc, char** argv){
 
         past.encoder.emplace_front(encoderData, !encoderErrorFlag);
         past.encoder.pop_back();
-        if(encoderErrorFlag == false)
-            msg.speed = calcSpeed(past.encoder, past.speed);
-        else
-            msg.speed = calcErrorSpeed(past.encoder, past.speed);
+        msg.speed = calcSpeed(past.encoder, past.speed);
         past.speed = msg.speed;
         
         //brake
         uint8_t brakeData = getParsingData<uint8_t>(dataArray,BrakeIndex);
-        //msg.brake = isDataInBound<int8_t>(brakeData, past.brake, BrakeBound) ?
-        //    brakeData : past.brake;
         msg.brake = brakeData;
         past.brake = msg.brake;
 
         //steer
         int16_t steeringData = getParsingData<uint16_t>(dataArray,SteerIndex);
-        //msg.steer = isDataInBound<int16_t>(steeringData, past.steer, SteerBound) ?
-        //    steeringData : past.steer;
         msg.steer = steeringData;
         past.steer = msg.steer;
 
