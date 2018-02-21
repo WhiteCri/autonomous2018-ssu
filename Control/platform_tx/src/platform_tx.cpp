@@ -7,6 +7,7 @@
 #define FREQUENCY 50
 #define TX_PACKET_LENGTH 14
 #define ACKERMANN_TOPIC_NAME "platform_tx_test"
+#define ALIGNMENT_BIAS 150
 
 //#define TX_DEBUG
 
@@ -65,7 +66,7 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
     *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
     
 //  //steer. should put value (actual steering degree * 71)
-    int16_t serialSteeringAngle = -msg->drive.steering_angle * ANGLE_TO_SERIAL_VALUE;
+    int16_t serialSteeringAngle = -msg->drive.steering_angle * ANGLE_TO_SERIAL_VALUE + ALIGNMENT_BIAS;
     checkSteeringBound(serialSteeringAngle);
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
@@ -115,7 +116,7 @@ int main(int argc, char *argv[]){
     ser->open();
     if(!ser->isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,"ser.isOpen() error!");
     ROS_INFO("serial setting done");
-    
+
     ros::Rate loop_rate(FREQUENCY);
     
 #ifndef TX_DEBUG
