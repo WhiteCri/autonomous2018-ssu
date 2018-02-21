@@ -234,6 +234,9 @@ int main (int argc, char** argv){
         msg.steer = steeringData;
         past.steer = msg.steer;
 
+        //seq
+        msg.seq = cnt;
+
         #ifdef MY_DEBUG_FLAG
             ROS_INFO("[%ld]encoder : %d",cnt, past.encoder[0].first);
             ROS_INFO("speed : %lf",msg.speed);
