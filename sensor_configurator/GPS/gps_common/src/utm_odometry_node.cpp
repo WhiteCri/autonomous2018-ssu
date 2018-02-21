@@ -82,7 +82,7 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
  //   node.getParam("/gps/northing_shift", northing_shift); // northing_shift 값 세팅해주면 됨
     odom.pose.pose.position.x = easting - Initpose.getX();
     odom.pose.pose.position.y = northing - Initpose.getY();
-    odom.pose.pose.position.z = fix->altitude;
+    odom.pose.pose.position.z = 0;
     
     ros::Subscriber GPS_sub = node.subscribe("raw/GPS",10,callback2);
     ros::spinOnce();

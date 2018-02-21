@@ -1,9 +1,7 @@
-#include <ros/ros.h>
-#include <string>
-#include <sstream>
-#include <geometry_msgs/Quaternion.h>
-#include <tf/transform_broadcaster.h>
+
 #include "IMUConfigurator.h"
+
+
 
 std::string IMUConfigurator::parse()
 {
@@ -65,10 +63,31 @@ imu::imu_msgs IMUConfigurator::RPY(std::string parse, ros::NodeHandle nh)
             
         //ROS_INFO("%.2f",imu_msg.Roll);
         //ROS_INFO("%.2f",imu_msg.Pitch);
+        double angle;
+        nh.getParam("IMU_Param",angle);
+        yaw += angle;
+        ROS_INFO("%lf",angle);
         ROS_INFO("%.2f",yaw);
 
         ROS_INFO("---------");  
         imu::imu_msgs msg;
+        
         msg.yaw = yaw;
         return msg;
+}
+sensor_msgs::Imu IMUConfigurator::transform(double yaw)
+{ 
+    geometry_msgs::Quaternion quaternion = tf::createQuaternionMsgFromYaw( - yaw  * DEG2RAD );
+    
+    boost::array<double, 9> covariance = {{
+    R_COVAR, 0, 0,
+    0, P_COVAR, 0,
+    0, 0, Y_COVAR
+    }};
+
+    imu_msg.header.frame_id = "base_link";
+    imu_msg.header.stamp = ros::Time::now();
+    imu_msg.orientation = quaternion;
+    imu_msg.orientation_covariance = covariance;
+    return imu_msg;
 }

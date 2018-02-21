@@ -1,11 +1,9 @@
-#include <ros/ros.h>
-#include <iostream>
 #include "IMUConfigurator.h"
-#include "imu/imu_msgs.h"
+
 int main(int argc, char **argv){
     ros::init(argc, argv, "imu_main");
     ros::NodeHandle nh;
-    ros::Publisher pub = nh.advertise<imu::imu_msgs>("raw/imu",100);
+    ros::Publisher pub_imu = nh.advertise<sensor_msgs::Imu>("raw/imu",100);
     
     IMUConfigurator imu;
 
@@ -19,12 +17,15 @@ int main(int argc, char **argv){
     }
 
     int fre = atoi(argv[2]);
+
     ros::Rate loop_rate(fre);
     imu::imu_msgs msg;
+    sensor_msgs::Imu imumsg;
 
     while(ros::ok()){
-        msg = imu.RPY(imu.parse(), nh);
-        pub.publish(msg);
+        msg = imu.RPY(imu.parse(),nh);
+        imumsg = imu.transform(msg.yaw);
+        pub_imu.publish(imumsg);
         loop_rate.sleep();
     }
 

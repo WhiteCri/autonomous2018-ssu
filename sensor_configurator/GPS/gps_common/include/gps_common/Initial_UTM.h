@@ -1,5 +1,3 @@
-
-
 class Initial{
     public:
         Initial():Exist(false),X(0),Y(0) {};
