@@ -4,7 +4,7 @@
 #include "platform_rx_msg/platform_rx_msg.h"
 #include <deque>
 
-#define FREQUENCY 10
+#define FREQUENCY 50
 #define TX_PACKET_LENGTH 14
 #define ACKERMANN_TOPIC_NAME "platform_tx_test"
 
@@ -12,8 +12,8 @@
 
 
 
-
-
+#define ANGLE_TO_SERIAL_VALUE 71.0
+#define MAX_STEERING_VALUE 1900
 
 //rx log variable
 std::deque<platform_rx_msg::platform_rx_msg> rxMsgdeq(10);
@@ -21,6 +21,23 @@ std::deque<platform_rx_msg::platform_rx_msg> rxMsgdeq(10);
 //serial
 serial::Serial *ser;
 uint8_t packet[TX_PACKET_LENGTH] = {};
+
+inline void checkSpeedBound(uint16_t& serialSpeed){
+    if(serialSpeed <= 200) return;
+    else serialSpeed = 200;
+}
+
+inline void checkBrakeBound(uint16_t& serialBrake){
+    if(serialBrake <= 200) return;
+    else serialBrake = 200;
+}
+
+inline void checkSteeringBound(int16_t& serialSteeringAngle){
+    if(serialSteeringAngle < -MAX_STEERING_VALUE)
+        serialSteeringAngle = MAX_STEERING_VALUE;
+    else if(serialSteeringAngle > MAX_STEERING_VALUE)
+        serialSteeringAngle = MAX_STEERING_VALUE;
+}
 
 void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
     static uint8_t alive = 0;
@@ -43,21 +60,24 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
 
 //  //speed. should put value (KPH * 10);
     //1 m/s = 3.6 kph
-    int16_t serialSpeed = abs(msg->drive.speed * 3.6 * 10);
+    uint16_t serialSpeed = abs(msg->drive.speed * 3.6 * 10);
+    checkSpeedBound(serialSpeed);
     *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
     
 //  //steer. should put value (actual steering degree * 71)
-    int16_t serialSteeringAngle = -msg->drive.steering_angle * 71;
+    int16_t serialSteeringAngle = -msg->drive.steering_angle * ANGLE_TO_SERIAL_VALUE;
+    checkSteeringBound(serialSteeringAngle);
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
     
 
 //  //brake. low number is low braking. 1 ~ 200
     packet[10] = static_cast<uint8_t>(1);
+    //checkBrakeBound()
+
     packet[11] = static_cast<uint8_t>(alive);//alive
-    
-    packet[12] = static_cast<uint8_t>(0x0D);//0x0D
     alive = (alive + 1) % 256;
+    packet[12] = static_cast<uint8_t>(0x0D);//0x0D
     packet[13] = static_cast<uint8_t>(0x0A);//0x0A
 }
 //for pid. I'm not sure but maybe this will be needed in the future
