@@ -1,4 +1,3 @@
 <launch>
     <include file="$(find odometry)/launch/odometry.launch"/>
-    <include file="$(find robot_pose_ekf)/robot_pose_ekf.launch"/>
 </launch>
