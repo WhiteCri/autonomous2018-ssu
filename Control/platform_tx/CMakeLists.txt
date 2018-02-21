@@ -31,3 +31,15 @@ add_dependencies(platform_tx
 target_link_libraries(platform_tx
   ${catkin_LIBRARIES}
 )
+
+add_executable(ackermann_pub
+  src/ackermann_pub.cpp
+)
+
+add_dependencies(ackermann_pub
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(ackermann_pub
+  ${catkin_LIBRARIES}
+)
