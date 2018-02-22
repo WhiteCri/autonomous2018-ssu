@@ -8,16 +8,52 @@
   - rviz view
  -->
 
+ <!-- 
+	1. TF broadcaster node (robot_setup)
+	2. sensor nodes (gps, camera, lidar, imu, platform(RX/TX))
+	3. ekf pose estimation node (odometry publisher node)
+	4. AMCL
+		-amcl_params.yaml
+	5. map server node
+	6. move_base node (global/local planner 세팅) → 얘가 메인으로 여기에 plugin형태로 planner 설정
+		- local_costmap_params.yaml
+	 	- global_costmap_params.yaml
+		- teb_local_planner_params.yaml
+		(여기 3개의 .yaml파일에서 footprint 입력 가능)
+		
+	<param name="base_global_planner" value="global_planner/GlobalPlanner" />
+	<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />	
+
+	*** 추가(참고) ***
+	Topic 명이 다른 경우,
+	<remap form=’원래 토픽이름’to=’원하는 토픽이름’>  으로 mapping가능
+
+
+-->
+
 
 <launch>
  	<!--  ************** Robot Coordinate System (tf nodes) 차량좌표계 설정 (정확한 마운트 후 수정 필요, 그 이후 건들 필요 없음) ***************  -->
+	 	<!--
+		해야할일(18.2.12 기준)
+			1. map - odom_combined - base_footprint - base_link 순으로 tf 수정해야 함
+			2. odom 관련 covariance 세팅 (#define으로 해놓았음)
+			3. footprint (static_tf)
+			4. robot_pose_ekf package에서 IMU를 off하면 orientation이 아예 안바뀜 -> 어떻게 할 지 생각해야 함
+		-->
+	<!--node pkg="platform_static_tf"  type="move_base"  name="move_base" /-->
+
+<!--
 	<node pkg="tf" type="static_transform_publisher" name="camera_main_tf"  args="-1 0 0 0 0 0 base_link camera_main 100" />
 	<node pkg="tf" type="static_transform_publisher" name="camera_rear_tf"  args="-2 0 0 3.141592 0 0 base_link camera_rear 100" />
 	<node pkg="tf" type="static_transform_publisher" name="camera_left_tf"  args="2 1 0 0.8 0 0 base_link camera_left 100" />
 	<node pkg="tf" type="static_transform_publisher" name="camera_right_tf" args="2 -1 0 -0.8 0 0 base_link camera_right 100" />
-	<node pkg="tf" type="static_transform_publisher" name="lidar_tf"        args="4 0 0 0 0 0 base_link lidar 100" />
+	<node pkg="tf" type="static_transform_publisher" name="lidar_tf"        args="4 0 0 0 0 0 base_link laser 100" />
 
-       
+	<node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0 0 0 0 base_link laser 100" />
+-->
+
+
 	   
 
 	    <!--  ************** Global Parameters (시뮬레이션 시간) ***************  -->
@@ -44,6 +80,11 @@
  
  
         <!--  ************** Navigation관련 Parameter 세팅 (이 부분이 main 작업이 될 것) ***************  -->
+			<!--
+			해야할일(18.2.12 기준)
+				1. .yaml파일 수정 (planning 과정에 footprint가 필요하므로 planning 관련 .yaml파일의 footprint 설정해야 함
+				2. footprint 설정하기 위한 차량의 크기 등 정확한 측정이 필요
+			-->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
   	  	<rosparam file="$(find teb_local_planner_tutorials)/cfg/carlike/costmap_common_params.yaml" command="load" ns="global_costmap" />
   	 	<rosparam file="$(find teb_local_planner_tutorials)/cfg/carlike/costmap_common_params.yaml" command="load" ns="local_costmap" />
@@ -66,12 +107,10 @@
 
 
 
-
 	<!--  ****** Maps *****  -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find teb_local_planner_tutorials)/maps/maze.yaml" output="screen">
 		<param name="frame_id" value="/map"/>
-	</node>
-
+	</node>>
 
 
 
