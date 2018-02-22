@@ -8,8 +8,8 @@
 #define CURVATURE_NEER_ZERO 0.0001
 #define STEER_PLATFORM_TO_RAD 20.0/2000.0 * (PI/180.0)
 #define TIME_GAIN 1.0
-#define TRANS_COV 3.0
-#define ROT_COV 99999.0
+
+
 
 namespace odometry_ackermann{
 
@@ -28,10 +28,19 @@ Odometry::Odometry()
     , dy_(0.0)
     , x_(0.0)
     , y_(0.0)
+    , trans_cov_(3.0)
+    , rot_cov_(99999.0)
+    , eps_cov_(1e-6)
+    , frame_id_("")
+    , child_frame_id_("")
 {
-    nh_.Param<double>("/odom/wheel_based/initial_heading",heading_, 0.0);
-    nh_.Param<double>("/odom/wheel_based/initial_x",x_, 0.0);
-    nh_.Param<double>("/odom/wheel_based/initial_y",y_, 0.0);
+    priv_nh_.param<double>("/odom_wheelbased/initial_x",x_, 0.0);
+    priv_nh_.param<double>("/odom_wheelbased/initial_y",y_, 0.0);
+    priv_nh_.param<double>("/odom_wheelbased/initial_heading",heading_, 0.0);
+    priv_nh_.param<double>("/odom_wheelbased/trans_cov", trans_cov_, 3.0);
+    priv_nh_.param<double>("/odom_wheelbased/rot_cov", rot_cov_, 99999.0);
+    priv_nh_.param<std::string>("/odom_wheelbased/frame_id", frame_id_, "odom_combined");
+    priv_nh_.param<std::string>("/odom_wheelbased/child_frame_id", child_frame_id_, "base_footprint");
 }
 
 
@@ -42,12 +51,12 @@ void Odometry::init(const ros::Time &time)
     pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
     /*    init odom    */
     odom_.header.stamp = time;
-    odom_.header.frame_id = "odom_combined";
-    odom_.child_frame_id = "base_link";
+    odom_.header.frame_id = frame_id_;
+    odom_.child_frame_id = child_frame_id_;
     /*     init tf     */
     odom_trans_.header.stamp = time;
-    odom_trans_.header.frame_id = "odom_combined";
-    odom_trans_.child_frame_id = "base_link";
+    odom_trans_.header.frame_id = frame_id_;
+    odom_trans_.child_frame_id = child_frame_id_;
 }
 
 
@@ -118,14 +127,16 @@ void Odometry::Odom_Set(const ros::Time& time)
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
     
     odom_.header.stamp = time;
+    nh_.getParam("/odom_wheelbased/trans_cov", trans_cov_);
+    nh_.getParam("/odom_wheelbased/rot_cov", rot_cov_);
 
     boost::array<double, 36> covariance = {{
-    TRANS_COV, 0, 0, 0, 0, 0,
-    0, TRANS_COV, 0, 0, 0, 0,
-    0, 0, TRANS_COV, 0, 0, 0,
-    0, 0, 0, ROT_COV, 0, 0,
-    0, 0, 0, 0, ROT_COV, 0,
-    0, 0, 0, 0, 0, ROT_COV
+    trans_cov_, 0, 0, 0, 0, 0,
+    0, trans_cov_, 0, 0, 0, 0,
+    0, 0, eps_cov_, 0, 0, 0,
+    0, 0, 0, eps_cov_, 0, 0,
+    0, 0, 0, 0, eps_cov_, 0,
+    0, 0, 0, 0, 0, rot_cov_
     }};
 
     odom_.pose.pose.position.x = x_;

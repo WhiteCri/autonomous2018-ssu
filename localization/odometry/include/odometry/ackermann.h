@@ -84,6 +84,7 @@ public:
 /*---  topic(sub/pub)관련 객체 선언 및 Odometry Calculation에 이용할 변수 선언  ---*/
 private:
     ros::NodeHandle nh_;
+    ros::NodeHandle priv_nh_;
     ros::Publisher pub_;
     ros::Subscriber sub_;
     ros::Time timestamp_;
@@ -92,8 +93,11 @@ private:
     nav_msgs::Odometry odom_;                         // publish할 odometry
     geometry_msgs::TransformStamped odom_trans_;      // tf으로 날릴 odometry transform
 
+    std::string frame_id_, child_frame_id_;
+
     double wheelbase_, curvature_, ignore_up_, ignore_low_;
     double velocity_, steering_, heading_;
+    double trans_cov_, rot_cov_, eps_cov_;
     double ds_, dth_, dx_, dy_, x_, y_;
 
 };
