@@ -29,7 +29,9 @@ Odometry::Odometry()
     , x_(0.0)
     , y_(0.0)
 {
-    nh_.getParam("odom_init_heading",heading_);
+    nh_.Param<double>("/odom/wheel_based/initial_heading",heading_, 0.0);
+    nh_.Param<double>("/odom/wheel_based/initial_x",x_, 0.0);
+    nh_.Param<double>("/odom/wheel_based/initial_y",y_, 0.0);
 }
 
 

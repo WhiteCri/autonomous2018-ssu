@@ -1,5 +1,7 @@
 <launch>
     <node pkg="odometry" type="odom_pub" name="odom_pub"/>
     <param name="wheelbase" value="1.0"/>
-    <param name="odom_init_heading" value="0">
+    <param name="/odom/initial_heading" value="0.0">
+    <param name="/odom/initial_x" value="0.0">
+    <param name="/odom/initial_y" value="0.0">
 </launch>
