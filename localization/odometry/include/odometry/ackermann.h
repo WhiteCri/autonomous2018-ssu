@@ -43,8 +43,7 @@ public:
      <Calc_Odom 함수>
         Car-like Robot의 Odometry를 계산수
     */
-    bool Calc_Odom(
-                   const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data,
+    bool Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data,
                    const ros::Time& time);
 
 
@@ -80,6 +79,11 @@ public:
     void publish();
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> upstream/master
 /*---  topic(sub/pub)관련 객체 선언 및 Odometry Calculation에 이용할 변수 선언  ---*/
 private:
     ros::NodeHandle nh_;
@@ -91,7 +95,11 @@ private:
     nav_msgs::Odometry odom_;                         // publish할 odometry
     geometry_msgs::TransformStamped odom_trans_;      // tf으로 날릴 odometry transform
 
+<<<<<<< HEAD
     double wheelbase_, curvature_, ignore_;
+=======
+    double wheelbase_, curvature_, ignore_up_, ignore_low_;
+>>>>>>> upstream/master
     double velocity_, steering_, heading_;
     double ds_, dth_, dx_, dy_, x_, y_;
 

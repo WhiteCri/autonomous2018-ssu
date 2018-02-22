@@ -1,0 +1,4 @@
+<launch>
+ <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB0 10"/>
+ <param name="IMU_Param" value="0"/>
+</launch>

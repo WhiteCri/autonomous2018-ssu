@@ -20,7 +20,7 @@ static constexpr EncoderDataType    EncoderInitialDataBound = 200;
 
 static constexpr EncoderDataType    EncoderInitialBound     = 10000000;//1000만.
 //바퀴당 100씩 엔코더가 변화하므로 1000만 / 100 * 1.655m = 165500m, 165km임
-static constexpr EncoderDataType    EncoderBound            = 50;
+static constexpr EncoderDataType    EncoderBound            = 100;
 static constexpr SteeringDataType   SteerBound              = 1000;
 static constexpr BrakeDataType      BrakeBound              = 10;
 
@@ -31,14 +31,6 @@ T getParsingData(const uint8_t *dataArray, int startIndex){
     T re_ = *(T*)(dataArray + startIndex);
     return re_;
 }
-
-template <typename __T>
-bool isDataInBound(__T value_cur, __T value_past, __T bound){
-    if((value_past - bound) < value_cur && value_cur < (value_past + bound))
-        return true;
-    else return false;
-}
-
 
 serial::Serial *getSerial(const char* path_, int baudrate_){
     serial::Serial *ser = new serial::Serial();
@@ -54,14 +46,6 @@ serial::Serial *getSerial(const char* path_, int baudrate_){
 
 static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
-
-inline double calcErrorSpeed(std::deque<std::pair<EncoderDataType,bool> >& encoder, double speed){
-    encoder[0].first = encoder[1].first + encoder[1].first - encoder[2].first;
-    double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
-    double re_speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
-        / timeInterval;
-    return re_speed;
-}
 
 inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double past){
     double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
@@ -105,12 +89,8 @@ int main (int argc, char** argv){
     ros::NodeHandle nh;
 
     ros::Publisher pub = nh.advertise<platform_rx_msg::platform_rx_msg>("raw/platform_rx",100);
-    platform_rx_msg::platform_rx_msg msg;
+   
     Past past;
-
-    //initialize
-    msg.steer = 0;
-    msg.brake = 0;
 
     loop = atoi(argv[2]);
     ros::Rate loop_rate(loop);
@@ -196,6 +176,7 @@ int main (int argc, char** argv){
 
     cnt = 0;
     while(ros::ok()){
+        platform_rx_msg::platform_rx_msg msg;
         cnt++;
         std::string raw;
 
@@ -224,7 +205,8 @@ int main (int argc, char** argv){
         bool encoderErrorFlag = false;
         if(abs(encoderData - past.encoder[0].first) > EncoderBound){
             ROS_WARN("Got super encoder Value%d!",encoderData);
-            encoderErrorFlag = true;
+            loop_rate.sleep();
+            continue;
         }
         // e-stop에 대한 처리가 필요
         else if(getParsingData<bool>(dataArray,EstopIndex)){
@@ -239,29 +221,31 @@ int main (int argc, char** argv){
 
         past.encoder.emplace_front(encoderData, !encoderErrorFlag);
         past.encoder.pop_back();
-        if(encoderErrorFlag == false)
-            msg.speed = calcSpeed(past.encoder, past.speed);
-        else
-            msg.speed = calcErrorSpeed(past.encoder, past.speed);
+        msg.speed = calcSpeed(past.encoder, past.speed);
         past.speed = msg.speed;
         
         //brake
         uint8_t brakeData = getParsingData<uint8_t>(dataArray,BrakeIndex);
-        msg.brake = isDataInBound<int8_t>(brakeData, past.brake, BrakeBound) ?
-            brakeData : past.brake;
+        msg.brake = brakeData;
         past.brake = msg.brake;
 
         //steer
         int16_t steeringData = getParsingData<uint16_t>(dataArray,SteerIndex);
-        msg.steer = isDataInBound<int16_t>(steeringData, past.steer, SteerBound) ?
-            steeringData : past.steer;
+        msg.steer = steeringData;
         past.steer = msg.steer;
+
+        //seq
+        msg.seq = cnt;
 
         #ifdef MY_DEBUG_FLAG
             ROS_INFO("[%ld]encoder : %d",cnt, past.encoder[0].first);
             ROS_INFO("speed : %lf",msg.speed);
-            ROS_INFO("brake : %d", msg.brake);
+            ROS_INFO("brake : %d", (uint8_t)msg.brake);
             ROS_INFO("steering : %hd",msg.steer);
+            for(int i = 0 ; i < 18; ++i)
+                msg.raw.push_back(dataArray[i]);
+           // for(int i = 0 ; i < 18; ++i)
+           //     ROS_INFO("[%d] : %#x",i,msg.raw[i]);
         #endif
         pub.publish(msg);
         loop_rate.sleep();
