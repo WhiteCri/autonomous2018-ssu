@@ -21,8 +21,6 @@ static constexpr EncoderDataType    EncoderInitialDataBound = 200;
 static constexpr EncoderDataType    EncoderInitialBound     = 10000000;//1000만.
 //바퀴당 100씩 엔코더가 변화하므로 1000만 / 100 * 1.655m = 165500m, 165km임
 static constexpr EncoderDataType    EncoderBound            = 100;
-static constexpr SteeringDataType   SteerBound              = 1000;
-static constexpr BrakeDataType      BrakeBound              = 10;
 
 int loop = 0;
 
