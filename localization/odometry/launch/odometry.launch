@@ -1,5 +1,13 @@
 <launch>
-    <node pkg="odometry" type="odom_pub" name="odom_pub"/>
     <param name="wheelbase" value="1.0"/>
-    <param name="odom_init_heading" value="0">
+    
+    <node pkg="odometry" type="odom_pub" name="odom_wheelbased">
+        <param name="/frame_id" value="odom_combined"/>
+        <param name="/child_frame_id" value="base_link"/>        
+        <param name="/initial_x" value="0.0"/>
+        <param name="/initial_y" value="0.0"/>
+        <param name="/initial_heading" value="0.0"/>
+        <param name="/trans_cov" value="3.0"/>
+        <param name="/rot_cov" value="99999.0"/>
+    </node>
 </launch>
