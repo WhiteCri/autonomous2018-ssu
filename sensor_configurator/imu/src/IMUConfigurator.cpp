@@ -1,7 +1,27 @@
 
 #include "IMUConfigurator.h"
 
+IMUConfigurator::IMUConfigurator(ros::NodeHandle& nh) 
+    : nhPtr_(&nh), yaw(0), angle_alignment(0), debugingFlag(false)
+{
+    //getParam
+    nhPtr_->getParam("angle_alignment", angle_alignment);
+    nhPtr_->getParam("debugingFlag", debugingFlag);
+    std::vector<double> covVector(9);
+    nhPtr_->getParam("imu_covariance",covVector);
+    for(int i = 0 ; i < 9; ++i)
+        covariance[i] = covVector[i];
 
+    //show state
+    ROS_INFO("angle_alignment : %.2lf",angle_alignment);
+    std::string temp = "DebugingFlag : ";
+    if(debugingFlag == true) temp += "true";
+    else temp += "false";
+    ROS_INFO("%s",temp.c_str());
+    ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[0], covariance[1], covariance[2]);
+    ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[3], covariance[4], covariance[5]);
+    ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[6], covariance[7], covariance[8]);
+}
 
 std::string IMUConfigurator::parse()
 {
@@ -38,53 +58,32 @@ bool IMUConfigurator::serialCommucation(char* path_)
     return true;
 }
 
-imu::imu_msgs IMUConfigurator::RPY(std::string parse, ros::NodeHandle nh)
+void IMUConfigurator::RPY(std::string parse)
 {
-        ROS_INFO("%s",parse.c_str());
-
-        std::stringstream cc(parse);
-
-        std::string trash;
-
-        std::string R="0";
-        std::string P="0";
-        std::string Y="0";
-       
-        std::getline(cc,trash,'*');
-        std::getline(cc,R,',');
-        std::getline(cc,P,',');
-        std::getline(cc,Y,',');
-        
-        //imu_msg.Roll = std::stod(R);
-        //imu_msg.Pitch = std::stod(P);
-        double yaw = std::stod(Y);
-        //qt.setRPY(0,0,yaw);
-        //imu_msg.orientation = qt;
-            
-        //ROS_INFO("%.2f",imu_msg.Roll);
-        //ROS_INFO("%.2f",imu_msg.Pitch);
-        double angle;
-        nh.getParam("IMU_Param",angle);
-        yaw += angle;
-        ROS_INFO("%lf",angle);
-        ROS_INFO("%.2f",yaw);
-
-        ROS_INFO("---------");  
-        imu::imu_msgs msg;
-        
-        msg.yaw = yaw;
-        return msg;
-}
-sensor_msgs::Imu IMUConfigurator::transform(double yaw)
-{ 
-    geometry_msgs::Quaternion quaternion = tf::createQuaternionMsgFromYaw( - yaw  * DEG2RAD );
+     std::stringstream cc(parse);
+     std::string trash;
+     std::string R="0";
+     std::string P="0";
+     std::string Y="0";
     
-    boost::array<double, 9> covariance = {{
-    R_COVAR, 0, 0,
-    0, P_COVAR, 0,
-    0, 0, Y_COVAR
-    }};
+     std::getline(cc,trash,'*');
+     std::getline(cc,R,',');
+     std::getline(cc,P,',');
+     std::getline(cc,Y,',');
+     
+     //imu_msg.Roll = std::stod(R);
+     //imu_msg.Pitch = std::stod(P);
+     yaw = std::stod(Y);
+     yaw = -yaw;
+     yaw += angle_alignment;
+     if(debugingFlag == true)
+        ROS_INFO("get : %.2lf(degree)",yaw);
+}
+sensor_msgs::Imu IMUConfigurator::transform()
+{ 
+    geometry_msgs::Quaternion quaternion = tf::createQuaternionMsgFromYaw(yaw  * DEG2RAD);
 
+    sensor_msgs::Imu imu_msg;
     imu_msg.header.frame_id = "base_link";
     imu_msg.header.stamp = ros::Time::now();
     imu_msg.orientation = quaternion;
