@@ -76,13 +76,17 @@ void IMUConfigurator::RPY(std::string parse)
      yaw = std::stod(Y);
      yaw = -yaw;
      yaw += angle_alignment;
-     if(debugingFlag == true)
+     if(debugingFlag == true){
         ROS_INFO("get : %.2lf(degree)",yaw);
+        ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[0], covariance[1], covariance[2]);
+        ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[3], covariance[4], covariance[5]);
+        ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[6], covariance[7], covariance[8]);
+    }
 }
 sensor_msgs::Imu IMUConfigurator::transform()
 { 
     geometry_msgs::Quaternion quaternion = tf::createQuaternionMsgFromYaw(yaw  * DEG2RAD);
-
+    nhPtr_->getParam("imu_yaw_covariance",covariance[8]);
     sensor_msgs::Imu imu_msg;
     imu_msg.header.frame_id = "base_link";
     imu_msg.header.stamp = ros::Time::now();
