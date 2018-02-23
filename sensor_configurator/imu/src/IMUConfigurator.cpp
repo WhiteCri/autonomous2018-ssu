@@ -5,12 +5,13 @@ IMUConfigurator::IMUConfigurator(ros::NodeHandle& nh)
     : nhPtr_(&nh), yaw(0), angle_alignment(0), debugingFlag(false)
 {
     //getParam
-    nhPtr_->getParam("angle_alignment", angle_alignment);
-    nhPtr_->getParam("debugingFlag", debugingFlag);
-    std::vector<double> covVector(9);
-    nhPtr_->getParam("imu_covariance",covVector);
-    for(int i = 0 ; i < 9; ++i)
-        covariance[i] = covVector[i];
+    nhPtr_->getParam("imu/angle_alignment", angle_alignment);
+    nhPtr_->getParam("imu/debugingFlag", debugingFlag);
+    for(auto& i : covariance)
+        i = 0;
+    nhPtr_->getParam("imu/imu_yaw_covariance",covariance[8]);
+    covariance[0] = 99999;
+    covariance[4] = 99999;
 
     //show state
     ROS_INFO("angle_alignment : %.2lf",angle_alignment);
@@ -19,8 +20,8 @@ IMUConfigurator::IMUConfigurator(ros::NodeHandle& nh)
     else temp += "false";
     ROS_INFO("%s",temp.c_str());
     ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[0], covariance[1], covariance[2]);
-    ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[3], covariance[4], covariance[5]);
-    ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[6], covariance[7], covariance[8]);
+    ROS_INFO(" %5.2lf %5.2lf %5.2lf",covariance[3], covariance[4], covariance[5]);
+    ROS_INFO(" %5.2lf %5.2lf %5.2lf]",covariance[6], covariance[7], covariance[8]);
 }
 
 std::string IMUConfigurator::parse()
@@ -76,17 +77,15 @@ void IMUConfigurator::RPY(std::string parse)
      yaw = std::stod(Y);
      yaw = -yaw;
      yaw += angle_alignment;
-     if(debugingFlag == true){
+     if(yaw >= 180.0) yaw -= 360;
+     if(yaw <= -180.0) yaw += 360;
+     if(debugingFlag == true)
         ROS_INFO("get : %.2lf(degree)",yaw);
-        ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[0], covariance[1], covariance[2]);
-        ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[3], covariance[4], covariance[5]);
-        ROS_INFO("[%5.2lf %5.2lf %5.2lf",covariance[6], covariance[7], covariance[8]);
-    }
 }
 sensor_msgs::Imu IMUConfigurator::transform()
 { 
     geometry_msgs::Quaternion quaternion = tf::createQuaternionMsgFromYaw(yaw  * DEG2RAD);
-    nhPtr_->getParam("imu_yaw_covariance",covariance[8]);
+
     sensor_msgs::Imu imu_msg;
     imu_msg.header.frame_id = "base_link";
     imu_msg.header.stamp = ros::Time::now();
