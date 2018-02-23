@@ -5,7 +5,6 @@
 #include <sstream>
 #include <geometry_msgs/Quaternion.h>
 #include <tf/transform_broadcaster.h>
-#include "imu/imu_msgs.h"
 
 #define PI 3.141592
 #define R_COVAR 99999.0
@@ -18,13 +17,18 @@ static uint32_t m = 0;
 class IMUConfigurator
 {
 public:
+    IMUConfigurator(ros::NodeHandle& nh);
     std::string parse();
     bool serialCommucation(char* path_);
-    imu::imu_msgs RPY(std::string parse,ros::NodeHandle nh);
-    sensor_msgs::Imu transform(double yaw);
+    void RPY(std::string parse);
+    sensor_msgs::Imu transform();
     
 private:
     serial::Serial ser;
     sensor_msgs::Imu imu_msg;
-
+    ros::NodeHandle *nhPtr_;
+    double yaw;
+    double angle_alignment;
+    bool debugingFlag;
+    boost::array<double, 9> covariance;
 };
