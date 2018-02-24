@@ -81,8 +81,6 @@ inline void checkSteeringBound(double& steeringAngle){
         steeringAngle = maxSteeringAngle;
     else if(steeringAngle < minSteeringAngle)
         steeringAngle = minSteeringAngle;
-    ROS_INFO("steeringAngle : %lf",steeringAngle);
-    ROS_INFO("min, max : %lf %lf",minSteeringAngle, maxSteeringAngle);
 }
 
 void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
@@ -145,7 +143,6 @@ int main(int argc, char *argv[]){
     ROS_INFO("serial setting done");
 
     ros::Rate loop_rate(frequency);
-    
 #ifndef TX_DEBUG
     while(ros::ok()){
         ros::spinOnce();
