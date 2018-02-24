@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
     while(ros::ok()){
         msg.header.seq = seq++;
         msg.header.stamp = ros::Time::now();
-        msg.drive.steering_angle = 20;
+        msg.drive.steering_angle = 10;
         msg.drive.speed = 0;
         ackermann_publisher.publish(msg);
         loop_rate.sleep();
