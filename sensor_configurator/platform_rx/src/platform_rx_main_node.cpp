@@ -4,7 +4,7 @@
 #include <utility>
 #include "platform_rx_msg/platform_rx_msg.h"
 
-#define EncoderAccumulateErrorRate 0.6
+#define EncoderAccumulateErrorRate 0.4
 
 static const size_t PlatformRXPacketByte = 18U;
 static constexpr int EncoderIndex = 11;
@@ -48,7 +48,6 @@ static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
 
 inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double past, int& interval){
-    ROS_INFO("%d %d",encoder[0].first, encoder[1].first);
     double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
     double speed = 0;
     try{
@@ -233,12 +232,15 @@ int main (int argc, char** argv){
             loop_rate.sleep();
             continue;
         }
-        else if((past.encoder[0].first/static_cast<double>(encoderData)) < EncoderAccumulateErrorRate){
-            ROS_WARN("[%ld]invalid encoder value : %lf",cnt,(double)past.encoder[0].first/encoderData);
-            loop_rate.sleep();
-            continue;
-        }
-        ROS_INFO("[%ld]%lf",cnt,past.encoder[0].first/static_cast<double>(encoderData));
+        double up = (past.encoder[0].first - past.encoder[1].first) * interval;
+        double down = encoderData - past.encoder[0].first + 0.01;
+        double differentRate = up / down;
+        ROS_INFO("different Rate : %lf",differentRate);
+        //if(fabs(1 - differentRate) < EncoderAccumulateErrorRate){
+        //    ROS_WARN("[%ld]invalid encoder value : %lf",cnt,differentRate);
+        //    loop_rate.sleep();
+        //    continue;
+        //}
         //else if ((encoderData - past.encoder[0].first) == 0){
         //    if((encoderData-past.encoder[1]) == 0)
         //        if((encoderData-past.encoder[2]) == 0)
