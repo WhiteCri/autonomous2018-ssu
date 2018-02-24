@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="imu" type="covariance_changer" name="covariance_changer"/>
+    <param name="imu_test_yaw_cov" value="0.5"/>
+    <param name="imu_test_yaw" value="105"/>
+</launch>
