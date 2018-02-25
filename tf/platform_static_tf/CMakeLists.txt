@@ -196,10 +196,10 @@ include_directories(
 # catkin_add_nosetests(test)
 
 
-add_executable(move_base
-  src/move_base.cpp
+add_executable(move_base_debug
+  src/move_base_debug.cpp
 )
-add_dependencies(move_base ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(move_base
+add_dependencies(move_base_debug ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(move_base_debug
   ${catkin_LIBRARIES}
 )
