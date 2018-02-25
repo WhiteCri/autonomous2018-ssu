@@ -1,0 +1,18 @@
+<launch>
+	<!--  ****** Maps *****  -->
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/back_of_ssara.yaml" output="screen">
+		<param name="frame_id" value="map"/>
+	</node>>
+
+
+
+
+	<!--  ****** ACML *****  -->
+	<node pkg="amcl" type="amcl" name="amcl" output="screen">
+		<rosparam file="$(find move_base_ssu)/cfg/amcl_params.yaml" command="load" />
+
+	    <param name="initial_pose_x"            value="0"/>
+		<param name="initial_pose_y"            value="0"/>
+		<param name="initial_pose_a"            value="90"/>
+	</node>
+</launch>
