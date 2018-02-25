@@ -8,6 +8,6 @@
         <param name="/initial_y" value="0.0"/>
         <param name="/initial_heading" value="0.0"/>
         <param name="/trans_cov" value="3.0"/>
-        <param name="/rot_cov" value="99999.0"/>
+        <param name="/rot_cov" value="3.0"/>
     </node>
 </launch>
