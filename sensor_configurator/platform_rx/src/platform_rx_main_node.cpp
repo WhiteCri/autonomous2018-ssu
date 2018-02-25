@@ -4,6 +4,8 @@
 #include <utility>
 #include "platform_rx_msg/platform_rx_msg.h"
 
+#define EncoderAccumulateErrorRate 0.4
+
 static const size_t PlatformRXPacketByte = 18U;
 static constexpr int EncoderIndex = 11;
 static constexpr int SteerIndex = 8;
@@ -45,17 +47,18 @@ serial::Serial *getSerial(const char* path_, int baudrate_){
 static const double encoderValuePerCycle = 99.2;
 static const double distanceValuePerCycle = 1.655;// m
 
-inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double past){
+inline double calcSpeed(std::deque<std::pair<EncoderDataType,bool> > encoder, double past, int& interval){
     double timeInterval = static_cast<double>(1) / static_cast<double>(loop);
     double speed = 0;
     try{
         speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
-            / timeInterval;
+            / timeInterval / interval;
     }
     catch(...){
         ROS_WARN("divide by zero. use past value");
         speed = past;
     }
+    interval = 0;
     return speed;
 }
 
@@ -72,7 +75,7 @@ struct Past{
     double                speed;
 };
 
-#define MY_DEBUG_FLAG 1
+//#define MY_DEBUG_FLAG 1
 
 int main (int argc, char** argv){
     bool startFlag = false;
@@ -173,21 +176,38 @@ int main (int argc, char** argv){
     //init end
 
     cnt = 0;
+    int interval = 0;
     while(ros::ok()){
         platform_rx_msg::platform_rx_msg msg;
         cnt++;
+        interval++;
         std::string raw;
 
         try{
-            raw = ser->read(ser->available());
+            if(ser->waitReadable()){
+                int availableCnt = ser->available();
+                if(availableCnt >= 18)
+                    ser->read(raw,ser->available());
+                else {
+                    ROS_WARN("[%ld]availableCnt is lower than packetLength : %d",cnt,availableCnt);
+                    loop_rate.sleep();
+                    continue;
+                }
+            }
+            if(raw.c_str()[0] != 0x53){
+                ROS_WARN("[%ld]invalid packet",cnt);
+                loop_rate.sleep();
+                continue;
+            }
+    
         }
         catch(...){//invoke when serial port is unpluged
             delete ser;
             checkSerial(&ser, argc, argv);
         }
         if(raw.size() < PlatformRXPacketByte){
-            ROS_WARN("Invalid Packet size : %ld needed but Got %ld"
-                , PlatformRXPacketByte, raw.size());
+            ROS_WARN("[%ld]Invalid Packet size : %ld needed but Got %ld"
+                , cnt,PlatformRXPacketByte, raw.size());
             loop_rate.sleep();
             continue;
         }
@@ -202,7 +222,7 @@ int main (int argc, char** argv){
         int32_t encoderData = getParsingData<int32_t>(dataArray,EncoderIndex);
         bool encoderErrorFlag = false;
         if(abs(encoderData - past.encoder[0].first) > EncoderBound){
-            ROS_WARN("Got super encoder Value%d!",encoderData);
+            ROS_WARN("[%ld]Got super encoder Value%d!",cnt,encoderData);
             loop_rate.sleep();
             continue;
         }
@@ -212,14 +232,25 @@ int main (int argc, char** argv){
             loop_rate.sleep();
             continue;
         }
+        double up = (past.encoder[0].first - past.encoder[1].first) * interval;
+        double down = encoderData - past.encoder[0].first + 0.01;
+        double differentRate = up / down;
+        ROS_INFO("different Rate : %lf",differentRate);
+        //if(fabs(1 - differentRate) < EncoderAccumulateErrorRate){
+        //    ROS_WARN("[%ld]invalid encoder value : %lf",cnt,differentRate);
+        //    loop_rate.sleep();
+        //    continue;
+        //}
         //else if ((encoderData - past.encoder[0].first) == 0){
-        //    ROS_WARN("Got same encoder Value : %d!",encoderData);
+        //    if((encoderData-past.encoder[1]) == 0)
+        //        if((encoderData-past.encoder[2]) == 0)
+        //            ROS_WARN("Got same encoder Value : %d!",encoderData);
         //    //encoderErrorFlag = true;
         //}
 
         past.encoder.emplace_front(encoderData, !encoderErrorFlag);
         past.encoder.pop_back();
-        msg.speed = calcSpeed(past.encoder, past.speed);
+        msg.speed = calcSpeed(past.encoder, past.speed,interval);
         past.speed = msg.speed;
         
         //brake
