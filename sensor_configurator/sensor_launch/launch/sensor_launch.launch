@@ -2,11 +2,22 @@
  <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node"
     args="/dev/ttyUSB0 10"/>
 
- <node pkg="imu" type="imu_main" name="imu_main"
-   args="/dev/ttyUSB1 10"/>
+  <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10">
+      <param name="angle_alignment" value="112"/>
+      <param name="debugingFlag" value="true"/>
+      <param name="imu_yaw_covariance" value="0.5"/>
+  </node>
 
  <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
- <include file="$(find gps_common)/launch/LL_UTM.launch"/>
+ <node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
+ <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
+ 
+ <param name="GPS_Odometry_initial" value="false"/>
 
- <include file="$(find lms1xx)/launch/LMS1xx.launch"/>
+ <arg name="host" default="192.168.0.204" />
+ <arg name="publish_min_range_as_inf" default="false" />
+ <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node">
+    <param name="host" value="$(arg host)" />
+    <param name="publish_min_range_as_inf" value="$(arg publish_min_range_as_inf)" />
+ </node>
 </launch>
