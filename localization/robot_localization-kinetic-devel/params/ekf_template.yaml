@@ -65,10 +65,10 @@ publish_acceleration: false
 ###############################################################################################################################
 ### frame_id 설정 ###
 
-#map_frame: map              # Defaults to "map" if unspecified (나중에 map 쓸꺼면 주석 지워야 함)
-odom_frame: odom_combined   # Defaults to "odom" if unspecified
+#map_frame: map                   # Defaults to "map" if unspecified (나중에 map 쓸꺼면 주석 지워야 함)
+odom_frame: odom_combined        # Defaults to "odom" if unspecified
 base_link_frame: base_link  # Defaults to "base_link" if unspecified
-world_frame: odom_combined  # Defaults to the value of odom_frame if unspecified
+world_frame: map                 # Defaults to the value of odom_frame if unspecified
 
 ###############################################################################################################################
 ###############################################################################################################################
@@ -169,8 +169,8 @@ world_frame: odom_combined  # Defaults to the value of odom_frame if unspecified
 
 ### odom0 (main: GPS) ###
 odom0: vo
-odom0_config: [false,  false,  false,
-               false,  false,  false,
+odom0_config: [false, false, false,
+               false, false, false,
                false, false, false,
                false, false, false,
                false, false, false]
@@ -185,10 +185,10 @@ odom0_twist_rejection_threshold: 0.2
 ### odom1 (sub: wheelbase_odometry(ackermann)) ###
 odom1: odom
 odom1_config: [true,  true,  false,
-          false, false, true,
-          false, false, false,
-          false, false, true,
-          false, false, false]
+               false, false, true,
+               false, false, false,
+               false, false, true,
+               false, false, false]
 odom1_queue_size: 2
 odom1_nodelay: false
 odom1_differential: true
