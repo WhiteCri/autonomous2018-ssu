@@ -170,22 +170,9 @@ world_frame: odom_combined  # Defaults to the value of odom_frame if unspecified
 ### 모든 frame은 utm 좌표의 기준인 ENU (ENU: EastNorthUpward) ###
 
 ### odom0 (main: GPS) ###
-#######odom0: vo                               # /odom/gps 로 바꾸기
-#######odom0_config: [true,  true,  false,
-#######               true,  true,  true,
-#######               false, false, false,
-#######               false, false, true,
-#######               false, false, false]
-#######odom0_queue_size: 2
-#######odom0_nodelay: false
-#######odom0_differential: false
-#######odom0_relative: true
-#######odom0_pose_rejection_threshold: 2
-#######odom0_twist_rejection_threshold: 0.2
-
-odom0: odom                              # /odom/gps 로 바꾸기
-odom0_config: [true,  true,  true,
-               false, false, true,
+odom0: vo                               # /odom/gps 로 바꾸기
+odom0_config: [true,  true,  false,
+               true,  true,  true,
                false, false, false,
                false, false, true,
                false, false, false]
@@ -195,6 +182,19 @@ odom0_differential: false
 odom0_relative: true
 odom0_pose_rejection_threshold: 2
 odom0_twist_rejection_threshold: 0.2
+
+odom1: odom                              # /odom/gps 로 바꾸기
+odom1_config: [true,  true,  true,
+               false, false, true,
+               false, false, false,
+               false, false, true,
+               false, false, false]
+odom1_queue_size: 2
+odom1_nodelay: false
+odom1_differential: true
+odom1_relative: true
+odom1_pose_rejection_threshold: 2
+odom1_twist_rejection_threshold: 0.2
 
 
 
