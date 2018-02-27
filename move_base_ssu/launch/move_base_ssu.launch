@@ -17,9 +17,19 @@
         <param name="/initial_x" value="0.0"/>
         <param name="/initial_y" value="0.0"/>
         <param name="/initial_heading" value="0.0"/>
-        <param name="/trans_cov" value="0.08"/>
+        <param name="/trans_cov" value="0.1"/>
         <param name="/rot_cov" value="0.005"/>
     </node>
+
+<!--	
+ 	<node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
+
+ 	<param name="/gps/easting_shift" value="319000"/>
+ 	<param name="/gps/northing_shift" value="4151000"/>
+
+ 	<param name="GPS_Odometry_initial" value="false"/>
+-->
+
 
 	<!--  ****** Localization 2 (ekf filtered odometry) ******  -->
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
