@@ -5,7 +5,12 @@
 
 
 #define TX_PACKET_LENGTH 14
-#define ACKERMANN_TOPIC_NAME "platform_tx_test"
+#define ACKERMANN_TOPIC_NAME "ackermann_cmd"
+
+#define PI 3.141592
+#define RAD2SERIAL (180.0 / PI) * 100.0         // rad -> deg -> serial
+#define M_S2SERIAL (3600.0 / 1000.0) * 10.0     // m/s -> km/h -> serial
+#define MAX_STEER_ANGLE 20.0                    // maximum steering angle = 20 [deg]
 
 //#define TX_DEBUG
 //#define RX_SUBSCRIBE
@@ -15,7 +20,7 @@ static double maxSteeringAngle;
 static double minSteeringAngle;
 static int alignmentBias;
 
-static double maxSpeed;//m/s
+static double maxSpeed; // m/s
 static double m_s2serial;
 
 static int frequency;
@@ -38,14 +43,14 @@ void initTx(const ros::NodeHandle& nh){
     packet[13] = static_cast<uint8_t>(0x0A);//0x0A
 
     //steering member
-    nh.param("/platform_tx/angleToSerialValue", angleToSerialValue, 71.0);
-    nh.param("/platform_tx/maxSteeringAngle", maxSteeringAngle, 24.0);
-    nh.param("/platform_tx/minSteeringAngle", minSteeringAngle, -24.0);
-    nh.param("/platform_tx/alignmentBias", alignmentBias, 160);
+    nh.param("/platform_tx/angleToSerialValue", angleToSerialValue, RAD2SERIAL);
+    nh.param("/platform_tx/maxSteeringAngle", maxSteeringAngle, MAX_STEER_ANGLE);
+    nh.param("/platform_tx/minSteeringAngle", minSteeringAngle, -MAX_STEER_ANGLE);
+    nh.param("/platform_tx/alignmentBias", alignmentBias, 0);
 
     //speed member
-    nh.param("/platform_tx/maxSpeed", maxSpeed, 10.0);
-    nh.param("/platform_tx/m_s2serial", m_s2serial, 36.0);
+    nh.param("/platform_tx/maxSpeed", maxSpeed, 20.0);
+    nh.param("/platform_tx/m_s2serial", m_s2serial, M_S2SERIAL);
 
     //frequency
     nh.param("/platform_tx/frequency", frequency, 50);
