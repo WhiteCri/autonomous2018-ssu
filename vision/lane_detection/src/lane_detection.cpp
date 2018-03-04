@@ -33,7 +33,7 @@
 
 static const std::string OPENCV_WINDOW_VF = "Image by videofile";
 static const std::string OPENCV_WINDOW_WC = "Image by webcam";
-static const bool DEBUG_SW = true;
+static const bool DEBUG_SW = false;
 static const bool TRACK_BAR = false;
 lane_detect_algo::vec_mat_t lane_m_vec;
 

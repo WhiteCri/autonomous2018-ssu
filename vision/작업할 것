@@ -1,9 +1,0 @@
-<실행방법>
-rosrun lane_detection lane_detection //imshow 전부주석처리해놓음
-rosrun cal_distance cal_distance
-rosrun convert_cloud convert_cloud
-
-<추가할내용>
-launch file로바꾸기
-scan data
-sensor calibration
