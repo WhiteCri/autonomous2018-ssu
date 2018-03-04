@@ -1,0 +1,5 @@
+<launch>
+
+        <node pkg="cal_distance" type="cal_distance" name="cal_distance0" output="screen"/>
+        
+</launch>
