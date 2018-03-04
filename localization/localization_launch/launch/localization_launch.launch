@@ -2,15 +2,15 @@
     <param name="wheelbase" value="1.0"/>
     <node pkg="odometry" type="odom_pub" name="odom_wheelbased">
         <param name="/frame_id" value="odom_combined"/>
-        <param name="/child_frame_id" value="base_link"/>        
+        <param name="/child_frame_id" value="base_footprint"/>        
         <param name="/initial_x" value="0.0"/>
         <param name="/initial_y" value="0.0"/>
-        <param name="/initial_heading" value="-86.0"/>
+        <param name="/initial_heading" value="0.0"/>
         <param name="/trans_cov" value="3.0"/>
         <param name="/rot_cov" value="3.0"/>
     </node>
 
-    <!--node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
         <rosparam command="load" file="$(find robot_localization)/params/ekf_template.yaml" />
-    </node-->
+    </node>
 </launch>

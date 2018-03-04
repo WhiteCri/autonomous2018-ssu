@@ -5,7 +5,11 @@
 
 
 #define TX_PACKET_LENGTH 14
-#define ACKERMANN_TOPIC_NAME "platform_tx_test"
+
+#define PI 3.141592
+#define RAD2SERIAL (180.0 / PI) * 100.0         // rad -> deg -> serial
+#define M_S2SERIAL (3600.0 / 1000.0) * 10.0     // m/s -> km/h -> serial
+#define MAX_STEER_ANGLE 20.0                    // maximum steering angle = 20 [deg]
 
 //#define TX_DEBUG
 //#define RX_SUBSCRIBE
@@ -14,8 +18,9 @@ static double angleToSerialValue;
 static double maxSteeringAngle;
 static double minSteeringAngle;
 static int alignmentBias;
+static std::string ackermann_topic_name;
 
-static double maxSpeed;//m/s
+static double maxSpeed; // m/s
 static double m_s2serial;
 
 static int frequency;
@@ -37,19 +42,22 @@ void initTx(const ros::NodeHandle& nh){
     packet[12] = static_cast<uint8_t>(0x0D);//0x0D
     packet[13] = static_cast<uint8_t>(0x0A);//0x0A
 
+    //setup
+    nh.param("/platform_tx/frequency", frequency, 50);
+    nh.param<std::string>("/platform_tx/ackermann_topic_name", ackermann_topic_name, "ackermann_cmd");
+
     //steering member
-    nh.param("/platform_tx/angleToSerialValue", angleToSerialValue, 71.0);
-    nh.param("/platform_tx/maxSteeringAngle", maxSteeringAngle, 24.0);
-    nh.param("/platform_tx/minSteeringAngle", minSteeringAngle, -24.0);
-    nh.param("/platform_tx/alignmentBias", alignmentBias, 160);
+    nh.param("/platform_tx/angleToSerialValue", angleToSerialValue, RAD2SERIAL);
+    nh.param("/platform_tx/maxSteeringAngle", maxSteeringAngle, MAX_STEER_ANGLE);
+    nh.param("/platform_tx/minSteeringAngle", minSteeringAngle, -MAX_STEER_ANGLE);
+    nh.param("/platform_tx/alignmentBias", alignmentBias, 0);
 
     //speed member
-    nh.param("/platform_tx/maxSpeed", maxSpeed, 10.0);
-    nh.param("/platform_tx/m_s2serial", m_s2serial, 36.0);
-
-    //frequency
-    nh.param("/platform_tx/frequency", frequency, 50);
+    nh.param("/platform_tx/maxSpeed", maxSpeed, 20.0);
+    nh.param("/platform_tx/m_s2serial", m_s2serial, M_S2SERIAL);
 }
+
+
 
 //rx log variable
 #ifdef RX_SUBSCRIBE
@@ -67,14 +75,18 @@ void rxMsgCallBack(const platform_rx_msg::platform_rx_msg::ConstPtr& msg){
 }
 #endif
 
+
+
 inline void checkSpeedBound(double& speed){
     speed = (speed <= maxSpeed) ? speed : maxSpeed;
     return;
 }
 
+
 inline void checkBrakeBound(double& brake_percent){
     brake_percent = (brake_percent <= 100) ? brake_percent : 100;
 }
+
 
 inline void checkSteeringBound(double& steeringAngle){
     if(steeringAngle > maxSteeringAngle)
@@ -82,6 +94,7 @@ inline void checkSteeringBound(double& steeringAngle){
     else if(steeringAngle < minSteeringAngle)
         steeringAngle = minSteeringAngle;
 }
+
 
 void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
     static uint8_t alive = 0;
@@ -115,6 +128,7 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
     alive = (alive + 1) % 256;
 }
 
+
 void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
     createSerialPacket(msg);
     ser->write(packet,TX_PACKET_LENGTH);
@@ -128,7 +142,7 @@ int main(int argc, char *argv[]){
     ros::init(argc, argv, "platform_tx");
     ros::NodeHandle nh;
     
-    ros::Subscriber sub = nh.subscribe(ACKERMANN_TOPIC_NAME, 100, &ackermannCallBack_);
+    ros::Subscriber sub = nh.subscribe(ackermann_topic_name, 100, &ackermannCallBack_);
     
     initTx(nh);
 
@@ -143,6 +157,7 @@ int main(int argc, char *argv[]){
     ROS_INFO("serial setting done");
 
     ros::Rate loop_rate(frequency);
+
 #ifndef TX_DEBUG
     while(ros::ok()){
         ros::spinOnce();
