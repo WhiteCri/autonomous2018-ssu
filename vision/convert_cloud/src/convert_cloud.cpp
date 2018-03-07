@@ -18,6 +18,8 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include <sensor_msgs/LaserScan.h>
+#include <laser_geometry/laser_geometry.h>
 
 static const bool DEBUG = true;
 
@@ -26,15 +28,18 @@ class ConvertCloud{
   ros::NodeHandle nh_;
   ros::Subscriber sub_;
   ros::Publisher pub_;
+  ros::Subscriber sub_scan;
 
 public:
     ConvertCloud(){
         sub_ = nh_.subscribe("/cam0/dist",100,&ConvertCloud::distCb,this);
-        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam0/point_cloud",10);
+        sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
+        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam0/point_cloud",1);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
     }
   void distCb(const std_msgs::Float32MultiArray::ConstPtr& distData);
+  void laserCb(const sensor_msgs::LaserScan::ConstPtr& input);
   void parseVec();
   void convert();
 
@@ -57,7 +62,9 @@ int main(int argc, char** argv){
 
   return 0;
 }
+void ConvertCloud::laserCb(const sensor_msgs::LaserScan::ConstPtr& input){
 
+}
 void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData){    
 
     if(DEBUG) std::cout<<"start call back"<<std::endl;
@@ -142,6 +149,7 @@ void ConvertCloud::convert(){
   
   pc->clear();
   pub_.publish(pc_out);
+  
 
 }
 
