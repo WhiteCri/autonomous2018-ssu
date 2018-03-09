@@ -49,7 +49,7 @@ class InitImgObjectforROS{
         image_transport::Subscriber sub_img;
         std_msgs::Int32MultiArray coordi_array;
         cv::Mat pub_img;
-        ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("/cam0/lane",100);
+        ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("/cam0/lane",100);//파라미터로 카메라 번호 받도록하기
         InitImgObjectforROS():it(nh){
             if(DEBUG_SW){//'DEBUG_SW == TURE' means subscribing videofile image
                 sub_img = it.subscribe("/videofile/image_raw",1,&InitImgObjectforROS::imgCb,this);
