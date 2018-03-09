@@ -26,7 +26,7 @@ void callback(const nav_msgs::OdometryConstPtr& odom){ // map와 base_link은 �
                                         odom->pose.pose.orientation.z, 
                                         odom->pose.pose.orientation.w) );
 
-  broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_link"));
+  broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "odom", "base_footprint"));
 }
 
 
@@ -35,7 +35,7 @@ int main(int argc, char** argv){
 
   ros::NodeHandle nh;
   
-  ros::Subscriber sub = nh.subscribe("odom", 100, &callback);
+  ros::Subscriber sub = nh.subscribe("odom/wheelbased", 100, &callback);
 
   ros::spin();
   return 0;

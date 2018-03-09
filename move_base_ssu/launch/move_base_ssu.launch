@@ -1,8 +1,5 @@
 <launch>
 
-	<param name="/use_sim_time" value="true"/>
-    
-
 	<!--  ****** Robot Setup ******  -->
 	<param name="wheelbase" value="1.0"/>
 	<node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
@@ -31,10 +28,11 @@
 -->
 
 
-	<!--  ****** Localization 2 (ekf filtered odometry) ******  -->
+	<!--  ****** Localization 2 (ekf filtered odometry) ******  
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
         <rosparam command="load" file="$(find robot_localization)/params/ekf_template.yaml" />
     </node>
+	-->
 
 
 	<!--  ****** Localization 3 (ACML) *****  -->
