@@ -1,4 +1,4 @@
 <launch>
-  <include file="$(find sensor_launch)/launch/sensor_launch.launch" />
+  <include file="$(find sensor_launch)/launch/sensor_launch.launch"/>
   <include file="$(find move_base_ssu)/launch/move_base_ssu.launch"/>
 </launch>
