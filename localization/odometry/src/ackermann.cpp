@@ -48,7 +48,7 @@ Odometry::Odometry()
 void Odometry::init(const ros::Time &time)
 {
     timestamp_ = time;
-    pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 100);         // publish 할 인스턴스 정의 
+    pub_ = nh_.advertise<nav_msgs::Odometry>("odom/wheelbased", 100);         // publish 할 인스턴스 정의 
 
     /*    init odom    */
     odom_.header.stamp = time;

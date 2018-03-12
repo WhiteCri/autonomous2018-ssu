@@ -63,7 +63,7 @@ public:
   // Constructor
   ScanToScanFilterChain() :
     private_nh_("~"),
-    scan_sub_(nh_, "scan", 50),
+    scan_sub_(nh_, "scan_raw", 50),
     tf_(NULL),
     tf_filter_(NULL),
     filter_chain_("sensor_msgs::LaserScan")
@@ -100,7 +100,7 @@ public:
     }
     
     // Advertise output
-    output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan_filtered", 1000);
+    output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan", 1000);
 
     // Set up deprecation printout
     deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, _1));

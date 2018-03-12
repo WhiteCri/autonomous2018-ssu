@@ -123,9 +123,9 @@ int main (int argc, char **argv) {
   ros::NodeHandle priv_node("~");
   ros::NodeHandle node;
   priv_node.param<std::string>("frame_id", frame_id, "odom_combined");
-  priv_node.param<std::string>("child_frame_id", child_frame_id, "base_link");
+  priv_node.param<std::string>("child_frame_id", child_frame_id, "base_footprint");
   priv_node.param<double>("rot_covariance", rot_cov, 99999.0);
-  odom_pub = node.advertise<nav_msgs::Odometry>("vo", 10);
+  odom_pub = node.advertise<nav_msgs::Odometry>("odom/GPS", 10);
 
   ros::Subscriber fix_sub = node.subscribe("fix", 10, callback);
   ros::Subscriber GPS_sub = node.subscribe("raw/GPS",10,callback2);
