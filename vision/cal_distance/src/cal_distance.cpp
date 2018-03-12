@@ -8,12 +8,12 @@
 #include "std_msgs/Int32MultiArray.h"
 #include "std_msgs/Float32MultiArray.h"
 
-#define X_CENTER 526.0
-#define Y_CENTER 509.0
+#define X_CENTER 460.0
+#define Y_CENTER 277.0
 
 // xGap = xCenter - xTarget, yGap = yTarget - yCenter
 
-static const bool DEBUG = false;
+static const bool DEBUG = true;
 
 class CalDistance{
     ros::NodeHandle nh_;
@@ -22,13 +22,13 @@ class CalDistance{
 public:
     CalDistance()
         : xCenter(X_CENTER), yCenter(Y_CENTER), yGap(0.0), yGap50(0.0), yDist(0.0), xGap(0.0), xDist(0.0)
-    {   
+    {
         sub_ = nh_.subscribe("/cam0/lane",100,&CalDistance::laneCb,this);
         pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/cam0/dist", 100);
     }
     void calXdist();
     void calYgap50();
-    void calYdist();    
+    void calYdist();
     void laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData);
     void sendDist();
 
@@ -61,7 +61,7 @@ void CalDistance::sendDist(){
 
     distData.data.clear();
 
-    std::vector<float>::iterator itX = laneXData.begin();    
+    std::vector<float>::iterator itX = laneXData.begin();
     std::vector<float>::iterator itY = laneYData.begin();
 
     distData.data.push_back((float)size);
@@ -78,12 +78,12 @@ void CalDistance::sendDist(){
 
 
 void CalDistance::calXdist(){
-    xDist = 0.4819*std::exp(0.0066*xGap);
+    xDist = 2.8162*std::exp(0.0054*xGap);
 }
 
-void CalDistance::calYgap50(){ 
-    yGap50 = 0.0146*std::pow(xDist, 6) - 0.3673*std::pow(xDist, 5) + 3.8374*std::pow(xDist, 4) 
-        - 21.814*std::pow(xDist, 3) + 74.873*std::pow(xDist, 2) - 167.26*xDist + 271.67;
+void CalDistance::calYgap50(){
+    yGap50 = ( 0.0843*std::pow(xDist, 6) - 2.5819*std::pow(xDist, 5) + 32.429*std::pow(xDist, 4)
+        - 214.4*std::pow(xDist, 3) + 792.81*std::pow(xDist, 2) - 1588.6*xDist + 1473.1 ) * -1;
 }
 
 void CalDistance::calYdist(){
@@ -91,20 +91,20 @@ void CalDistance::calYdist(){
 }
 
 
-void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){    
+void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
 
     if(DEBUG) std::cout<<"start call back"<<std::endl;
-    
+
     laneXData.clear();
-    laneYData.clear();    
+    laneYData.clear();
 
     std::vector<int>::const_iterator it;
-    
+
     if(DEBUG) std::cout<<"before push_back"<<std::endl;
-    
+
     it = laneData->data.begin();
-    
+
     size = (*it);
     ++it;
 
@@ -113,13 +113,19 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
             xGap = xCenter - (*it);
             calXdist();
             laneXData.push_back(xDist);
+            if(DEBUG){
+              std::cout<<"vec x : "<<(*it)<<std::endl;
+            }
             ++it;
 
             yGap = (*it)-yCenter;
             calYdist();
             calYgap50();
+            if(DEBUG){
+              std::cout<<"vec y : "<<(*it)<<std::endl;
+            }
             laneYData.push_back(yDist);
-            ++it;       
+            ++it;
 
         }
         catch(std::exception& e){
@@ -127,13 +133,12 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
         }
     }
 
-    if(DEBUG) {    
+    if(DEBUG) {
         std::cout<<"size : "<<size<<std::endl;
-        for(int i=0; i<size; i++){
+        for(int i=0; i<size/2; i++){
             std::cout<<"X : "<<laneXData[i]<<" / Y : "<<laneYData[i]<<std::endl;
         }
     }
-    
+
     sendDist();
 }
-
