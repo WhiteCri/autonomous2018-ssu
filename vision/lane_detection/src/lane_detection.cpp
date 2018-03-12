@@ -58,6 +58,7 @@ class InitImgObjectforROS{
             }
             else{//'DEBUG_SW == FALE' means subscribing webcam image
                 sub_img = it.subscribe("/cam0/raw_image",1,&InitImgObjectforROS::imgCb,this);
+                
                // cv::namedWindow(OPENCV_WINDOW_WC);
             }
         }
@@ -71,16 +72,17 @@ class InitImgObjectforROS{
         }
         void imgCb(const sensor_msgs::ImageConstPtr& img_msg){
             cv_bridge::CvImagePtr cv_ptr;
-            cv::Mat frame, canny_img, gray, yellow, yellow2, yellow3, white, white2, white3, laneColor;
+            cv::Mat frame, canny_img, gray, yellow, yellow2, yellow3, white, white2, white3, laneColor, origin;
             
             
             uint frame_height, frame_width;
             try{
                 cv_ptr = cv_bridge::toCvCopy(img_msg,sensor_msgs::image_encodings::BGR8);
                 frame = cv_ptr->image;
+                origin = cv_ptr->image;
                 if(!frame.empty()){
-             //   cv::resize(frame, frame, cv::Size(), 0.2, 0.2); 
-              cv::resize(frame,frame,cv::Size(200,200),0,0,CV_INTER_AREA);
+             //   cv::resize(frame, frame, cv::Size(), 0.2, 0.2 320 240); 
+                cv::resize(origin,frame,cv::Size(320,240),0,0,CV_INTER_AREA);
                 frame_height = (uint)frame.rows;
                 frame_width = (uint)frame.cols;
                 unsigned int* H_yResultYellow = new unsigned int[frame_width];
@@ -133,19 +135,21 @@ class InitImgObjectforROS{
                 //cv::imshow("yellow_threshold",before_yellow);
                 //cv::dilate(yellow, yellow2, NULL, cv::Point(-1, -1), 1);
                 //cv::imshow("yellow_dilate",yellow2);
-                cv::adaptiveThreshold(yellow, // 입력영상
-                yellow2, // 이진화 결과 영상
-                255, // 최대 화소 값
-                cv::ADAPTIVE_THRESH_MEAN_C, // Adaptive 함수
-                cv::THRESH_BINARY_INV, // 이진화 타입
-                11,  // 이웃크기
-                2);
+
+                // cv::adaptiveThreshold(yellow, // 입력영상
+                // yellow2, // 이진화 결과 영상
+                // 255, // 최대 화소 값
+                // cv::ADAPTIVE_THRESH_MEAN_C, // Adaptive 함수
+                // cv::THRESH_BINARY_INV, // 이진화 타입
+                // 3,  // 이웃크기
+                // 2);
+                cv::threshold(yellow, yellow2, 180, 255, CV_THRESH_BINARY);                
                 cv::adaptiveThreshold(white, // 입력영상
                 white2, // 이진화 결과 영상
                 255, // 최대 화소 값
                 cv::ADAPTIVE_THRESH_MEAN_C, // Adaptive 함수
                 cv::THRESH_BINARY_INV, // 이진화 타입
-                11,  // 이웃크기
+                3,  // 이웃크기
                 6);//threshold
                 //H  :색의 종류를 나타냄. S : 0이면 무채색(gray 색), 255면 가장 선명한(순수한) 색
                 //V  : 작을수록 어둡고 클수록 밝은 색
@@ -169,31 +173,50 @@ class InitImgObjectforROS{
 
                 cv::Mat inv_bev = frame.clone();
              //   imshow("my_bev",bev);
+                imshow("origin",origin);
                 callane.inverseBirdEyeView(bev, inv_bev);
-         //     imshow("my_inv_bev",inv_bev);
+                imshow("my_inv_bev",inv_bev);
                 cv::Mat newlane = frame.clone();
                 callane.inverseBirdEyeView(laneColor, newlane);
             //    cv::imshow("newlane", newlane);
-               
+                cv::Mat output_origin = origin.clone();
                 pub_img = newlane.clone();
-                imshow("d",pub_img);
                 int coordi_count = 0;
                 coordi_array.data.clear();
-                coordi_array.data.push_back(10);   
-                for (int y = pub_img.rows-1; y >=0; y--) {
-                    uchar* inv_bev_data = pub_img.ptr<uchar>(y);
-                        for (int x = 0; x < pub_img.cols; x++) {
-                            if (inv_bev_data[x] != (uchar)0) {
+                coordi_array.data.push_back(10);
+                // for (int y = pub_img.rows-1; y >=0; y--) {
+                //     uchar* inv_bev_data = pub_img.ptr<uchar>(y);
+                //     uchar* my_data = inv_bev.ptr<uchar>(y);
+                //         for (int x = 0; x < pub_img.cols; x++) {
+                //             if (inv_bev_data[x] != (uchar)0) {
+                //                 coordi_count++;
+                //                 coordi_array.data.push_back(x);
+                //                 coordi_array.data.push_back(y);
+                //                 my_data[x*inv_bev.channels()] = 255;
+                //             }
+                //         }
+                // }
+
+                for(int y = output_origin.rows-1; y>=0; y--){
+                    uchar* origin_data = output_origin.ptr<uchar>(y);
+                    uchar* pub_img_data = pub_img.ptr<uchar>(y*0.5);//resize 복구(0.5 -> 1))
+                        for(int x = 0; x<output_origin.cols; x++){
+                            int temp = x*0.5;//resize 복구(0.5 -> 1)
+                            if(pub_img_data[temp]!= (uchar)0){
                                 coordi_count++;
                                 coordi_array.data.push_back(x);
                                 coordi_array.data.push_back(y);
-                            }
+                                origin_data[x*output_origin.channels()] = 255;
                         }
-                }
+                    }
+                } 
+                coordi_array.data[0] = coordi_count;
+                imshow("myorigin",output_origin);
                 cv::Mat inv_lane = laneColor.clone();
                 callane.inverseBirdEyeView(laneColor, inv_lane);
-           //     cv::imshow("inv_bev", inv_bev);
-           //     cv::imshow("laneColor", laneColor);
+        
+             //   cv::imshow("inv_bev", inv_bev);
+             // cv::imshow("laneColor", laneColor);
                 if (TRACK_BAR) cv::imshow("TARCKBAR", yellow);
                 float degree=0., ladian = 0.;
                 int no_data;
@@ -221,7 +244,7 @@ class InitImgObjectforROS{
                 ROS_ERROR("cv_bridge exception : %s", e.what());
                 return;
             }
-          //  cv::imshow(OPENCV_WINDOW_VF,frame);
+            cv::imshow(OPENCV_WINDOW_VF,frame);
             
             int ckey = cv::waitKey(10);
             if(ckey == 27) exit(1);    

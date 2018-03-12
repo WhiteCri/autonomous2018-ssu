@@ -110,22 +110,24 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
     while(it != laneData->data.end()){
         try{
-            xGap = xCenter - (*it);
-            calXdist();
-            laneXData.push_back(xDist);
+            yGap = (*it)-yCenter;
+            if(DEBUG){
+              std::cout<<"vec y : "<<(*it)<<std::endl;
+            }
+            ++it;
+
+            xGap = xCenter - (*it);            
             if(DEBUG){
               std::cout<<"vec x : "<<(*it)<<std::endl;
             }
             ++it;
 
-            yGap = (*it)-yCenter;
+            calXdist();
+            laneXData.push_back(xDist);
+
             calYdist();
             calYgap50();
-            if(DEBUG){
-              std::cout<<"vec y : "<<(*it)<<std::endl;
-            }
             laneYData.push_back(yDist);
-            ++it;
 
         }
         catch(std::exception& e){

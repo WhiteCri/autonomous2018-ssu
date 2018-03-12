@@ -54,7 +54,7 @@ namespace pointcloud_to_laserscan
     boost::mutex::scoped_lock lock(connect_mutex_);
     private_nh_ = getPrivateNodeHandle();
 
-    private_nh_.param<std::string>("target_frame", target_frame_, "");
+    private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
     private_nh_.param<double>("transform_tolerance", tolerance_, 0.01);
     private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min());
     private_nh_.param<double>("max_height", max_height_, std::numeric_limits<double>::max());
@@ -94,6 +94,8 @@ namespace pointcloud_to_laserscan
     // if pointcloud target frame specified, we need to filter by transform availability
     if (!target_frame_.empty())
     {
+      
+     
       tf2_.reset(new tf2_ros::Buffer());
       tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
       message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
@@ -102,10 +104,12 @@ namespace pointcloud_to_laserscan
     }
     else // otherwise setup direct subscription
     {
+
+    
       sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
     }
 
-    pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan", 10,
+    pub_ = nh_.advertise<sensor_msgs::LaserScan>("/total_scan", 10,
                                                  boost::bind(&PointCloudToLaserScanNodelet::connectCb, this),
                                                  boost::bind(&PointCloudToLaserScanNodelet::disconnectCb, this));
   }
@@ -113,10 +117,15 @@ namespace pointcloud_to_laserscan
   void PointCloudToLaserScanNodelet::connectCb()
   {
     boost::mutex::scoped_lock lock(connect_mutex_);
+    
     if (pub_.getNumSubscribers() > 0 && sub_.getSubscriber().getNumPublishers() == 0)
     {
       NODELET_INFO("Got a subscriber to scan, starting subscriber to pointcloud");
       sub_.subscribe(nh_, "cloud_in", input_queue_size_);
+    }
+    else{
+      ROS_INFO("pub_.getNumSubscribers() = %d, sub_.getSubscriber().getNumPublishers() = %d",
+      pub_.getNumSubscribers(),sub_.getSubscriber().getNumPublishers());
     }
   }
 
@@ -140,9 +149,11 @@ namespace pointcloud_to_laserscan
   void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
   {
 
+   
     //build laserscan output
     sensor_msgs::LaserScan output;
     output.header = cloud_msg->header;
+    
     if (!target_frame_.empty())
     {
       output.header.frame_id = target_frame_;
@@ -180,6 +191,7 @@ namespace pointcloud_to_laserscan
         cloud.reset(new sensor_msgs::PointCloud2);
         tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_));
         cloud_out = cloud;
+        
       }
       catch (tf2::TransformException &ex)
       {
@@ -190,6 +202,7 @@ namespace pointcloud_to_laserscan
     else
     {
       cloud_out = cloud_msg;
+     
     }
 
     // Iterate through pointcloud

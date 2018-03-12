@@ -129,7 +129,7 @@ void ConvertCloud::convert(){
   pc->clear();
 
   // Create header
-  std::string frame_id("convert_cloud");
+  std::string frame_id("camera_main");
   pc->header.frame_id = frame_id;
   pc->header.seq = ros::Time::now().toNSec()/1e3;
   //pc->header.stamp = ros::Time();
