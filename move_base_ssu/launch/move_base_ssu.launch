@@ -2,14 +2,11 @@
 
 	<!--  ****** Robot Setup ******  -->
 	<param name="wheelbase" value="1.0"/>
-	<node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
-	<node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0 0 0 0 base_link laser 100" />	
-
 
 
 	<!--  ****** Localization 1 (wheelbased odometry) ******  -->
     <node pkg="odometry" type="odom_pub" name="odom_wheelbased">
-        <param name="/frame_id" value="odom_combined"/>
+        <param name="/frame_id" value="odom"/>
         <param name="/child_frame_id" value="base_footprint"/>        
         <param name="/initial_x" value="0.0"/>
         <param name="/initial_y" value="0.0"/>
@@ -39,15 +36,15 @@
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">
 		<rosparam file="$(find move_base_ssu)/cfg/amcl_params.yaml" command="load" />
 
-	    <param name="initial_pose_x"            value="0"/>
-		<param name="initial_pose_y"            value="0"/>
-		<param name="initial_pose_a"            value="1.7"/>
+	    <param name="initial_pose_x"            value="5"/>
+		<param name="initial_pose_y"            value="-2"/>
+		<param name="initial_pose_a"            value="0"/>
 	</node>
 	
 
 
 	<!--  ****** Maps ******  -->
-	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/back_of_ssara.yaml" output="screen">
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/front_of_three.yaml" output="screen">
 		<param name="frame_id" value="map"/>
 	</node>
 
