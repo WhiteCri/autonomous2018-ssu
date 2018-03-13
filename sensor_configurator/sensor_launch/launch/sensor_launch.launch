@@ -1,7 +1,6 @@
 <launch>
- <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node"
-    args="/dev/ttyUSB0 10"/>
-
+	<node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node"
+    	      args="/dev/ttyUSB0 10"/>
   <!-->
   <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10">
       <param name="angle_alignment" value="112"/>
@@ -15,13 +14,29 @@
  
  <param name="GPS_Odometry_initial" value="false"/>
  <-->
- <arg name="host" default="192.168.0.204" />
- <arg name="publish_min_range_as_inf" default="false" />
- <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node">
-    <param name="host" value="$(arg host)" />
-    <param name="publish_min_range_as_inf" value="$(arg publish_min_range_as_inf)" />
- </node>
- <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
-    <rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
- </node>
+ 	<arg name="host" default="192.168.0.204" />
+ 	<arg name="publish_min_range_as_inf" default="false" />
+ 	<node pkg="lms1xx" name="lms1xx" type="LMS1xx_node">
+    		<param name="host" value="$(arg host)" />
+    		<param name="publish_min_range_as_inf" value="$(arg publish_min_range_as_inf)" />
+ 	</node>
+ 	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
+    		<rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
+ 	</node>
+ 	
+	<arg name="cam_num" default="0"/>	
+	<arg name="frequency" default="30"/>
+	<include file="$(find camera_image)/launch/camera_image.launch">
+		<arg name="cam_num" value="$(arg cam_num)"/>
+		<arg name="frequency" value="$(arg frequency)"/>
+	</include> 
+	<node name="lane_detection" pkg="lane_detection" type="lane_detection" respawn="true">
+	</node>
+	<node name="cal_distance" pkg="cal_distance" type="cal_distance" respawn="true">
+	</node>
+    	<node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" respawn="true">
+	</node>
+	<include file="$(find pointcloud_to_laserscan)/launch/sample_node.launch">
+		<arg name="cam_num" value="$(arg cam_num)"/>
+	</include>
 </launch>
