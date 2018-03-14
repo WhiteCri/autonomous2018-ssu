@@ -109,7 +109,7 @@ namespace pointcloud_to_laserscan
       sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
     }
 
-    pub_ = nh_.advertise<sensor_msgs::LaserScan>("/total_scan", 10,
+    pub_ = nh_.advertise<sensor_msgs::LaserScan>("/scan", 10,
                                                  boost::bind(&PointCloudToLaserScanNodelet::connectCb, this),
                                                  boost::bind(&PointCloudToLaserScanNodelet::disconnectCb, this));
   }

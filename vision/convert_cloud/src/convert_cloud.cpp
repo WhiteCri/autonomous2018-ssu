@@ -33,7 +33,7 @@ class ConvertCloud{
 public:
     ConvertCloud(){
         sub_ = nh_.subscribe("/cam0/dist",100,&ConvertCloud::distCb,this);
-     //   sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
+        sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
         pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam0/point_cloud",1);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
