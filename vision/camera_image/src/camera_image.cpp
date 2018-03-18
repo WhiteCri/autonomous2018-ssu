@@ -6,7 +6,7 @@
 // argv[0] : camera_number, argv[1] : frequency
 
 
-static const bool DEBUG = true; // 디버깅 스위치
+static const bool DEBUG = false; // 디버깅 스위치
 static const std::string OPENCV_WINDOW = "Raw Image Window";
 
 template < typename T > std::string to_string( const T& n );

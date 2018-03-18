@@ -2,7 +2,7 @@
 	<node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node"
     	      args="/dev/ttyUSB0 10"/>
 	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py"
-	 	name="cmd_vel_to_ackermann_drive.py"/>
+	 	name="cmd_vel_to_ackermann_drive"/>
 	<node pkg="platform_tx" type="platform_tx" name="platform_tx" output="screen" args="/dev/ttyUSB0">
         <param name="angleToSerialValue" value="71.0"/>
         <param name="maxSteeringAngle" value="24.0"/>
@@ -39,7 +39,7 @@
     		<rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
  	</node>
  	
-	<arg name="cam_num" default="0"/>	
+	<arg name="cam_num" default="1"/>	
 	<arg name="frequency" default="30"/>
 	<include file="$(find camera_image)/launch/camera_image.launch">
 		<arg name="cam_num" value="$(arg cam_num)"/>

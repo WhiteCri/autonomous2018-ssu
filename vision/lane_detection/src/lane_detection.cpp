@@ -34,7 +34,7 @@
 static const std::string OPENCV_WINDOW_VF = "Image by videofile";
 static const std::string OPENCV_WINDOW_WC = "Image by webcam";
 static const bool DEBUG_SW = false;
-static const bool TRACK_BAR = true;
+static const bool TRACK_BAR = false;
 lane_detect_algo::vec_mat_t lane_m_vec;
 
 int check = 0;
@@ -154,7 +154,7 @@ class InitImgObjectforROS{
                 //H  :색의 종류를 나타냄. S : 0이면 무채색(gray 색), 255면 가장 선명한(순수한) 색
                 //V  : 작을수록 어둡고 클수록 밝은 색
                 // 히스토그램
-            //    cv::imshow("adaptive_yellow",yellow2);
+                cv::imshow("adaptive_yellow",yellow2);
                 cv::Mat yellowYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                 cv::Mat whiteYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                 cv::Mat yellowXProj(cv::Size(frame_width, frame_height), CV_8UC1);
@@ -163,13 +163,13 @@ class InitImgObjectforROS{
                 yellow3 = yellow2.clone();
                 
                 const int64 start = cv::getTickCount();/////////////time check///////////////////////
-                callane.makeContoursLeftLane(yellow2, yellow3);
-                callane.makeContoursRightLane(white2, white3);
-
+           //     callane.makeContoursLeftLane(yellow2, yellow3);
+          //      callane.makeContoursRightLane(white2, white3);
+                
                 int64 elapsed = (cv::getTickCount() - start);////////time check//////////////////////
                // std::cout << "Elapsed time " << elapsed << std::endl;
 
-                laneColor = yellow3 | white3;
+                laneColor = yellow2 | white2;
 
                 cv::Mat inv_bev = frame.clone();
              //   imshow("my_bev",bev);
@@ -184,18 +184,18 @@ class InitImgObjectforROS{
                 int coordi_count = 0;
                 coordi_array.data.clear();
                 coordi_array.data.push_back(10);
-                // for (int y = pub_img.rows-1; y >=0; y--) {
-                //     uchar* inv_bev_data = pub_img.ptr<uchar>(y);
-                //     uchar* my_data = inv_bev.ptr<uchar>(y);
-                //         for (int x = 0; x < pub_img.cols; x++) {
-                //             if (inv_bev_data[x] != (uchar)0) {
-                //                 coordi_count++;
-                //                 coordi_array.data.push_back(x);
-                //                 coordi_array.data.push_back(y);
-                //                 my_data[x*inv_bev.channels()] = 255;
-                //             }
-                //         }
-                // }
+                for (int y = pub_img.rows-1; y >=0; y--) {
+                    uchar* inv_bev_data = pub_img.ptr<uchar>(y);
+                    uchar* my_data = inv_bev.ptr<uchar>(y);
+                        for (int x = 0; x < pub_img.cols; x++) {
+                            if (inv_bev_data[x] != (uchar)0) {
+                                coordi_count++;
+                                coordi_array.data.push_back(x);
+                                coordi_array.data.push_back(y);
+                                my_data[x*inv_bev.channels()] = 255;
+                            }
+                        }
+                }
 
                 for(int y = output_origin.rows-1; y>=0; y--){
                     uchar* origin_data = output_origin.ptr<uchar>(y);
@@ -261,7 +261,7 @@ int main(int argc, char **argv){
     
      
 //    std::cout<<coordi_array.data[0];
-    ros::Rate loop_rate(5);
+    ros::Rate loop_rate(30);
  //   coordi_array.data.push_back(10);
  
    // cv::imshow("mm",img_obj.pub_img);
