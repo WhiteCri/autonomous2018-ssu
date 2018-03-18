@@ -1,6 +1,6 @@
 TebLocalPlannerROS:
 
- odom_topic: odom_combined
+ odom_topic: odom/wheelbased
     
  # Trajectory
   
