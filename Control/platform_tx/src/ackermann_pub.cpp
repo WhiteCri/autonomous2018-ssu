@@ -18,11 +18,11 @@ int main(int argc, char *argv[]){
     while(ros::ok()){
         msg.header.seq = seq++;
         msg.header.stamp = ros::Time::now();
-        msg.drive.steering_angle = 10;
-        msg.drive.speed = 0;
+        msg.drive.steering_angle = 0;
+        msg.drive.speed = 0.5;
         nh.getParam("txSpeed",msg.drive.speed);
-        if(flag) msg.drive.speed = -msg.drive.speed;
-        flag = !flag;
+        //if(flag) msg.drive.speed = -msg.drive.speed;
+        //flag = !flag;
         ackermann_publisher.publish(msg);
         loop_rate.sleep();
     }

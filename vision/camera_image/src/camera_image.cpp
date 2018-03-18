@@ -100,7 +100,7 @@ void CameraImage::sendImage(){
 }
 
 std::string CameraImage::createTopicName(){
-    topic_name =  "/cam"+ to_string(0) +"/raw_image";
+    topic_name =  "/cam"+ to_string(1) +"/raw_image";
 }
 
 template < typename T > 

@@ -32,9 +32,9 @@ class ConvertCloud{
 
 public:
     ConvertCloud(){
-        sub_ = nh_.subscribe("/cam0/dist",100,&ConvertCloud::distCb,this);
+        sub_ = nh_.subscribe("/cam1/dist",100,&ConvertCloud::distCb,this);
         sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
-        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam0/point_cloud",1);
+        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam1/point_cloud",1);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
     }
@@ -97,7 +97,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
     }
 ROS_INFO("size : %u",size);
     if(DEBUG) {    
-        std::cout<<"size : "<<size<<std::endl;
+        std::cout<<"size : "<<distVec.size()<<std::endl;
         for(int i=0; i<distXdata.size(); i++){
             std::cout<<"X : "<<distXdata[i]<<" / Y : "<<distYdata[i]<<std::endl;
         }

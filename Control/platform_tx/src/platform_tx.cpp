@@ -2,15 +2,19 @@
 #include <serial/serial.h>
 #include <ackermann_msgs/AckermannDriveStamped.h>
 #include <deque>
+#include <thread>
+#include <mutex>
+
 
 
 #define TX_PACKET_LENGTH 14
 
 #define PI 3.141592
-#define RAD2SERIAL (180.0 / PI) * 100.0         // rad -> deg -> serial
+#define RAD2SERIAL (180.0 / PI) * 100.0         // rad ->[ 86%] Built target robot_localization deg -> serial
 #define M_S2SERIAL (3600.0 / 1000.0) * 10.0     // m/s -> km/h -> serial
 #define MAX_STEER_ANGLE 20.0                    // maximum steering angle = 20 [deg]
 
+#define TX_SERIAL_FREQUENCY 50
 //#define TX_DEBUG
 //#define RX_SUBSCRIBE
 
@@ -24,6 +28,8 @@ static double maxSpeed; // m/s
 static double m_s2serial;
 
 static int frequency;
+
+std::mutex lock;
 
 uint8_t packet[TX_PACKET_LENGTH] = {};
 
@@ -95,6 +101,15 @@ inline void checkSteeringBound(double& steeringAngle){
         steeringAngle = minSteeringAngle;
 }
 
+void serialWrite(){
+    ros::Rate loop_rate(TX_SERIAL_FREQUENCY);
+    while(true){
+        lock.lock();
+        ser->write(packet,TX_PACKET_LENGTH);
+        lock.unlock();
+        loop_rate.sleep();
+    }
+}
 
 void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
     static uint8_t alive = 0;
@@ -132,7 +147,6 @@ ROS_INFO("serial angle : %d",serialSteeringAngle);
 
 void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
     createSerialPacket(msg);
-    ser->write(packet,TX_PACKET_LENGTH);
 }
 
 int main(int argc, char *argv[]){
@@ -159,9 +173,12 @@ int main(int argc, char *argv[]){
 
     ros::Rate loop_rate(frequency);
 
+    std::thread tr(serialWrite);
+    tr.detach();
 #ifndef TX_DEBUG
     while(ros::ok()){
         ros::spinOnce();
+        //ser->write(packet,TX_PACKET_LENGTH);
         loop_rate.sleep();
     }
 #else

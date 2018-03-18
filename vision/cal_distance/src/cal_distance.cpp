@@ -23,8 +23,8 @@ public:
     CalDistance()
         : xCenter(X_CENTER), yCenter(Y_CENTER), yGap(0.0), yGap50(0.0), yDist(0.0), xGap(0.0), xDist(0.0)
     {
-        sub_ = nh_.subscribe("/cam0/lane",100,&CalDistance::laneCb,this);
-        pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/cam0/dist", 100);
+        sub_ = nh_.subscribe("/cam1/lane",100,&CalDistance::laneCb,this);
+        pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/cam1/dist", 100);
     }
     void calXdist();
     void calYgap50();

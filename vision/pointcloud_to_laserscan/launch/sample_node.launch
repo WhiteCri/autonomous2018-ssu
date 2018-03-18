@@ -2,10 +2,10 @@
 
 <launch>
 
-    <arg name="cam_num" default="0"/>	
+    <arg name="cam_num" default="1"/>	
     <!-- run pointcloud_to_laserscan node -->
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
-        <remap from="cloud_in"  to="/cam0/point_cloud"/>
+        <remap from="cloud_in"  to="/cam1/point_cloud"/>
         <remap from="scan" to="/scan"/>
         <rosparam>
             target_frame: camera_main # Leave disabled to output scan in pointcloud frame
@@ -18,7 +18,7 @@
             angle_increment: 0.0087 # M_PI/360.0
             scan_time: 0.1
             range_min: 0
-            range_max: 10
+            range_max: 500
             use_inf: false
             inf_epsilon: 1.0
 

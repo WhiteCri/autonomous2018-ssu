@@ -22,7 +22,7 @@ int main(int argc, char **argv){
     cv::namedWindow("view");
     cv::startWindowThread();
     image_transport::ImageTransport it(nh);
-    image_transport::Subscriber sub = it.subscribe("cam0/raw_image",1, imageCallback);
+    image_transport::Subscriber sub = it.subscribe("cam1/raw_image",1, imageCallback);
     ros::spin();
     cv::destroyWindow("view");
 }

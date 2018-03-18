@@ -34,7 +34,7 @@
 static const std::string OPENCV_WINDOW_VF = "Image by videofile";
 static const std::string OPENCV_WINDOW_WC = "Image by webcam";
 static const bool DEBUG_SW = false;
-static const bool TRACK_BAR = false;
+static const bool TRACK_BAR = true;
 lane_detect_algo::vec_mat_t lane_m_vec;
 
 int check = 0;
@@ -49,7 +49,7 @@ class InitImgObjectforROS{
         image_transport::Subscriber sub_img;
         std_msgs::Int32MultiArray coordi_array;
         cv::Mat pub_img;
-        ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("/cam0/lane",100);//파라미터로 카메라 번호 받도록하기
+        ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("/cam1/lane",100);//파라미터로 카메라 번호 받도록하기
         InitImgObjectforROS():it(nh){
             if(DEBUG_SW){//'DEBUG_SW == TURE' means subscribing videofile image
                 sub_img = it.subscribe("/videofile/image_raw",1,&InitImgObjectforROS::imgCb,this);
@@ -57,7 +57,7 @@ class InitImgObjectforROS{
               //  cv::namedWindow(OPENCV_WINDOW_VF);
             }
             else{//'DEBUG_SW == FALE' means subscribing webcam image
-                sub_img = it.subscribe("/cam0/raw_image",1,&InitImgObjectforROS::imgCb,this);
+                sub_img = it.subscribe("/cam1/raw_image",1,&InitImgObjectforROS::imgCb,this);
                 
                // cv::namedWindow(OPENCV_WINDOW_WC);
             }
@@ -178,7 +178,7 @@ class InitImgObjectforROS{
              //   imshow("my_inv_bev",inv_bev);
                 cv::Mat newlane = frame.clone();
                 callane.inverseBirdEyeView(laneColor, newlane);
-            //    cv::imshow("newlane", newlane);
+                cv::imshow("newlane", newlane);
                 cv::Mat output_origin = origin.clone();
                 pub_img = newlane.clone();
                 int coordi_count = 0;
@@ -202,7 +202,7 @@ class InitImgObjectforROS{
                     uchar* pub_img_data = pub_img.ptr<uchar>(y*0.5);//resize 복구(0.5 -> 1))
                         for(int x = 0; x<output_origin.cols; x++){
                             int temp = x*0.5;//resize 복구(0.5 -> 1)
-                            if(pub_img_data[temp]!= (uchar)0){
+                            if(pub_img_data[temp]!= (uchar)0 && x%2==0){
                                 coordi_count++;
                                 coordi_array.data.push_back(x);
                                 coordi_array.data.push_back(y);
