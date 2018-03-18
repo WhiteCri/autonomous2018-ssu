@@ -72,4 +72,8 @@
 	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py" 
 		name="cmd_vel_to_ackermann_drive.py"/>
 
+	 <!--  **************** Visualisation ****************  -->
+	  <node name="rviz" pkg="rviz" type="rviz"/>
+	  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+
 </launch>
