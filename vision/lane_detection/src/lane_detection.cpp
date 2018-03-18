@@ -206,12 +206,12 @@ class InitImgObjectforROS{
                                 coordi_count++;
                                 coordi_array.data.push_back(x);
                                 coordi_array.data.push_back(y);
-             //                   origin_data[x*output_origin.channels()] = 255;
+                                origin_data[x*output_origin.channels()] = 255;
                         }
                     }
                 } 
                 coordi_array.data[0] = coordi_count;
-            //    imshow("myorigin",output_origin);
+                imshow("myorigin",output_origin);
                 cv::Mat inv_lane = laneColor.clone();
                 callane.inverseBirdEyeView(laneColor, inv_lane);
         

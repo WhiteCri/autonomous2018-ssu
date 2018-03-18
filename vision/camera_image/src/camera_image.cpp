@@ -91,7 +91,7 @@ void CameraImage::sendImage(){
         if(DEBUG) cv::imshow(OPENCV_WINDOW,frame);
 
         msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-        camera_image_pub_.publish(msg);                
+        camera_image_pub_.publish(msg);             
         }                        
         int ckey = cv::waitKey(1);
         if(ckey == 27)break;
@@ -100,7 +100,7 @@ void CameraImage::sendImage(){
 }
 
 std::string CameraImage::createTopicName(){
-    topic_name =  "/cam"+ to_string(camera_number) +"/raw_image";
+    topic_name =  "/cam"+ to_string(0) +"/raw_image";
 }
 
 template < typename T > 

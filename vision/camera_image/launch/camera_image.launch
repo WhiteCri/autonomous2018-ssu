@@ -1,5 +1,5 @@
 <launch>
-    <arg name="cam_num" default="0"/>
+    <arg name="cam_num" default="1"/>
     <arg name="frequency" default="30"/>
 	<node name="camera_image" pkg="camera_image" type="camera_image" respawn="true" respawn_delay="2" args="$(arg cam_num) $(arg frequency)"/>
 </launch>

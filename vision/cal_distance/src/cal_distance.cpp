@@ -13,7 +13,7 @@
 
 // xGap = xCenter - xTarget, yGap = yTarget - yCenter
 
-static const bool DEBUG = true;
+static const bool DEBUG = false;
 
 class CalDistance{
     ros::NodeHandle nh_;

@@ -21,7 +21,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <laser_geometry/laser_geometry.h>
 
-static const bool DEBUG = true;
+static const bool DEBUG = false;
 
 
 class ConvertCloud{
@@ -71,6 +71,8 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
     
     distXdata.clear();
     distYdata.clear();
+    distXdata.resize(0);
+    distYdata.resize(0);
 
     std::vector<float>::const_iterator it;
 
@@ -93,7 +95,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
             break;
         }
     }
-
+ROS_INFO("size : %u",size);
     if(DEBUG) {    
         std::cout<<"size : "<<size<<std::endl;
         for(int i=0; i<distXdata.size(); i++){

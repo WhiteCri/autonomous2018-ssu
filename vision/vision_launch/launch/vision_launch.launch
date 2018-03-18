@@ -1,5 +1,5 @@
 <launch>
-	<arg name="cam_num" default="0"/>	
+	<arg name="cam_num" default="1"/>	
 	<arg name="frequency" default="30"/>
 	<include file="$(find camera_image)/launch/camera_image.launch">
 		<arg name="cam_num" value="$(arg cam_num)"/>
