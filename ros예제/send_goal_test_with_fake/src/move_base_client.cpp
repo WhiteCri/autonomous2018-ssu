@@ -7,7 +7,7 @@
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
 int main(int argc, char** argv){
-    ros::init(argc, argv, "simple_navigation_goals");
+    ros::init(argc, argv, "move_base_client");
 
     //tell the action client that we want to spin a thread by default
     MoveBaseClient ac("move_base", true);
@@ -17,9 +17,9 @@ int main(int argc, char** argv){
     std::vector<int> x_goal, y_goal;
     std::vector<double> yaw_goal;
 
-    nh.getParam("/send_goal/send_goal/x_goal", x_goal);
-    nh.getParam("/send_goal/send_goal/y_goal", y_goal);
-    nh.getParam("/send_goal/send_goal/yaw_goal", yaw_goal);
+    nh.getParam("/move_base_client/send_goal/x_goal", x_goal);
+    nh.getParam("/move_base_client/send_goal/y_goal", y_goal);
+    nh.getParam("/move_base_client/send_goal/yaw_goal", yaw_goal);
 
     //wait for the action server to come up
     while(!ac.waitForServer(ros::Duration(5.0))){
@@ -48,11 +48,11 @@ int main(int argc, char** argv){
         ac.waitForResult();
 
         if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
-            ROS_WARN("Complete Driving. Sending Next Goal...");
+            ROS_INFO("Hooray, the base moved 1 meter forward");
             idx++;
         }
         else
-            ROS_INFO("failed to reach the goal");
+            ROS_INFO("The base failed to move forward 1 meter for some reason");
     }
     return 0;
 }
