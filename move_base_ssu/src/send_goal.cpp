@@ -2,6 +2,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <tf/transform_broadcaster.h>
+#define RAD2DEG 1 / (180.0)*3.141592
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
@@ -30,7 +31,8 @@ int main(int argc, char** argv){
     //we'll send a goal to the robot to move 1 meter forward
 
     size_t idx = 0;
-    while(idx < x_goal.size()){
+    size_t goal_count = x_goal.size();
+    while(idx < goal_count){
         goal.target_pose.header.frame_id = "base_link";
         goal.target_pose.header.stamp = ros::Time::now();
 
@@ -40,7 +42,7 @@ int main(int argc, char** argv){
             static_cast<double>(yaw_goal[idx])
         );
 
-        ROS_INFO("Sending goal");
+        ROS_INFO("Sending goal : %d %d %lf", x_goal[idx], y_goal[idx], yaw_goal[idx] / RAD2DEG);
         ac.sendGoal(goal);
 
         ac.waitForResult();
