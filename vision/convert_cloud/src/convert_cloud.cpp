@@ -42,7 +42,9 @@ public:
   void laserCb(const sensor_msgs::LaserScan::ConstPtr& input);
   void parseVec();
   void convert();
-
+  ros::NodeHandle getNh();
+  ros::Publisher getPub();
+  sensor_msgs::PointCloud2 getPc_out();
 
 private:
   pcl::PointCloud<pcl::PointXYZ>::Ptr pc;
@@ -58,7 +60,13 @@ private:
 int main(int argc, char** argv){
   ros::init(argc,argv,"convert_cloud");
   ConvertCloud cvtCloud;
-  ros::spin();
+  ros::NodeHandle nh = cvtCloud.getNh();
+  ros::Publisher pub = cvtCloud.getPub();
+
+  while(nh.ok()){
+    pub.publish(cvtCloud.getPc_out());
+    ros::spinOnce();
+  }
 
   return 0;
 }
@@ -95,7 +103,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
             break;
         }
     }
-ROS_INFO("size : %u",size);
+    ROS_INFO("size : %u",size);
     if(DEBUG) {    
         std::cout<<"size : "<<distVec.size()<<std::endl;
         for(int i=0; i<distXdata.size(); i++){
@@ -150,8 +158,10 @@ void ConvertCloud::convert(){
   if(DEBUG) std::cout<<"make cloud done"<<std::endl;
   
   pc->clear();
-  pub_.publish(pc_out);
-  
 
+    
 }
 
+ros::NodeHandle ConvertCloud::getNh(){ return nh_; }
+ros::Publisher ConvertCloud::getPub(){ return pub_; }
+sensor_msgs::PointCloud2 ConvertCloud::getPc_out(){ return pc_out; }
