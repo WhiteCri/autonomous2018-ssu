@@ -48,11 +48,11 @@ int main(int argc, char** argv){
         ac.waitForResult();
 
         if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
-            ROS_INFO("Hooray, the base moved 1 meter forward");
+            ROS_WARN("Complete Driving. Sending Next Goal...");
             idx++;
         }
         else
-            ROS_INFO("The base failed to move forward 1 meter for some reason");
+            ROS_INFO("failed to reach the goal");
     }
     return 0;
 }
