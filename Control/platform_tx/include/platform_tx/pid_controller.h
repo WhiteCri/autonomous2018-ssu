@@ -7,7 +7,7 @@ PID_Controller()
     : current_speed_(0.0), current_steer_(0.0)
     , ref_speed_(0.0), ref_steer_(0.0)
     , err_speed_(0.0), err_steer_(0.0)
-    , cmd_speed_(0.0), cmd_steer_(0.0)
+    , cmd_speed_(0.0), cmd_steer_(0.0), cmd_brake_(0.0)
     , kp_speed_(0.0), ki_speed_(0.0), kd_speed_(0.0)
     , kp_steer_(0.0), ki_steer_(0.0), kd_steer_(0.0)
     , kp_brake_(0.0), ki_brake_(0.0), kd_brake_(0.0)
@@ -30,13 +30,13 @@ void Init(void) // Controller 돌리기 전에 initialize (dt 계산을 위한 t
     timestamp_ = ros::Time::now();
 }
 
-void Read_State(double &speed, double &steer) // "Platform_RX 받는 부분에 사용 (Platform Unit-> SI Unit으로 변환해서 넣기)
+void Read_State(double speed, double steer) // "Platform_RX 받는 부분에 사용 (Platform Unit-> SI Unit으로 변환해서 넣기)
 {
     current_speed_ = speed;
     current_steer_ = steer;
 }
 
-void Read_Reference(double &speed, double &steer) // "ackermann_cmd 받는 부분에 사용 (Platform Unit-> SI Unit으로 변환해서 넣기)
+void Read_Reference(double speed, double steer) // "ackermann_cmd 받는 부분에 사용 (Platform Unit-> SI Unit으로 변환해서 넣기)
 {
     ref_speed_ = speed;
     ref_steer_ = steer;
@@ -80,6 +80,10 @@ void Calc_PID(void) // read_state, read_reference로 읽은 후에 Platform_TX(S
     cmd_steer_ = err_steer_ * (kp_steer_ + ki_steer_*dt + kd_steer_/dt);
 }
 
+inline double cmd_speed(void){ return cmd_speed_; }
+inline double cmd_steer(void){ return cmd_steer_; }
+inline double cmd_brake(void){ return cmd_brake_; }
+
 private:
     ros::NodeHandle priv_nh_;
     ros::Time timestamp_;
@@ -88,6 +92,7 @@ private:
     double ref_speed_, ref_steer_;
     double err_speed_, err_steer_;
     double cmd_speed_, cmd_steer_, cmd_brake_;
+    
     double kp_speed_, ki_speed_, kd_speed_;
     double kp_steer_, ki_steer_, kd_steer_;
     double kp_brake_, ki_brake_, kd_brake_;

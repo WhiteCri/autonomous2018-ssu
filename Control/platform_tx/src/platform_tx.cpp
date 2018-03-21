@@ -6,18 +6,18 @@
 #include <mutex>
 #include "platform_tx/pid_controller.h"
 
-
-
 #define TX_PACKET_LENGTH 14
+#define TX_SERIAL_FREQUENCY 50
 
 #define PI 3.141592
 #define RAD2SERIAL (180.0 / PI) * 100.0         // rad ->[ 86%] Built target robot_localization deg -> serial
 #define M_S2SERIAL (3600.0 / 1000.0) * 10.0     // m/s -> km/h -> serial
 #define MAX_STEER_ANGLE 20.0                    // maximum steering angle = 20 [deg]
 
-#define TX_SERIAL_FREQUENCY 50
 //#define TX_DEBUG
-//#define RX_SUBSCRIBE
+#define RX_SUBSCRIBE
+
+PID_Controller PID;
 
 static double angleToSerialValue;
 static double maxSteeringAngle;
@@ -73,9 +73,7 @@ std::deque<platform_rx_msg::platform_rx_msg> rxMsgdeq(10);
 //for pid. I'm not sure but maybe this will be needed in the future
 void rxMsgCallBack(const platform_rx_msg::platform_rx_msg::ConstPtr& msg){
     platform_rx_msg::platform_rx_msg temp;
-    temp.speed = msg->steer;
-    temp.steer = msg->steer;
-    temp.brake = msg->brake;
+    PID.Read_State(msg->speed, msg->steer);
     rxMsgdeq.push_front(temp);
     rxMsgdeq.pop_back();
     ROS_INFO("rxMsgSubscribing Done!");
@@ -125,20 +123,20 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
 
 //  //speed. should put value (KPH * 10);
     //1 m/s = 3.6 kph
-    double speed = fabs(msg->drive.speed);
-    checkSpeedBound(speed);
+    double speed = fabs(PID.cmd_speed());
+    //checkSpeedBound(speed);
     uint16_t serialSpeed = speed * m_s2serial;
     *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
 ROS_INFO("serial speed : %u",serialSpeed);
 //  //steer. should put value (actual steering degree * 71)
-    double angle = -msg->drive.steering_angle;
-    checkSteeringBound(angle);
+    double angle = -PID.cmd_steer();
+    //checkSteeringBound(angle);
     int16_t serialSteeringAngle = angle * angleToSerialValue + alignmentBias;
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
 ROS_INFO("serial angle : %d",serialSteeringAngle);
 //  //brake. low number is low braking. 1 ~ 200
-    packet[10] = static_cast<uint8_t>(1);
+    packet[10] = static_cast<uint8_t>(1 + (2*PID.cmd_brake()));
     //checkBrakeBound()
 
     packet[11] = static_cast<uint8_t>(alive);//alive
@@ -147,6 +145,7 @@ ROS_INFO("serial angle : %d",serialSteeringAngle);
 
 
 void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
+    PID.Read_Reference(msg->drive.speed, msg->drive.steering_angle);
     createSerialPacket(msg);
 }
 
