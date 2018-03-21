@@ -34,15 +34,17 @@ public:
     ConvertCloud(){
         sub_ = nh_.subscribe("/cam1/dist",100,&ConvertCloud::distCb,this);
         sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
-        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam1/point_cloud",1);
+        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam1/point_cloud",100);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
     }
   void distCb(const std_msgs::Float32MultiArray::ConstPtr& distData);
-  void laserCb(const sensor_msgs::LaserScan::ConstPtr& input);
+  void laserCb(const sensor_msgs::LaserScan input);
   void parseVec();
   void convert();
-
+  ros::NodeHandle getNh();
+  ros::Publisher getPub();
+  sensor_msgs::PointCloud2 getPc_out();
 
 private:
   pcl::PointCloud<pcl::PointXYZ>::Ptr pc;
@@ -58,12 +60,18 @@ private:
 int main(int argc, char** argv){
   ros::init(argc,argv,"convert_cloud");
   ConvertCloud cvtCloud;
-  ros::spin();
+  ros::NodeHandle nh = cvtCloud.getNh();
+  ros::Publisher pub = cvtCloud.getPub();
+
+  while(nh.ok()){
+    pub.publish(cvtCloud.getPc_out());
+    ros::spinOnce();
+  }
 
   return 0;
 }
-void ConvertCloud::laserCb(const sensor_msgs::LaserScan::ConstPtr& input){
-
+void ConvertCloud::laserCb(const sensor_msgs::LaserScan input){
+    
 }
 void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData){    
 
@@ -95,7 +103,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
             break;
         }
     }
-ROS_INFO("size : %u",size);
+    ROS_INFO("size : %u",size);
     if(DEBUG) {    
         std::cout<<"size : "<<distVec.size()<<std::endl;
         for(int i=0; i<distXdata.size(); i++){
@@ -133,7 +141,7 @@ void ConvertCloud::convert(){
   // Create header
   std::string frame_id("camera_main");
   pc->header.frame_id = frame_id;
-  pc->header.seq = ros::Time::now().toNSec()/1e3;
+//  pc->header.seq = ros::Time::now().toNSec()/1e3;
   //pc->header.stamp = ros::Time();
 
   pcl::PointCloud<pcl::PointXYZ>::iterator pc_iter = pc->begin();
@@ -150,8 +158,10 @@ void ConvertCloud::convert(){
   if(DEBUG) std::cout<<"make cloud done"<<std::endl;
   
   pc->clear();
-  pub_.publish(pc_out);
-  
 
+    
 }
 
+ros::NodeHandle ConvertCloud::getNh(){ return nh_; }
+ros::Publisher ConvertCloud::getPub(){ return pub_; }
+sensor_msgs::PointCloud2 ConvertCloud::getPc_out(){ return pc_out; }
