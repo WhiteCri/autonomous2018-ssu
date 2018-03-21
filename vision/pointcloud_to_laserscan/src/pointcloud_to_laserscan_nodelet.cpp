@@ -62,13 +62,13 @@ namespace pointcloud_to_laserscan
     private_nh_.param<double>("angle_min", angle_min_, - M_PI);
     private_nh_.param<double>("angle_max", angle_max_, M_PI);
     private_nh_.param<double>("angle_increment", angle_increment_, M_PI / 180.0);
-    private_nh_.param<double>("scan_time", scan_time_, 1.0 / 30.0);
+    private_nh_.param<double>("scan_time", scan_time_, 0.1);
     private_nh_.param<double>("range_min", range_min_, 0.0);
     private_nh_.param<double>("range_max", range_max_, std::numeric_limits<double>::max());
     private_nh_.param<double>("inf_epsilon", inf_epsilon_, 1.0);
-
+    
     int concurrency_level;
-    private_nh_.param<int>("concurrency_level", concurrency_level, 1);
+    private_nh_.param<int>("concurrency_level", concurrency_level,1);
     private_nh_.param<bool>("use_inf", use_inf_, true);
 
     //Check if explicitly single threaded, otherwise, let nodelet manager dictate thread pool size
@@ -94,8 +94,6 @@ namespace pointcloud_to_laserscan
     // if pointcloud target frame specified, we need to filter by transform availability
     if (!target_frame_.empty())
     {
-      
-     
       tf2_.reset(new tf2_ros::Buffer());
       tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
       message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
@@ -166,10 +164,10 @@ namespace pointcloud_to_laserscan
     output.scan_time = scan_time_;
     output.range_min = range_min_;
     output.range_max = range_max_;
-
+  //  output.header.seq = ros::Time::now().toNSec()/1e3;;
     //determine amount of rays to create
     uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
-
+    //uint32_t ranges_size = 10000;
     //determine if laserscan rays with no obstacle data will evaluate to infinity or max_range
     if (use_inf_)
     {
@@ -206,12 +204,13 @@ namespace pointcloud_to_laserscan
     }
 
     // Iterate through pointcloud
+    int count = 0;
     for (sensor_msgs::PointCloud2ConstIterator<float>
               iter_x(*cloud_out, "x"), iter_y(*cloud_out, "y"), iter_z(*cloud_out, "z");
               iter_x != iter_x.end();
               ++iter_x, ++iter_y, ++iter_z)
     {
-
+      count++;
       if (std::isnan(*iter_x) || std::isnan(*iter_y) || std::isnan(*iter_z))
       {
         NODELET_DEBUG("rejected for nan in point(%f, %f, %f)\n", *iter_x, *iter_y, *iter_z);
@@ -241,12 +240,14 @@ namespace pointcloud_to_laserscan
 
       //overwrite range at laserscan ray if new range is smaller
       int index = (angle - output.angle_min) / output.angle_increment;
+      
       if (range < output.ranges[index])
       {
         output.ranges[index] = range;
       }
-
+      
     }
+    ROS_INFO("cloud count : %d",count);
     pub_.publish(output);
   }
 

@@ -34,12 +34,12 @@ public:
     ConvertCloud(){
         sub_ = nh_.subscribe("/cam1/dist",100,&ConvertCloud::distCb,this);
         sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
-        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam1/point_cloud",1);
+        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam1/point_cloud",100);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
     }
   void distCb(const std_msgs::Float32MultiArray::ConstPtr& distData);
-  void laserCb(const sensor_msgs::LaserScan::ConstPtr& input);
+  void laserCb(const sensor_msgs::LaserScan input);
   void parseVec();
   void convert();
   ros::NodeHandle getNh();
@@ -70,8 +70,8 @@ int main(int argc, char** argv){
 
   return 0;
 }
-void ConvertCloud::laserCb(const sensor_msgs::LaserScan::ConstPtr& input){
-
+void ConvertCloud::laserCb(const sensor_msgs::LaserScan input){
+    
 }
 void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData){    
 
@@ -141,7 +141,7 @@ void ConvertCloud::convert(){
   // Create header
   std::string frame_id("camera_main");
   pc->header.frame_id = frame_id;
-  pc->header.seq = ros::Time::now().toNSec()/1e3;
+//  pc->header.seq = ros::Time::now().toNSec()/1e3;
   //pc->header.stamp = ros::Time();
 
   pcl::PointCloud<pcl::PointXYZ>::iterator pc_iter = pc->begin();
