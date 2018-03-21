@@ -31,6 +31,7 @@ public:
     void calYdist();
     void laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData);
     void sendDist();
+    ros::NodeHandle getNh();
 
 
 private:
@@ -52,7 +53,11 @@ int main(int argc, char** argv){
     ros::init(argc, argv, "cal_distance");
 
     CalDistance calDist;
-    ros::spin();
+    while(calDist.getNh().ok()){
+        calDist.sendDist();
+        ros::spinOnce();
+    }
+    
 
     return 0;
 }
@@ -142,5 +147,7 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
         }
     }
 
-    sendDist();
+    
 }
+
+ros::NodeHandle CalDistance::getNh(){ return nh_; }
