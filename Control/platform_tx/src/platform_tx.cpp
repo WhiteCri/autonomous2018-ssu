@@ -4,6 +4,7 @@
 #include <deque>
 #include <thread>
 #include <mutex>
+#include "platform_tx/pid_controller.h"
 
 
 
