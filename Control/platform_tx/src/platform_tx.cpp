@@ -186,8 +186,7 @@ int main(int argc, char *argv[]){
 
     std::thread tr(serialWrite);
     tr.detach();
-    std::thread control(subscribetopic);
-    control.detach();
+
 #ifndef TX_DEBUG
     while(ros::ok()){
         ros::spinOnce();
