@@ -11,9 +11,9 @@ void subscriberaw()
   ros::Subscriber sub_1 = nh.subscribe("/raw/platform_rx", 100, &PlatformController::RX_Callback, &ctrl);
   while(ros::ok())
   {
-    lock.lock();
+   // lock.lock();
     ros::spinOnce();
-    lock.unlock();
+   // lock.unlock();
   }
 }
 
