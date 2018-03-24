@@ -156,20 +156,6 @@ void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
    // createSerialPacket(msg);
 }
 
-void subscribetopic()
-{
-    ros::NodeHandle Node;
-    ros::Subscriber sub1 = Node.subscribe("/ackermann_cmd",100,&ackermannCallBack_);
-    ros::Subscriber sub2 = Node.subscribe("/raw/platform_rx",100,rxMsgCallBack);
-
-    while(true)
-    {
-        lock.lock();
-        ros::spinOnce();
-        lock.unlock();
-    }
-}
-
 int main(int argc, char *argv[]){
     if(argc < 2){
         ROS_ERROR("give me [path]");
@@ -196,8 +182,7 @@ int main(int argc, char *argv[]){
 
     std::thread tr(serialWrite);
     tr.detach();
-    std::thread control(subscribetopic);
-    control.detach();
+
 #ifndef TX_DEBUG
     while(ros::ok()){
         ros::spinOnce();
