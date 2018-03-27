@@ -5,7 +5,6 @@
 
 // argv[0] : camera_number, argv[1] : frequency
 
-#define OPEN
 
 static const bool DEBUG = false; // 디버깅 스위치
 static const std::string OPENCV_WINDOW = "Raw Image Window";
@@ -24,7 +23,7 @@ public:
         createTopicName();  
         if(DEBUG) std::cout<<"topic_name : "<<topic_name<<std::endl;
         camera_image_pub_ = it_.advertise(topic_name,1);
-        cap.open(0);
+        cap.open(camera_number);
     }
 
     ~CameraImage()
@@ -57,11 +56,8 @@ int main(int argc, char** argv){
 
     ros::init(argc, argv, "camera_image");
 
-    //int camera_number = atoi(argv[1]);
-    //int frequency = atoi(argv[2]);
-
-    int camera_number = 1;
-    int frequency = 15;
+    int camera_number = atoi(argv[1]);
+    int frequency = atoi(argv[2]);
 
     ROS_INFO("camera_number : %d / frequency : %d",camera_number, frequency);
     if(!frequency){

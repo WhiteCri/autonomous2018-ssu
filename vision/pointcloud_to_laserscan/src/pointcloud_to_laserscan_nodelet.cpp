@@ -54,7 +54,8 @@ namespace pointcloud_to_laserscan
     boost::mutex::scoped_lock lock(connect_mutex_);
     private_nh_ = getPrivateNodeHandle();
 
-    private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
+//    private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
+private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
     private_nh_.param<double>("transform_tolerance", tolerance_, 0.01);
     private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min());
     private_nh_.param<double>("max_height", max_height_, std::numeric_limits<double>::max());
@@ -207,7 +208,7 @@ namespace pointcloud_to_laserscan
     int count = 0;
     for (sensor_msgs::PointCloud2ConstIterator<float>
               iter_x(*cloud_out, "x"), iter_y(*cloud_out, "y"), iter_z(*cloud_out, "z");
-              iter_x != iter_xpublish.end();
+              iter_x != iter_x.end();
               ++iter_x, ++iter_y, ++iter_z)
     {
       count++;
@@ -245,10 +246,10 @@ namespace pointcloud_to_laserscan
       {
         output.ranges[index] = range;
       }
-      
+        
     }
-    ROS_INFO("cloud count : %d",count);
-    //pub_.publish(output);
+//    ROS_INFO("cloud count : %d",count);
+    pub_.publish(output);
   }
 
 }

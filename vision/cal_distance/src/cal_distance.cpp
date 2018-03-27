@@ -51,12 +51,11 @@ private:
 
 int main(int argc, char** argv){
     ros::init(argc, argv, "cal_distance");
+
     CalDistance calDist;
-    ros::Rate loop_rate(15);
     while(calDist.getNh().ok()){
         calDist.sendDist();
         ros::spinOnce();
-        loop_rate.sleep();
     }
     
 
