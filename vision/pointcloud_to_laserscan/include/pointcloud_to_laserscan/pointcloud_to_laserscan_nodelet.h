@@ -51,6 +51,9 @@
 #include "message_filters/subscriber.h"
 #include "sensor_msgs/PointCloud2.h"
 
+ros::NodeHandle nh_, private_nh_;
+sensor_msgs::LaserScan outputMsg;
+ros::Publisher pub_;
 
 namespace pointcloud_to_laserscan
 {
@@ -76,8 +79,8 @@ namespace pointcloud_to_laserscan
 
     void disconnectCb();
 
-    ros::NodeHandle nh_, private_nh_;
-    ros::Publisher pub_;
+    
+    
     boost::mutex connect_mutex_;
 
     boost::shared_ptr<tf2_ros::Buffer> tf2_;

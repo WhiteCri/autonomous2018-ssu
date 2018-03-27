@@ -59,6 +59,7 @@ int main(int argc, char **argv){
   }else{
     spinner.reset(new ros::MultiThreadedSpinner());
   }
+  
   spinner->spin();
   return 0;
 

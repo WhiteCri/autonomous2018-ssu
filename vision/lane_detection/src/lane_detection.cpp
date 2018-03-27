@@ -33,8 +33,8 @@
 
 static const std::string OPENCV_WINDOW_VF = "Image by videofile";
 static const std::string OPENCV_WINDOW_WC = "Image by webcam";
-static const bool DEBUG_SW = true;
-static const bool IMSHOW_SW = true;
+static const bool DEBUG_SW = false;
+static const bool IMSHOW_SW = false;
 static const bool TRACK_BAR = false;
 static const bool TIME_CHECK = false;
 
@@ -122,7 +122,8 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
 
                     cv::createTrackbar("v max", "TRACKBAR", &vmax, 255, NULL);
                     cv::setTrackbarPos("v max", "TRACKBAR", 180);
-                    }
+                }
+                
                 lane_detect_algo::CalLane callane;
                 cv::Mat bev = frame.clone();
                 callane.birdEyeView(frame,bev);
@@ -210,7 +211,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                 ROS_ERROR("cv_bridge exception : %s", e.what());
                 return;
             }
-            cv::imshow(OPENCV_WINDOW_VF,frame);
+            if(IMSHOW_SW) cv::imshow(OPENCV_WINDOW_VF,frame);
             
             int ckey = cv::waitKey(10);
             if(ckey == 27) exit(1); 
@@ -221,7 +222,7 @@ int main(int argc, char **argv){
     ros::init(argc, argv, "lane_detection");
     ros::NodeHandle nh_;
     InitImgObjectforROS img_obj;
-    ros::Rate loop_rate(30);
+    ros::Rate loop_rate(15);
 
     while(img_obj.nh.ok()){
         img_obj.pub.publish(img_obj.coordi_array);

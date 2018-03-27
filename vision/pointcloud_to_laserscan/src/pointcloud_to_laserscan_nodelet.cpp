@@ -207,7 +207,7 @@ namespace pointcloud_to_laserscan
     int count = 0;
     for (sensor_msgs::PointCloud2ConstIterator<float>
               iter_x(*cloud_out, "x"), iter_y(*cloud_out, "y"), iter_z(*cloud_out, "z");
-              iter_x != iter_x.end();
+              iter_x != iter_xpublish.end();
               ++iter_x, ++iter_y, ++iter_z)
     {
       count++;
@@ -248,7 +248,7 @@ namespace pointcloud_to_laserscan
       
     }
     ROS_INFO("cloud count : %d",count);
-    pub_.publish(output);
+    //pub_.publish(output);
   }
 
 }
