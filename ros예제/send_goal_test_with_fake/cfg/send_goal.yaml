@@ -1,0 +1,4 @@
+send_goal:
+  x_goal: [1, 2]
+  y_goal: [1, 2]
+  yaw_goal: [0, 0]
