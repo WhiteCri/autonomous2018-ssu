@@ -62,8 +62,14 @@ int main(int argc, char** argv){
   ConvertCloud cvtCloud;
   ros::NodeHandle nh = cvtCloud.getNh();
   ros::Publisher pub = cvtCloud.getPub();
+  bool is_cross_walk = false;
 
   while(nh.ok()){
+
+    if(ros::param::get("cross_walk",is_cross_walk)){
+      //차량정지 및 파라미터값 복구 작성 예정
+    } 
+     
     pub.publish(cvtCloud.getPc_out());
     ros::spinOnce();
   }
@@ -103,7 +109,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
             break;
         }
     }
-    ROS_INFO("size : %u",size);
+//    ROS_INFO("size : %u",size);
     if(DEBUG) {    
         std::cout<<"size : "<<distVec.size()<<std::endl;
         for(int i=0; i<distXdata.size(); i++){
@@ -140,8 +146,9 @@ void ConvertCloud::convert(){
 
   // Create header
   std::string frame_id("camera_main");
+
   pc->header.frame_id = frame_id;
-//  pc->header.seq = ros::Time::now().toNSec()/1e3;
+  pc->header.seq = ros::Time::now().toNSec()/1e3;
   //pc->header.stamp = ros::Time();
 
   pcl::PointCloud<pcl::PointXYZ>::iterator pc_iter = pc->begin();
@@ -150,7 +157,8 @@ void ConvertCloud::convert(){
   int count = 0;
   while(data_iter != distVec.end()){
     pcl::PointXYZ inputPoint((*data_iter)[0],(*data_iter)[1],(*data_iter)[2]);
-    pc_iter = pc->insert(pc_iter, inputPoint);
+    //pc_iter = pc->insert(pc_iter, inputPoint);
+    (*pc).points.push_back(inputPoint);
     ++data_iter;
   }
 

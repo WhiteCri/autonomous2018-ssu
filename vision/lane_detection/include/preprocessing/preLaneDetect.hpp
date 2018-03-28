@@ -59,17 +59,28 @@ namespace lane_detect_algo
             void checkFrame(vec_mat_t frame_vec);
             cv::Mat makeLanePoint(cv::Mat lane_img);
             void drawLane(vec2i_t coordi_vec);
-            void detectHSVcolor(const cv::Mat& src, cv::Mat& dst, double minHue, double maxHue, double minSat, double maxSat, double minVal, double maxVal);
+            void detectYHSVcolor(const cv::Mat& src, cv::Mat& dst, double minHue, double maxHue, double minSat, double maxSat, double minVal, double maxVal);
+            void detectWHSVcolor(const cv::Mat& src, cv::Mat& dst, double minHue, double maxHue, double minSat, double maxSat, double minVal, double maxVal);
+            void detectWhiteLane(cv::Mat src, cv::Mat& dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax, int amin, int amax);
             void birdEyeView(cv::Mat src, cv::Mat& dst);
             void inverseBirdEyeView(cv::Mat src, cv::Mat& dst);
-            void makeYProjection(cv::Mat src, cv::Mat dst, unsigned int* H_result);
+            void makeYProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result);
             void makeXProjection(cv::Mat src, cv::Mat dst, unsigned int* H_result);
             void medianForXHistogram(unsigned int* H_result, int H_result_size);
             void makeWindow(cv::Mat src, cv::Mat dst, int window_width, int window_offset, int per_lane_checked);
             void slideWindow(cv::Mat src, int window_width, int window_height, int per_lane_in_window);
             bool addMat_imsi(cv::Mat src, int per_lane_in_window);
             void makeContoursLeftLane(cv::Mat src, cv::Mat& dst);
+            void crosswalkCheck(cv::Mat);
+            void makeContoursRightLane(cv::Mat src, cv::Mat& dst, int* crosswalk);
             void makeContoursRightLane(cv::Mat src, cv::Mat& dst);
+            
     };
     
 }
+// cv::threshold(white_hsv, white_thresh, 180, 255, CV_THRESH_BINARY);
+// cv::Mat afterSobel;
+// cv::Sobel(white_thresh,afterSobel,CV_32F,1,0);
+// callane.detectWHSVcolor(bev, white_hsv, w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax);
+// callane.detectWHSVcolor(bev, yellow_hsv, 0, 180, 0, 20, 200, 255);
+
