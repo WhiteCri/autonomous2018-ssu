@@ -2,10 +2,13 @@
 #include <serial/serial.h>
 #include <mutex>
 #include <thread>
+#include <deque>
 #include "platform_rx_msg/platform_rx_msg.h"
 
 static constexpr int serial_read_loop_rate = 50;
-static constexpr int pub_loop_rate = 25;
+static constexpr int pub_loop_rate = 10;
+static constexpr int encoder_memory = 4;
+static constexpr int encoder_gap_memory = encoder_memory - 1;
 serial::Serial ser;
 std::mutex lock;
 
@@ -27,6 +30,7 @@ void readSerial(){
         seq++;
         if(ser.available() >= 18) raw = ser.read(ser.available());
         else loop_rate.sleep(); 
+
         const char *check = raw.c_str();
         if((check[0] == 0x53) & (check[1] == 0x54) & (check[2] == 0x58) & check[16] == 0x0D & check[17] == 0x0a ){
             lock.lock();
@@ -75,16 +79,38 @@ int main (int argc, char** argv){
     size_t seq = 0;
     uint8_t packet_main[18] ={0};
 
-int encoder_past = 0;    
+    //speed calcuration member
+    std::deque<int32_t> encoder(encoder_memory);
+    std::deque<int32_t> encoderGap(encoder_gap_memory);
+
+    //init
+    for(int i = 0 ; i < 4; ++i){
+        lock.lock();
+        for(int j = 0 ; j < 18; ++j) *(packet_main + i) = *(packet + i);
+        lock.unlock();
+        encoder.push_front(getParsingData<int32_t>(packet_main, 11));
+        encoder.pop_back();
+        encoderGap.push_front(encoder[0] - encoder[1]);
+        encoderGap.pop_back();
+    }
+
+
     while(ros::ok()){
+        //get packet
         lock.lock();
         for(int i = 0 ; i < 18; ++i) *(packet_main + i) = *(packet + i);
         lock.unlock();
-        
 
-        encoder_past = msg.encoder;
-        msg.encoder = getParsingData<int32_t>(packet_main, 11);
-        msg.encoder_gap = msg.encoder - encoder_past;
+        //calc speed
+        encoder.push_front(getParsingData<int32_t>(packet_main, 11));
+        encoder.pop_back();
+        encoderGap.push_front(encoder[0] - encoder[1]);
+        encoderGap.pop_back();
+        msg.speed = (encoder[0] + encoder[1] + encoder[2]) / 3.0;
+
+        msg.steer = getParsingData<int16_t>(packet_main, 8);
+        msg.brake = getParsingData<uint8_t>(packet_main, 10);
+        msg.seq = seq++;
 
         pub.publish(msg);     
         loop_rate.sleep();
