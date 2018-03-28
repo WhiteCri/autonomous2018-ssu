@@ -24,6 +24,15 @@ PlatformController()
     , kp_brake_(0.0), ki_brake_(0.0), kd_brake_(0.0)
     , settling_time_(1.0)
 {
+     
+}
+
+void Init(int argc, char **argv) // Controller 돌리기 전에 initialize (dt 계산을 위한 time 초기값)
+{
+    ros::init(argc, argv, "Platform_Controller");
+    ros::NodeHandle priv_nh_("~");
+    ros::NodeHandle nh_;
+
     priv_nh_.param<double>("/control/accel/settling_time", settling_time_, 0.0);
 
     priv_nh_.param<double>("/control/steer/kp", kp_steer_, 0.0);
@@ -32,13 +41,8 @@ PlatformController()
     
     priv_nh_.param<double>("/control/brake/kp", kp_brake_, 0.0);
     priv_nh_.param<double>("/control/brake/ki", ki_brake_, 0.0);
-    priv_nh_.param<double>("/control/brake/kd", kd_brake_, 0.0);     
-}
+    priv_nh_.param<double>("/control/brake/kd", kd_brake_, 0.0);
 
-void Init(int argc, char **argv) // Controller 돌리기 전에 initialize (dt 계산을 위한 time 초기값)
-{
-    ros::init(argc, argv, "Platform_Controller");
-    
     pub_ = nh_.advertise<platform_controller::cmd_platform>("control/cmd_platform", 100);
     
     timestamp_ = ros::Time::now();
@@ -57,6 +61,7 @@ void Read_Reference(double speed, double steer) // "ackermann_cmd 받는 부분�
 }
 
 void UpdateParameters(void){
+    ros::NodeHandle priv_nh_("~");
      priv_nh_.getParam("/control/accel/settling_time", settling_time_);
 
      priv_nh_.getParam("/control/steer/kp", kp_steer_);
@@ -114,8 +119,8 @@ void publish(){
 }
 
 private:
-    ros::NodeHandle nh_;
-    ros::NodeHandle priv_nh_;
+//    ros::NodeHandle nh_;
+//    ros::NodeHandle priv_nh_;
     ros::Publisher pub_;
     ros::Time timestamp_;
 
