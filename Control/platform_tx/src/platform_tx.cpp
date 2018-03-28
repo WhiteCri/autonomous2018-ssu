@@ -9,14 +9,14 @@
 #define TX_PACKET_LENGTH 14
 #define TX_SERIAL_FREQUENCY 50
 
+/*
+ 실제 차량의 dynamic에 의해 제한되는 최대조향각과 최대가속도, 최대속도값은 teb_local_planner의 parameter 튜닝으로 설정함.
+ 여기서는 Boundary Check만 진행 (원래 여기에 걸리는 것도 문제가 있음)
+ 여기서 걸리지 않게 테스트하면서 teb_local_planner parameter 튜닝할 필요가 있지만, 이 작업은 시간이 있으면 진행하는게 좋을듯
+*/
 #define MAX_SPEED 200
 #define MAX_BRAKE 200
 #define MAX_STEER 2000
-
-#define PI 3.141592
-#define RAD2SERIAL (180.0 / PI) * 100.0         // rad ->[ 86%] Built target robot_localization deg -> serial
-#define M_S2SERIAL (3600.0 / 1000.0) * 10.0     // m/s -> km/h -> serial
-
 
 //#define TX_DEBUG
 //#define RX_SUBSCRIBE
@@ -114,18 +114,19 @@ void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
     int speed = fabs(msg->accel);    checkSpeedBound(speed);
     uint16_t serialSpeed = speed;
     *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
-    ROS_INFO("serial speed : %u",serialSpeed);
+    ROS_INFO("serial speed : %u", serialSpeed);
 
 // STEER
     int angle = -msg->steer;    checkSteeringBound(angle);
     int16_t serialSteeringAngle = angle + alignmentBias;
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
-    ROS_INFO("serial angle : %d",serialSteeringAngle);
+    ROS_INFO("serial angle : %d", serialSteeringAngle);
 
 // BRAKE
     int brake = msg->brake;    checkBrakeBound(brake); 
     packet[10] = static_cast<uint8_t>(brake);
+    ROS_INFO("serial brake : %u", brake);
 
 // ALIVE
     packet[11] = static_cast<uint8_t>(alive);    alive = (alive + 1) % 256;

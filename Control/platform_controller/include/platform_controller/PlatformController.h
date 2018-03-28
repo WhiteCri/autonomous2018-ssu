@@ -6,8 +6,8 @@
 #include "platform_rx_msg/platform_rx_msg.h"
 
 #define PI 3.141592
-#define RAD2SERIAL (180.0 / PI) * 100.0      // rad ->[ 86%] Built target robot_localization deg -> serial
-#define M_S2SERIAL (3600.0 / 1000.0) * 10.0  // m/s -> km/h -> serial
+#define RAD2SERIAL (180.0 / PI) * 100.0      // rad -> serial
+#define M_S2SERIAL (3600.0 / 1000.0) * 10.0  // m/s -> km/h -> serial  => 얘는 말도 안되는 값임(언맨 style) -> 실험한 데이터 토대로 바꿔야 함 ******
 
 #define C0 0.1080 // acceleration [m/s^2] = 0.108*exp(0.0184*platform) -> C0 = 0.108
 #define C1 0.0184 // acceleration [m/s^2] = 0.108*exp(0.0184*platform) -> C1 = 0.0184
