@@ -48,18 +48,6 @@ void Init(int argc, char **argv) // Controller 돌리기 전에 initialize (dt �
     timestamp_ = ros::Time::now();
 }
 
-void Read_State(double speed, double steer) // "Platform_RX 받는 부분에 사용 (Platform Unit-> SI Unit으로 변환해서 넣기)
-{
-    current_speed_ = speed;
-    current_steer_ = steer;
-}
-
-void Read_Reference(double speed, double steer) // "ackermann_cmd 받는 부분에 사용 (Platform Unit-> SI Unit으로 변환해서 넣기)
-{
-    ref_speed_ = speed;
-    ref_steer_ = steer;
-}
-
 void UpdateParameters(void){
     ros::NodeHandle priv_nh_("~");
      priv_nh_.getParam("/control/accel/settling_time", settling_time_);
@@ -106,12 +94,20 @@ void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data)
 {
     current_speed_ = rx_data->speed;
     current_steer_ = rx_data->steer;
+    
+    #ifdef MY_DEBUG
+        ROS_INFO("Current Speed: %lf\tCurrent Steer: %lf\n", current_speed_, current_steer_);
+    #endif
 }
 
 void Ack_Callback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ack_data)
 {
     ref_speed_ = ack_data->drive.speed;
     ref_steer_ = ack_data->drive.steering_angle;
+   
+    #ifdef MY_DEBUG
+        ROS_INFO("Reference Speed: %lf\tReference Steer: %lf\n", ref_speed_, ref_steer_);
+    #endif
 }
 
 void publish(){

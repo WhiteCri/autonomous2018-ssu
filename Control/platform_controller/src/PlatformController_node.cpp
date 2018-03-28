@@ -7,18 +7,16 @@ std::mutex lock;
 static PlatformController ctrl;
 static int rate = 10;
 
-void subscriberaw()
-{
+void subscriberaw(){
   ros::NodeHandle nh;
   ros::Subscriber sub_1 = nh.subscribe("/raw/platform_rx", 100, &PlatformController::RX_Callback, &ctrl);
+  
   ros::Rate loop_rate(rate);
-  while(ros::ok())
-  {
+  while(ros::ok()){
    lock.lock();
    ros::spinOnce();
    lock.unlock();
    loop_rate.sleep();
-
   }
 }
 
