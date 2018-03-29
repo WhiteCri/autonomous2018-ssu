@@ -1,19 +1,22 @@
 <launch>
     <include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
 
+
     <node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py" name="cmd_to_ackermann"/>
+
 
     <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node" args="/dev/ttyUSB0 10"/>
     
-    <node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
-       
-        <param name="/accel/settling_time" value="0.2"/>
 
-        <param name="/steer/kp" value="5.0"/>
+    <node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
+
+        <param name="/accel/settling_time" value="0.1"/>
+
+        <param name="/steer/kp" value="1.0"/>
         <param name="/steer/ki" value="0.0"/>
         <param name="/steer/kd" value="0.0"/>
 
-        <param name="/brake/kp" value="5.0"/>
+        <param name="/brake/kp" value="1.0"/>
         <param name="/brake/ki" value="0.0"/>
         <param name="/brake/kd" value="0.0"/>
     </node>
