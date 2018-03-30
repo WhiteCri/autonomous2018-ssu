@@ -14,9 +14,6 @@
  여기서는 Boundary Check만 진행 (원래 여기에 걸리는 것도 문제가 있음)
  여기서 걸리지 않게 테스트하면서 teb_local_planner parameter 튜닝할 필요가 있지만, 이 작업은 시간이 있으면 진행하는게 좋을듯
 */
-#define MAX_SPEED 200
-#define MAX_BRAKE 200
-#define MAX_STEER 2000
 
 //#define TX_DEBUG
 //#define RX_SUBSCRIBE
@@ -69,25 +66,6 @@ void rxMsgCallBack(const platform_rx_msg::platform_rx_msg::ConstPtr& msg){
 }
 #endif
 
-
-
-inline void checkSpeedBound(int& speed){
-    speed = (speed <= MAX_SPEED) ? speed : MAX_SPEED;
-    return;
-}
-
-
-inline void checkBrakeBound(int& brake){
-    brake = (brake <= MAX_BRAKE) ? brake : MAX_BRAKE;
-}
-
-
-inline void checkSteeringBound(int& steeringAngle){
-    if(steeringAngle > MAX_STEER)
-        steeringAngle = MAX_STEER;
-    else if(steeringAngle < -MAX_STEER)
-        steeringAngle = -MAX_STEER;
-}
 
 void serialWrite(){
     ros::Rate loop_rate(TX_SERIAL_FREQUENCY);

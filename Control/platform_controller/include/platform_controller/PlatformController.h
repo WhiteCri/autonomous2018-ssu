@@ -10,7 +10,7 @@
 #define MAX_ACCEL 200
 #define NO_BRAKE  1
 #define MAX_BRAKE 200
-#define MAX_STEER 1970
+#define MAX_STEER 2000
 #define GEAR_FORWARD 0
 #define GEAR_BACKWARD 2
 
@@ -23,8 +23,8 @@
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
 /* Debug */
-//#define MY_DEBUG_1
-#define MY_DEBUG_2
+#define MY_DEBUG
+#define MY_TEST
 
 
 class PlatformController {
@@ -76,10 +76,6 @@ void Calc_PID(void) // read_state, read_reference로 읽은 후에 Platform_TX(S
     Calc_accleration(); // SPEED CONTROL
 
     Calc_steer(); // STEER CONTROL
-
-    #ifdef MY_DEBUG_1
-        ROS_INFO("Command Accel: %d\tCommand Brake: %d\tCommand Steer: %d\n", cmd_accel_, cmd_brake_ ,cmd_steer_);
-    #endif
 }
 
 
@@ -87,10 +83,6 @@ void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data)
 {
     current_speed_ = rx_data->speed;
     current_steer_ = rx_data->steer;
-    
-    #ifdef MY_DEBUG_1
-        ROS_INFO("Current Speed: %lf\tCurrent Steer: %lf\n", current_speed_, current_steer_);
-    #endif
 }
 
 
@@ -98,21 +90,18 @@ void Ack_Callback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ack_dat
 {
     ref_speed_ = ack_data->drive.speed;
     ref_steer_ = RAD2SERIAL*(ack_data->drive.steering_angle);
-
-    #ifdef MY_DEBUG_1
-        ROS_INFO("Reference Speed: %lf\tReference Steer: %lf\n", ref_speed_, ref_steer_);
-    #endif
 }
 
 
 void publish()
 {
     pub_.publish(cmd_);
-    #ifdef MY_DEBUG_1
-        ROS_INFO("Platform Command Topic Published !!!");
+
+    #ifdef MY_TEST // rqt_plot으로 비교하기 위한 용도로 테스트
+        cmd_.reference = BoundaryCheck_Steer(ref_steer_);
     #endif
 
-    #ifdef MY_DEBUG_2
+    #ifdef MY_DEBUG
         ROS_INFO("Gear: %d (0: Forward / 2: Backward)", cmd_.gear);
         ROS_INFO("Reference Speed: %lf   Current Speed: %lf   Command Accel: %d   Command Brake: %d", ref_speed_, current_speed_ ,cmd_.accel, cmd_.brake);
         ROS_INFO("Reference Steer: %lf   Current Steer: %lf   Command Steer: %d", ref_steer_, current_steer_ ,cmd_.steer);
@@ -185,14 +174,14 @@ inline int BoundaryCheck_Steer(const int steer)
 
 inline int Calc_gear(double ref_speed)
 {
-        if(ref_speed >= 0.0){
-            cmd_.gear = GEAR_FORWARD;
-            return 1;
-        }
-        else{
-            cmd_.gear = GEAR_BACKWARD;
-            return -1;
-        }
+    if(ref_speed >= 0.0){
+        cmd_.gear = GEAR_FORWARD;
+        return 1;
+    }
+    else{
+        cmd_.gear = GEAR_BACKWARD;
+        return -1;
+    }
 }
 
 void Calc_accleration(void) // 나중에 Brake에 대한 가속도 실험 후 수정 필요(감속부분)
@@ -232,8 +221,6 @@ void Calc_steer(void)
     
     cmd_steer_ = (int)( err_steer_ * (kp_steer_ + ki_steer_*dt_ + kd_steer_/dt_) );
 
-
-    //cmd_.steer = 1000;
     cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
 }
 
