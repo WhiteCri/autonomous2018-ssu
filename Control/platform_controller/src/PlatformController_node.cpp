@@ -13,10 +13,10 @@ void subscriberaw(){
   
   ros::Rate loop_rate(rate);
   while(ros::ok()){
-   lock.lock();
-   ros::spinOnce();
-   lock.unlock();
-   loop_rate.sleep();
+    lock.lock();
+    ros::spinOnce();
+    lock.unlock();
+    loop_rate.sleep();
   }
 }
 
