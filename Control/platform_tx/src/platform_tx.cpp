@@ -7,7 +7,7 @@
 #include "platform_controller/cmd_platform.h"
 
 #define TX_PACKET_LENGTH 14
-#define TX_SERIAL_FREQUENCY 50
+#define TX_SERIAL_FREQUENCY 20
 
 /*
  실제 차량의 dynamic에 의해 제한되는 최대조향각과 최대가속도, 최대속도값은 teb_local_planner의 parameter 튜닝으로 설정함.
@@ -47,7 +47,7 @@ void initTx(const ros::NodeHandle& nh){
 
     //setup
     nh.param("/platform_tx/frequency", frequency, 50);
-    nh.param<std::string>("/platform_tx/cmd_platform_topic_name", cmd_platform_topic_name, "cmd_platform");
+    nh.param<std::string>("/platform_tx/cmd_platform_topic_name", cmd_platform_topic_name, "/control/cmd_platform");
 
     //steering member
     nh.param("/platform_tx/alignmentBias", alignmentBias, 0);
@@ -107,24 +107,23 @@ void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
     0x01 : neutral
     0x02 : backward
 */
-    packet[5] = (msg->accel >= 0) ?
-         static_cast<uint8_t>(0x00) : static_cast<uint8_t>(0x02);
+    packet[5] = static_cast<uint8_t>(msg->gear);
     
 // SPEED (원래는 accel이 맞는데 혼란을 피하기 위해 변수 이름들은 그냥 speed로 했음)
-    int speed = fabs(msg->accel);    checkSpeedBound(speed);
+    int speed = fabs(msg->accel); //   checkSpeedBound(speed);
     uint16_t serialSpeed = speed;
     *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
     ROS_INFO("serial speed : %u", serialSpeed);
 
 // STEER
-    int angle = -msg->steer;    checkSteeringBound(angle);
+    int angle = - msg->steer; //   checkSteeringBound(angle);
     int16_t serialSteeringAngle = angle + alignmentBias;
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
     ROS_INFO("serial angle : %d", serialSteeringAngle);
 
 // BRAKE
-    int brake = msg->brake;    checkBrakeBound(brake); 
+    int brake = msg->brake; //   checkBrakeBound(brake); 
     packet[10] = static_cast<uint8_t>(brake);
     ROS_INFO("serial brake : %u", brake);
 

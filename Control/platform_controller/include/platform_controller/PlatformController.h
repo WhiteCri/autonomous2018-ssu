@@ -10,7 +10,7 @@
 #define MAX_ACCEL 200
 #define NO_BRAKE  1
 #define MAX_BRAKE 200
-#define MAX_STEER 2000
+#define MAX_STEER 1970
 #define GEAR_FORWARD 0
 #define GEAR_BACKWARD 2
 
@@ -228,11 +228,13 @@ void Calc_accleration(void) // 나중에 Brake에 대한 가속도 실험 후 �
 
 void Calc_steer(void)
 {
-    err_steer_ = ref_steer_ - current_steer_;
+    err_steer_ = BoundaryCheck_Steer(ref_steer_) - current_steer_;
     
     cmd_steer_ = (int)( err_steer_ * (kp_steer_ + ki_steer_*dt_ + kd_steer_/dt_) );
 
-    cmd_.steer = ref_steer_ - BoundaryCheck_Steer(cmd_steer_);
+
+    //cmd_.steer = 1000;
+    cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
 }
 
 };
