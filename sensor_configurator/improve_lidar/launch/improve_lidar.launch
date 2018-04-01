@@ -1,0 +1,5 @@
+<launch>
+
+ <node pkg="improve_lidar" type="improve_lidar" name="improve_lidar"/>
+
+</launch>
