@@ -249,6 +249,7 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
         
     }
 //    ROS_INFO("cloud count : %d",count);
+    output.header.stamp = ros::Time::now();
     pub_.publish(output);
   }
 

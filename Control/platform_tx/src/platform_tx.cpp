@@ -134,7 +134,7 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
     *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
 ROS_INFO("serial speed : %u",serialSpeed);
 //  //steer. should put value (actual steering degree * 71)
-    double angle = -msg->drive.steering_angle;
+    double angle = -msg->drive.steering_angle * 180 / 3.141592;
     checkSteeringBound(angle);
     int16_t serialSteeringAngle = angle * angleToSerialValue + alignmentBias;
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);

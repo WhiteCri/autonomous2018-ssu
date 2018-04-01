@@ -149,7 +149,10 @@ void ConvertCloud::convert(){
 
   pc->header.frame_id = frame_id;
   pc->header.seq = ros::Time::now().toNSec()/1e3;
-  //pc->header.stamp = ros::Time();
+    //ros::Time start = ros::Time::now();
+
+      // pc->header.stamp = start;
+  //pc->header.stamp = ros::Time::now();
 
   pcl::PointCloud<pcl::PointXYZ>::iterator pc_iter = pc->begin();
   std::vector<cv::Vec3f>::iterator data_iter = distVec.begin();
