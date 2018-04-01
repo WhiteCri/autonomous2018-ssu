@@ -13,10 +13,11 @@
 #define RAD2SERIAL (180.0 / PI) * 100.0         // rad ->[ 86%] Built target robot_localization deg -> serial
 #define M_S2SERIAL (3600.0 / 1000.0) * 10.0     // m/s -> km/h -> serial
 #define MAX_STEER_ANGLE 20.0                    // maximum steering angle = 20 [deg]
+#define MAX_BRAKE 200
 
 #define TX_SERIAL_FREQUENCY 50
 //#define TX_DEBUG
-//#define RX_SUBSCRIBE
+#define RX_SUBSCRIBE
 
 static double angleToSerialValue;
 static double maxSteeringAngle;
@@ -112,6 +113,7 @@ void serialWrite(){
 }
 
 void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
+    ros::NodeHandle Node;
     static uint8_t alive = 0;
     /*  gear
         0x00 : forward
@@ -126,18 +128,23 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
     //1 m/s = 3.6 kph
     double speed = fabs(msg->drive.speed);
     checkSpeedBound(speed);
-    uint16_t serialSpeed = speed * m_s2serial;
+    double speed_param;
+    Node.getParam("Tx/speed_param",speed_param);
+    uint16_t serialSpeed = ( speed + speed_param) * m_s2serial;
     *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
 ROS_INFO("serial speed : %u",serialSpeed);
 //  //steer. should put value (actual steering degree * 71)
-    double angle = -msg->drive.steering_angle;
+    double angle = -msg->drive.steering_angle * 180 / 3.141592;
     checkSteeringBound(angle);
     int16_t serialSteeringAngle = angle * angleToSerialValue + alignmentBias;
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
 ROS_INFO("serial angle : %d",serialSteeringAngle);
 //  //brake. low number is low braking. 1 ~ 200
-    packet[10] = static_cast<uint8_t>(1);
+    double brake_param;
+    Node.getParam("Tx/brake_param",brake_param);
+    uint8_t brake = brake_param / 100 * MAX_BRAKE;
+    packet[10] = static_cast<uint8_t>(brake);
     //checkBrakeBound()
 
     packet[11] = static_cast<uint8_t>(alive);//alive
@@ -146,7 +153,7 @@ ROS_INFO("serial angle : %d",serialSteeringAngle);
 
 
 void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
-    createSerialPacket(msg);
+   // createSerialPacket(msg);
 }
 
 int main(int argc, char *argv[]){
@@ -156,7 +163,7 @@ int main(int argc, char *argv[]){
     }
     ros::init(argc, argv, "platform_tx");
     ros::NodeHandle nh;
-    
+
     initTx(nh);
 
     ros::Subscriber sub = nh.subscribe(ackermann_topic_name, 100, &ackermannCallBack_);
@@ -175,6 +182,7 @@ int main(int argc, char *argv[]){
 
     std::thread tr(serialWrite);
     tr.detach();
+
 #ifndef TX_DEBUG
     while(ros::ok()){
         ros::spinOnce();

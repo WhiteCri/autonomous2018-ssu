@@ -38,7 +38,7 @@
  	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
     		<rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
  	</node>
-<!-- 	
+
 	<arg name="cam_num" default="1"/>	
 	<arg name="frequency" default="30"/>
 	<include file="$(find camera_image)/launch/camera_image.launch">
@@ -54,5 +54,5 @@
 	<include file="$(find pointcloud_to_laserscan)/launch/sample_node.launch">
 		<arg name="cam_num" value="$(arg cam_num)"/>
 	</include>
--->
+
 </launch>
