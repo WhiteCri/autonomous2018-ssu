@@ -106,7 +106,7 @@ int main (int argc, char** argv){
         encoder.pop_back();
         encoderGap.push_front(encoder[0] - encoder[1]);
         encoderGap.pop_back();
-        msg.speed = (encoder[0] + encoder[1] + encoder[2]) / 3.0;
+        msg.speed = (encoderGap[0] + encoderGap[1] + encoderGap[2]) / 3.0;
 
         msg.steer = getParsingData<int16_t>(packet_main, 8);
         msg.brake = getParsingData<uint8_t>(packet_main, 10);
