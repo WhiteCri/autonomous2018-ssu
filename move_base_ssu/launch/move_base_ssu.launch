@@ -36,15 +36,15 @@
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">
 		<rosparam file="$(find move_base_ssu)/cfg/amcl_params.yaml" command="load" />
 
-	    <param name="initial_pose_x"            value="22"/>
-		<param name="initial_pose_y"            value="13.5"/>
-		<param name="initial_pose_a"            value="-1.57"/>
+	    <param name="initial_pose_x"            value="35.5"/>
+		<param name="initial_pose_y"            value="7"/>
+		<param name="initial_pose_a"            value="3.14"/>
 	</node>
 	
 
 
 	<!--  ****** Maps ******  -->
-	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/jingy_garden.yaml" output="screen">
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/namu.yaml" output="screen">
 		<param name="frame_id" value="map"/>
 	</node>
 

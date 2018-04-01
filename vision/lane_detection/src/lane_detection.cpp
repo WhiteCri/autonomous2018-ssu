@@ -11,8 +11,11 @@
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/Int32MultiArray.h"
 #include <time.h>
+//15 21 52 151 000 180
+//0 180 0 24 172 255
 
-//#include <lanedetection/coordinateMsg.h>
+
+//#include <lanedetection/coordinat0eMsg.h>
 //#include <lanedetection/vecMsg.h>
 //#include <lanedetection/dataSize.h>
 #define COORDI_COUNT 4000
@@ -66,7 +69,7 @@ InitImgObjectforROS::InitImgObjectforROS():it(nh){
                     cv::namedWindow("TRACKBAR_WHITE" ,cv::WINDOW_AUTOSIZE);
            
                     cv::createTrackbar("h min", "TRACKBAR_YELLOW", &y_hmin, 50, NULL);
-                    cv::setTrackbarPos("h min", "TRACKBAR_YELLOW", 7);
+                    cv::setTrackbarPos("h min", "TRACKBAR_YELLOW", 15);
 
                     cv::createTrackbar("h max", "TRACKBAR_YELLOW", &y_hmax, 50, NULL);
                     cv::setTrackbarPos("h max", "TRACKBAR_YELLOW", 21);
@@ -94,10 +97,10 @@ InitImgObjectforROS::InitImgObjectforROS():it(nh){
                     cv::setTrackbarPos("s min", "TRACKBAR_WHITE", 0);
 
                     cv::createTrackbar("s max", "TRACKBAR_WHITE", &w_smax, 255, NULL);
-                    cv::setTrackbarPos("s max", "TRACKBAR_WHITE", 29);
+                    cv::setTrackbarPos("s max", "TRACKBAR_WHITE", 24);
 
                     cv::createTrackbar("v min", "TRACKBAR_WHITE", &w_vmin, 255, NULL);
-                    cv::setTrackbarPos("v min", "TRACKBAR_WHITE", 179);
+                    cv::setTrackbarPos("v min", "TRACKBAR_WHITE", 172);
 
                     cv::createTrackbar("v max", "TRACKBAR_WHITE", &w_vmax, 255, NULL);
                     cv::setTrackbarPos("v max", "TRACKBAR_WHITE", 255);
@@ -221,12 +224,12 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                 coordi_array.data.clear();
                 coordi_array.data.push_back(10);
 
-                for(int y = output_origin.rows-1; y>=290; y--){
+                for(int y = output_origin.rows-1; y>=320; y--){
                     uchar* origin_data = output_origin.ptr<uchar>(y);
                     uchar* pub_img_data = pub_img.ptr<uchar>(y*0.5);//resize 복구(0.5 -> 1))
                         for(int x = 0; x<output_origin.cols; x++){
                             int temp = x*0.5;//resize 복구(0.5 -> 1)
-                            if(pub_img_data[temp]!= (uchar)0 && x%2==0){
+                            if(pub_img_data[temp]!= (uchar)0){
                                 coordi_count++;
                                 coordi_array.data.push_back(x);
                                 coordi_array.data.push_back(y);

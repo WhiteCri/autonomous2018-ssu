@@ -5,7 +5,7 @@
 #include <deque>
 #include "platform_rx_msg/platform_rx_msg.h"
 
-static constexpr int serial_read_loop_rate = 50;
+static constexpr int serial_read_loop_rate = 20;
 static constexpr int pub_loop_rate = 10;
 static constexpr int encoder_memory = 4;
 static constexpr int encoder_gap_memory = encoder_memory - 1;
@@ -48,7 +48,7 @@ int main (int argc, char** argv){
     ros::init(argc, argv, "rx_thread_test");
     ros::NodeHandle nh;
 
-    ros::Publisher pub = nh.advertise<platform_rx_msg::platform_rx_msg>("test/platform_rx", 1000);
+    ros::Publisher pub = nh.advertise<platform_rx_msg::platform_rx_msg>("raw/platform_rx", 1000);
 
     try
     {
@@ -84,17 +84,6 @@ int main (int argc, char** argv){
     std::deque<int32_t> encoderGap(encoder_gap_memory);
 
     //init
-    for(int i = 0 ; i < 4; ++i){
-        lock.lock();
-        for(int j = 0 ; j < 18; ++j) *(packet_main + i) = *(packet + i);
-        lock.unlock();
-        encoder.push_front(getParsingData<int32_t>(packet_main, 11));
-        encoder.pop_back();
-        encoderGap.push_front(encoder[0] - encoder[1]);
-        encoderGap.pop_back();
-    }
-
-
     while(ros::ok()){
         //get packet
         lock.lock();
@@ -106,13 +95,18 @@ int main (int argc, char** argv){
         encoder.pop_back();
         encoderGap.push_front(encoder[0] - encoder[1]);
         encoderGap.pop_back();
-        msg.speed = (encoderGap[0] + encoderGap[1] + encoderGap[2]) / 3.0;
+ROS_INFO("gap[%ld] : %d, encoder : %d",seq, encoderGap[0],encoder[0]);
+        msg.speed = (encoderGap[0] + encoderGap[1] + encoderGap[2]) / 99.2 * 1.655 
+            / 0.1 / 3;
+         //speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
+         //   / timeInterval / interval;
 
         msg.steer = getParsingData<int16_t>(packet_main, 8);
         msg.brake = getParsingData<uint8_t>(packet_main, 10);
         msg.seq = seq++;
 
-        pub.publish(msg);     
+        if(seq > 5)
+            pub.publish(msg);     
         loop_rate.sleep();
     }
 }

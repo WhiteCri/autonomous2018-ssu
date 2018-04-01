@@ -57,7 +57,7 @@ void initTx(const ros::NodeHandle& nh){
     nh.param("/platform_tx/angleToSerialValue", angleToSerialValue, RAD2SERIAL);
     nh.param("/platform_tx/maxSteeringAngle", maxSteeringAngle, MAX_STEER_ANGLE);
     nh.param("/platform_tx/minSteeringAngle", minSteeringAngle, -MAX_STEER_ANGLE);
-    nh.param("/platform_tx/alignmentBias", alignmentBias, 0);
+    nh.param("/platform_tx/alignmentBias", alignmentBias, -160);
 
     //speed member
     nh.param("/platform_tx/maxSpeed", maxSpeed, 20.0);
@@ -131,7 +131,7 @@ void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& m
     double speed_param;
     Node.getParam("Tx/speed_param",speed_param);
     uint16_t serialSpeed = ( speed + speed_param) * m_s2serial;
-    *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
+    *(uint16_t*)(packet + 7) = static_cast<uint16_t>(50);
 ROS_INFO("serial speed : %u",serialSpeed);
 //  //steer. should put value (actual steering degree * 71)
     double angle = -msg->drive.steering_angle * 180 / 3.141592;
@@ -140,11 +140,11 @@ ROS_INFO("serial speed : %u",serialSpeed);
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
 ROS_INFO("serial angle : %d",serialSteeringAngle);
-//  //brake. low number is low braking. 1 ~ 200
+  //brake. low number is low braking. 1 ~ 200
     double brake_param;
     Node.getParam("Tx/brake_param",brake_param);
     uint8_t brake = brake_param / 100 * MAX_BRAKE;
-    packet[10] = static_cast<uint8_t>(brake);
+    packet[10] = static_cast<uint8_t>(0);
     //checkBrakeBound()
 
     packet[11] = static_cast<uint8_t>(alive);//alive
@@ -153,7 +153,7 @@ ROS_INFO("serial angle : %d",serialSteeringAngle);
 
 
 void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
-   // createSerialPacket(msg);
+   createSerialPacket(msg);
 }
 
 int main(int argc, char *argv[]){

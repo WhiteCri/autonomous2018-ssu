@@ -3,7 +3,7 @@
         <param name="angleToSerialValue" value="71.0"/>
         <param name="maxSteeringAngle" value="24.0"/>
         <param name="minSteeringAngle" value="-24.0"/>
-        <param name="alignmentBias" value="-150"/>
+        <param name="alignmentBias" value="-288"/>
         <!-- maxSpeed(m/s)-->
         <param name="maxSpeed" value="3"/>
         <!-- serial value = kph * 10-->
