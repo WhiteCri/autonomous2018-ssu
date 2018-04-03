@@ -22,13 +22,13 @@ void subscriberaw(){
 
 
 int main(int argc, char **argv){
-//  PlatformController ctrl;
+
   ctrl.Init(argc, argv);
   ros::NodeHandle nh;
 
-//  ros::Subscriber sub_1 = nh.subscribe("/raw/platform_rx", 100, &PlatformController::RX_Callback, &ctrl);
-  ros::Subscriber sub_2 = nh.subscribe("/ackermann_cmd", 100, &PlatformController::Ack_Callback, &ctrl);
-
+  //ros::Subscriber sub_2 = nh.subscribe("/ackerman_cmd", 100, &PlatformController::Ack_Callback, &ctrl);
+  ros::Subscriber sub_2 = nh.subscribe("/cmd_vel", 100, &PlatformController::Cmd_Callback, &ctrl);
+  
   std::thread rawnode(subscriberaw);
   rawnode.detach();
 

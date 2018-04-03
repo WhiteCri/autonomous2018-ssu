@@ -1,12 +1,14 @@
 <launch>
 <!--
 
-    <include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
+
     <node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py" name="cmd_to_ackermann"/>
 
 -->
 
-<node pkg="platform_tx" type="ackermann_pub" name="ackermann_pub"/>
+    <include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
+
+    <node pkg="platform_tx" type="ackermann_pub" name="ackermann_pub"/>
 
 
 

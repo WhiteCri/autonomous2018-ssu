@@ -4,6 +4,7 @@
 #include <ackermann_msgs/AckermannDriveStamped.h>
 #include "platform_controller/cmd_platform.h"
 #include "platform_rx_msg/platform_rx_msg.h"
+#include <geometry_msgs/Twist.h>
 
 /* Platform Protocol 관련 */
 #define NO_ACCEL  0
@@ -86,11 +87,18 @@ void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data)
 }
 
 
-void Ack_Callback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ack_data)
+void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist)
 {
-    ref_speed_ = ack_data->drive.speed;
-    ref_steer_ = RAD2SERIAL*(ack_data->drive.steering_angle);
+    ref_speed_ = twist->linear.x;
+    ref_steer_ = RAD2SERIAL*(twist->angular.z);
 }
+
+
+//void Ack_Callback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ack_data)
+//{
+//    ref_speed_ = ack_data->drive.speed;
+//    ref_steer_ = RAD2SERIAL*(ack_data->drive.steering_angle);
+//}
 
 
 void publish()
@@ -100,7 +108,7 @@ void publish()
     #ifdef MY_TEST // rqt_plot으로 비교하기 위한 용도로 테스트
         cmd_.reference = BoundaryCheck_Steer(ref_steer_);
     #endif
-
+    
     #ifdef MY_DEBUG
         ROS_INFO("Gear: %d (0: Forward / 2: Backward)", cmd_.gear);
         ROS_INFO("Reference Speed: %lf   Current Speed: %lf   Command Accel: %d   Command Brake: %d", ref_speed_, current_speed_ ,cmd_.accel, cmd_.brake);
