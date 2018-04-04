@@ -24,8 +24,8 @@
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
 /* Debug */
-#define MY_DEBUG
-#define MY_TEST
+//#define MY_DEBUG
+//#define MY_TEST
 
 #define ARY_SIZE 5
 
@@ -39,7 +39,7 @@ PlatformController()
     , kp_steer_(1.0), ki_steer_(0.0), kd_steer_(0.0)
     , kp_brake_(1.0), ki_brake_(0.0), kd_brake_(0.0)
     , settling_time_(0.5)
-    , dt_(0.0), n(0)
+    , dt_(0.0), index_(0)
 {
      
 }
@@ -98,13 +98,7 @@ void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data)
 void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist)
 {
     ref_speed_ = twist->linear.x;
-    filter_[n] = RAD2SERIAL*(twist->angular.z);
-    n = (n+1) % ARY_SIZE;
-    double temp;
-    for(int i = 0; i < ARY_SIZE; i++){
-        temp += filter_[i];
-    }
-    ref_steer_ = temp / ARY_SIZE;
+    ref_steer_ = mv_avg_filter( BoundaryCheck_Steer(RAD2SERIAL*(twist->angular.z)) );
 }
 
 
@@ -151,7 +145,17 @@ double kp_steer_, ki_steer_, kd_steer_;
 double kp_brake_, ki_brake_, kd_brake_;
 
 double filter_[ARY_SIZE];
-int n;
+int index_;
+
+
+double mv_avg_filter(double data){
+    double sum = 0;
+ 
+    filter_[index_] = data;
+    for(int i = 0; i < ARY_SIZE; i++)   sum += filter_[i];
+    index_ = (index_+1) % ARY_SIZE;
+    return (sum/ARY_SIZE);
+}
 
 
 inline void UpdateParameters(void)
@@ -240,14 +244,23 @@ void Calc_accleration(void) // 나중에 Brake에 대한 가속도 실험 후 �
     cmd_.brake = BoundaryCheck_Brake(cmd_brake_);
 }
 
+
 void Calc_steer(void)
 {
-    err_steer_ = BoundaryCheck_Steer(ref_steer_) - current_steer_;
-    
-    cmd_steer_ = (int)( err_steer_ * (kp_steer_ + ki_steer_*dt_ + kd_steer_/dt_) );
-
-    //cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
-    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
+    //cmd_.steer = BoundaryCheck_Steer(ref_steer_);
+    cmd_.steer = 1970;
 }
+
+//void Calc_steer(void)
+//{
+//    err_steer_ = BoundaryCheck_Steer(ref_steer_) - current_steer_;
+//    
+//    cmd_steer_ = (int)( err_steer_ * (kp_steer_ + ki_steer_*dt_ + kd_steer_/dt_) );
+//
+//    //cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
+//    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
+//}
+
+
 
 };

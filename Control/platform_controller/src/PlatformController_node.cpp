@@ -5,7 +5,7 @@
 
 std::mutex lock;
 static PlatformController ctrl;
-static int rate = 5;
+static int rate = 10;
 
 void subscriberaw(){
   ros::NodeHandle nh;
