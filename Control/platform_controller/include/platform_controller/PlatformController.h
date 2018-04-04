@@ -11,7 +11,7 @@
 #define MAX_ACCEL 200
 #define NO_BRAKE  1
 #define MAX_BRAKE 200
-#define MAX_STEER 2000
+#define MAX_STEER 1970
 #define GEAR_FORWARD 0
 #define GEAR_BACKWARD 2
 
@@ -27,6 +27,8 @@
 #define MY_DEBUG
 #define MY_TEST
 
+#define ARY_SIZE 5
+
 
 class PlatformController {
 public:
@@ -37,7 +39,7 @@ PlatformController()
     , kp_steer_(1.0), ki_steer_(0.0), kd_steer_(0.0)
     , kp_brake_(1.0), ki_brake_(0.0), kd_brake_(0.0)
     , settling_time_(0.5)
-    , dt_(0.0)
+    , dt_(0.0), n(0)
 {
      
 }
@@ -87,10 +89,22 @@ void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data)
 }
 
 
+//void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist)
+//{
+//    ref_speed_ = twist->linear.x;
+//    ref_steer_ = RAD2SERIAL*(twist->angular.z);
+//}
+
 void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist)
 {
     ref_speed_ = twist->linear.x;
-    ref_steer_ = RAD2SERIAL*(twist->angular.z);
+    filter_[n] = RAD2SERIAL*(twist->angular.z);
+    n = (n+1) % ARY_SIZE;
+    double temp;
+    for(int i = 0; i < ARY_SIZE; i++){
+        temp += filter_[i];
+    }
+    ref_steer_ = temp / ARY_SIZE;
 }
 
 
@@ -135,6 +149,9 @@ int cmd_accel_, cmd_steer_, cmd_brake_;
 double settling_time_;
 double kp_steer_, ki_steer_, kd_steer_;
 double kp_brake_, ki_brake_, kd_brake_;
+
+double filter_[ARY_SIZE];
+int n;
 
 
 inline void UpdateParameters(void)
@@ -229,7 +246,8 @@ void Calc_steer(void)
     
     cmd_steer_ = (int)( err_steer_ * (kp_steer_ + ki_steer_*dt_ + kd_steer_/dt_) );
 
-    cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
+    //cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
+    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
 }
 
 };
