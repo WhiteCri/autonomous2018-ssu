@@ -129,7 +129,7 @@ public:
     if (using_scan_topic_deprecated_)
       sub_.subscribe(nh, scan_topic_, 50);
     else
-      sub_.subscribe(nh, "scan", 50);
+      sub_.subscribe(nh, "scan_raw", 50);
 
     filter_.connectInput(sub_);
 

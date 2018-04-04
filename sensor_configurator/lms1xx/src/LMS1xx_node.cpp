@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
     scan_msg.header.frame_id = frame_id;
     scan_msg.range_min = 0.01;
-    scan_msg.range_max = 20.0;
+    scan_msg.range_max = 30.0;
     scan_msg.scan_time = 100.0 / cfg.scaningFrequency;
     scan_msg.angle_increment = static_cast<double>(outputRange.angleResolution / 10000.0 * DEG2RAD);
     scan_msg.angle_min = static_cast<double>(outputRange.startAngle / 10000.0 * DEG2RAD - M_PI / 2);

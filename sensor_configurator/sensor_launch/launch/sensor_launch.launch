@@ -4,8 +4,7 @@
 	<node pkg="platform_rx_thread_test" type="rx_thread_test" name="rx_thread_test" />
 	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py"
 	 	name="cmd_vel_to_ackermann_drive"/>
-	<node pkg="platform_tx" type="platform_tx" name="platform_tx" output="screen" args="/dev/ttyUSB0"
-		output="screen">
+	<node pkg="platform_tx" type="platform_tx" name="platform_tx" output="screen" args="/dev/ttyUSB0">
         <param name="angleToSerialValue" value="71.0"/>
         <param name="maxSteeringAngle" value="24.0"/>
         <param name="minSteeringAngle" value="-24.0"/>
