@@ -99,7 +99,7 @@ void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
     ROS_INFO("serial angle : %d", serialSteeringAngle);
-    ROS_WARN("SSSSSSSSSSSSSSSSSSSSSSSSSs");
+
 // BRAKE
     int brake = msg->brake; //   checkBrakeBound(brake); 
     packet[10] = static_cast<uint8_t>(brake);
@@ -148,17 +148,18 @@ int main(int argc, char *argv[]){
     if(!ser->isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,"ser.isOpen() error!");
     ROS_INFO("serial setting done");
 
-    ros::Rate loop_rate(frequency);
+///    ros::Rate loop_rate(frequency);
 
     std::thread tr(serialWrite);
     tr.detach();
 
 #ifndef TX_DEBUG
-    while(ros::ok()){
-        ros::spinOnce();
-        //ser->write(packet,TX_PACKET_LENGTH);
-        loop_rate.sleep();
-    }
+    ros::spin();
+///    while(ros::ok()){
+///        ros::spinOnce();
+///        //ser->write(packet,TX_PACKET_LENGTH);
+///        loop_rate.sleep();
+///    }
 #else
     //5hz->9.75
     //10hz->9.95

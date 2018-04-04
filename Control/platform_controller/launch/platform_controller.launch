@@ -1,16 +1,6 @@
 <launch>
-<!--
-
-
-    <node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py" name="cmd_to_ackermann"/>
-
--->
 
     <include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
-
-    <node pkg="platform_tx" type="ackermann_pub" name="ackermann_pub"/>
-
-
 
 
     <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node" args="/dev/ttyUSB0 10"/>

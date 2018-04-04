@@ -23,11 +23,13 @@
 #define C1 0.0184 // acceleration [m/s^2] = 0.108*exp(0.0184*platform) -> C1 = 0.0184
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
+#define FILTER_SIZE 3
+
 /* Debug */
 //#define MY_DEBUG
 //#define MY_TEST
 
-#define ARY_SIZE 5
+
 
 
 class PlatformController {
@@ -144,7 +146,7 @@ double settling_time_;
 double kp_steer_, ki_steer_, kd_steer_;
 double kp_brake_, ki_brake_, kd_brake_;
 
-double filter_[ARY_SIZE];
+double filter_[FILTER_SIZE];
 int index_;
 
 
@@ -152,9 +154,9 @@ double mv_avg_filter(double data){
     double sum = 0;
  
     filter_[index_] = data;
-    for(int i = 0; i < ARY_SIZE; i++)   sum += filter_[i];
-    index_ = (index_+1) % ARY_SIZE;
-    return (sum/ARY_SIZE);
+    for(int i = 0; i < FILTER_SIZE; i++)   sum += filter_[i];
+    index_ = (index_+1) % FILTER_SIZE;
+    return (sum/FILTER_SIZE);
 }
 
 
@@ -199,8 +201,6 @@ inline int BoundaryCheck_Steer(const int steer)
     return (fabs(steer) <= MAX_STEER) ? steer : MAX_STEER*(steer/fabs(steer));
 }
 
-
-
 inline int Calc_gear(double ref_speed)
 {
     if(ref_speed >= 0.0){
@@ -224,9 +224,6 @@ void Calc_accleration(void) // 나중에 Brake에 대한 가속도 실험 후 �
         1. Reference > Current : (+) deceleration (->with brake)
         2. Reference < Current : (-) acceleration (to backward)
     */
-
-//    cmd_.gear = (ref_speed_ >= 0.0) ? GEAR_FORWARD : GEAR_BACKWARD;
-//    const int dir = (int)( ref_speed_ / fabs(ref_speed_) );
     
     const int dir = Calc_gear(ref_speed_);
     err_speed_ = ref_speed_ - current_speed_; // error speed 단위: [m/s]
@@ -244,11 +241,9 @@ void Calc_accleration(void) // 나중에 Brake에 대한 가속도 실험 후 �
     cmd_.brake = BoundaryCheck_Brake(cmd_brake_);
 }
 
-
 void Calc_steer(void)
 {
-    //cmd_.steer = BoundaryCheck_Steer(ref_steer_);
-    cmd_.steer = 1970;
+    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
 }
 
 //void Calc_steer(void)
@@ -260,7 +255,5 @@ void Calc_steer(void)
 //    //cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
 //    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
 //}
-
-
 
 };
