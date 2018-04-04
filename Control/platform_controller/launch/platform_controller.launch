@@ -1,7 +1,13 @@
 <launch>
+<!--
 
-    <include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
+<include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
 
+
+<param name="test" value="1"/>
+<node pkg="platform_tx" type="ackermann_pub" name="test_node"/>
+
+-->
 
     <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node" args="/dev/ttyUSB0 10"/>
     
@@ -22,21 +28,20 @@
                 - a_x_limit은 실제로 3~4m/s^2까지 가능 (platform value 200 넣었을 때)
                 - 하지만 자체적으로 limit을 주려면 teb_local_planner에서!
         -->
-        <param name="/accel/settling_time" value="1000.0"/>
+        <param name="/accel/settling_time" value="0.5"/>
         
-        <param name="/brake/kp" value="1.0"/>
-
+        <param name="/brake/kp" value="33.0"/>
         <param name="/brake/ki" value="0.2"/>
-        <param name="/brake/kd" value="0.0001"/>
+        <param name="/brake/kd" value="0.0"/>
 
         <!--
             Steering Angle 제어 parameter: "/steer/*"
                 - kp: 비례계수, ki: 적분계수, kd: 미분계수
                 - 튜닝필요
         -->
-        <param name="/steer/kp" value="1.0"/>     0.8 /  0.7 / 0.5
-        <param name="/steer/ki" value="0.0"/>    10.0 /  1.0 / 1.0
-        <param name="/steer/kd" value="0.0"/>  0.01 / 0.01 / 0.008
+        <param name="/steer/kp" value="1.0"/>    0.8  / 0.7  / 0.5
+        <param name="/steer/ki" value="0.0"/>    10.0 / 1.0  / 1.0
+        <param name="/steer/kd" value="0.0"/>    0.01 / 0.01 / 0.008
 
 
     </node>
@@ -46,7 +51,6 @@
 
         <param name="alignmentBias" value="0"/>
 
-        <param name="frequency" value="50"/>
         <param name="cmd_platform_topic_name" value="/control/cmd_platform"/>
     </node>
 

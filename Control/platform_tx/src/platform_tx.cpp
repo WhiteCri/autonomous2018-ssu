@@ -20,7 +20,6 @@
 
 
 static std::string cmd_platform_topic_name;
-static int frequency;
 static int alignmentBias;
 
 std::mutex lock;
@@ -43,14 +42,12 @@ void initTx(const ros::NodeHandle& nh){
     packet[13] = static_cast<uint8_t>(0x0A);//0x0A
 
     //setup
-    nh.param("/platform_tx/frequency", frequency, 50);
     nh.param<std::string>("/platform_tx/cmd_platform_topic_name", cmd_platform_topic_name, "/control/cmd_platform");
 
     //steering member
     nh.param("/platform_tx/alignmentBias", alignmentBias, 0);
 
 }
-
 
 
 //rx log variable
@@ -113,18 +110,8 @@ void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
 void Cmd_CallBack_(const platform_controller::cmd_platform::ConstPtr& msg){
     createSerialPacket(msg);
 }
-/*
-void subscribetopic()
-{
-    ros::NodeHandle Node;
-    ros::Subscriber sub1 = Node.subscribe("/ackermann_cmd",100,&Cmd_CallBack_);
-    ros::Subscriber sub2 = Node.subscribe("/raw/platform_rx",100,rxMsgCallBack);
-    ros::MultiThreadedSpinner spinner(2);
 
-    spinner.spin();
-  
-}
-*/
+
 
 int main(int argc, char *argv[]){
     if(argc < 2){
@@ -147,8 +134,6 @@ int main(int argc, char *argv[]){
     ser->open();
     if(!ser->isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,"ser.isOpen() error!");
     ROS_INFO("serial setting done");
-
-///    ros::Rate loop_rate(frequency);
 
     std::thread tr(serialWrite);
     tr.detach();
