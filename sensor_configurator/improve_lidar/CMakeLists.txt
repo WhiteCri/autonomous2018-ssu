@@ -3,20 +3,10 @@ project(improve_lidar)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
+set(CMAKE_CXX_FLAGS "-std=c++11 -fpermissive ${CMAKE_CXX_FLAGS} -Wfatal-errors\ ")
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
-
-
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -35,8 +25,11 @@ find_package(catkin REQUIRED)
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
+  roscpp roslaunch geometry_msgs sensor_msgs tf
 )
+find_package(Armadillo REQUIRED)
+find_package(Boost 1.54.0 REQUIRED system)
+
 ##   * add "message_runtime" and every package in MSG_DEP_SET to
 ##     catkin_package(CATKIN_DEPENDS ...)
 ##   * uncomment the add_*_files sections below as needed
@@ -106,6 +99,7 @@ catkin_package(
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
+include_directories(include ${catkin_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 ###########
 ## Build ##
@@ -113,11 +107,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-  include ${catkin_INCLUDE_DIRS}
-# include
-# ${catkin_INCLUDE_DIRS}
-)
+
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}

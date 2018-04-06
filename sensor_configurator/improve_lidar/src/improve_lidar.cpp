@@ -1,26 +1,34 @@
-#include "ros/ros.h"
-#include "sensor_msgs/LaserScan.h"
+#include <ros/ros.h>
+#include <sensor_msgs/LaserScan.h>
 #include <math.h>
+#include <thread>
 
-#define Laser_Filter_start 110
-#define Laser_Filter_end 430
+
+#define Laser_Filter_start 200
+#define Laser_Filter_end 300
 #define check_dynamic 5
 #define check_UTurn 2
 #define dynamic_distance_point 0.5
-#define UTurn_distance_point 0.5
+#define UTurn_distance_point 0.1
 #define frequency 1
 
-#define test_dynamic
 #define test_uturn
+
 
 static bool dynamic_obstacle, u_turn;
 
 bool checkdynamic(std::vector<float> ranges, int number)
 {
+   // obstacle_detector::Obstacles test;
+    //ROS_INFO("%lf",test.segments.data->first_point.x);
+
+
     int offset;
     for(offset=1; offset<=check_dynamic; offset++)
     {
-        if( (ranges[number] > 0 ) && (ranges[number] < 5) && (fabs(ranges[number]-ranges[number+offset])<dynamic_distance_point) && (fabs(ranges[number]-ranges[number-offset])<dynamic_distance_point) )
+        if( (ranges[number] > 100 ) && (ranges[number] < 5) &&
+          (fabs(ranges[number]-ranges[number+offset])<dynamic_distance_point) &&
+          (fabs(ranges[number]-ranges[number-offset])<dynamic_distance_point) )
             continue;
         else
             return false;
@@ -34,7 +42,8 @@ bool checkUTurn(std::vector<float>ranges, int number)
     int offset;
     for(offset=1; offset<=check_UTurn; offset++)
     {
-        if((ranges[number]>100) && (fabs(ranges[number]-ranges[number+offset])<0.5) && (fabs(ranges[number]-ranges[number-offset])<0.5) )
+        if( (fabs(ranges[number]-ranges[number+offset])<UTurn_distance_point) &&
+           (fabs(ranges[number]-ranges[number-offset])<UTurn_distance_point) )
             continue;
         else
             return false;
@@ -97,13 +106,13 @@ int main(int argc, char *argv[])
     n.param<bool>("dynamic_obstacle",dynamic_obstacle,false);
     n.param<bool>("u_turn",u_turn,false);
 
-    ros::Subscriber scan_sub = Node.subscribe("scan",100,CallScan);
+    ros::Subscriber scan_sub = Node.subscribe("uturn_scan",100,CallScan);
     ros::Rate loop_rate(frequency);
 
     while(ros::ok())
     {
         ros::spinOnce();
-        loop_rate.sleep();
+        //loop_rate.sleep();
     }
     ros::spin();
 
