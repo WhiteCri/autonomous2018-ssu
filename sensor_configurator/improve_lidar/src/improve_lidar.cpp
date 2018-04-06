@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <math.h>
-#include <thread>
+#include <assert.h>
 
 
 #define Laser_Filter_start 200
@@ -14,7 +14,7 @@
 
 #define test_uturn
 
-
+static double inf = std::numeric_limits<double>::infinity();
 static bool dynamic_obstacle, u_turn;
 
 bool checkdynamic(std::vector<float> ranges, int number)
@@ -40,10 +40,20 @@ bool checkdynamic(std::vector<float> ranges, int number)
 bool checkUTurn(std::vector<float>ranges, int number)
 {
     int offset;
+    int max_range = check_UTurn + 1;
+
+    if( (ranges[number+max_range] == inf || ranges[number+max_range] == -inf) &&
+        (ranges[number-max_range] == inf || ranges[number-max_range] == -inf) )
+        {}
+    else
+        return false;
+    
+
     for(offset=1; offset<=check_UTurn; offset++)
     {
-        if( (fabs(ranges[number]-ranges[number+offset])<UTurn_distance_point) &&
-           (fabs(ranges[number]-ranges[number-offset])<UTurn_distance_point) )
+        if( (ranges[number+offset] != inf) && (ranges[number-offset] != inf) &&
+             (fabs(ranges[number]-ranges[number+offset]) < UTurn_distance_point) &&
+           (fabs(ranges[number]-ranges[number-offset]) < UTurn_distance_point) )
             continue;
         else
             return false;
