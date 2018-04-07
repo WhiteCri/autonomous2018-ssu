@@ -1,1 +1,43 @@
 hl_controller:
+  
+  frequency: 5
+  publish_param: false
+
+#tx
+  tx_stop: false
+
+#crosswalk
+  use_process_crosswalk: true
+  use_crosswalk_onetime_flag: true
+  crosswalk_onetime_flag: true
+
+  crosswalk_driving_duration: 1.0
+  crosswalk_stop_duration: 3.0
+
+#movingobj
+  use_process_movingobj: true
+  use_movingobj_onetime_flag: true
+  movingobj_onetime_flag: true
+
+  movingobj_driving_duration: 1.0
+  movingobj_stop_duration: 5.0
+
+#parking
+  parking: false
+  use_process_parking: true
+  use_parking_onetime_flag: true
+  parking_onetime_flag: true
+
+  parknig_stop_duration: 10.0
+
+  parking_near_arrive_point_x: -200.0
+  parking_near_arrive_point_y: -200.0
+  parking_far_arrive_point_x: -200.0
+  parking_far_arrive_point_y: -200.0
+  parking_near_back_point_x: -200.0
+  parking_near_back_point_y: -200.0
+  parking_far_back_point_x: -200.0
+  parking_far_back_point_y: -200.0
+
+#recovery 
+  need_recovery: false

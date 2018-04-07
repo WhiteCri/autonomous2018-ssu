@@ -14,7 +14,6 @@ int main(int argc, char *argv[]){
     ros::Rate loop_rate(param_ptr->frequency);
     while(ros::ok()){
         param_ptr->load_param(nh);
-ROS_INFO("h");
         loop_rate.sleep();    
     }
 }
