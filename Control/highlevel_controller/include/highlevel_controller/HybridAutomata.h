@@ -22,7 +22,9 @@ class TimedCondition : public Condition
 {
 public:
   TimedCondition(unsigned int condCount) : condCount_(condCount)
-  {}
+  { 
+    if(condCount_ == 0) condCount_ = 1;
+  }
   virtual bool check(HybridAutomata *HA)
   {
     if (timedCheck(HA) == true){
@@ -37,7 +39,7 @@ public:
   virtual bool timedCheck(HybridAutomata *HA) = 0;
   virtual ~TimedCondition() {}
 private:
-  const unsigned int condCount_;
+  unsigned int condCount_;
   unsigned cnt;
 };
 //added by TawWook End

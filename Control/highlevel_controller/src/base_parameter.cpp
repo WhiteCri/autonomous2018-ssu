@@ -16,6 +16,7 @@ Parameters::Parameters(ros::NodeHandle& nh){
 
     /* crosswalk parameter */
     nh.param("hl_controller/crosswalk", crosswalk, false);
+    nh.param("hl_controller/crosswalk_check_duration", crosswalk_check_duration, 1.0);
     nh.param("hl_controller/use_process_crosswalk", use_process_crosswalk, true);
     nh.param("hl_controller/use_crosswalk_onetime_flag", use_crosswalk_onetime_flag, true);
 
@@ -25,6 +26,7 @@ Parameters::Parameters(ros::NodeHandle& nh){
 
     /* movingobj paramter */
     nh.param("hl_controller/movingobj", movingobj, false);
+    nh.param("hl_controller/movingobj_check_duration", movingobj_check_duration, 1.0);
     nh.param("hl_controller/use_process_movingobj", use_process_movingobj, true);
     nh.param("hl_controller/use_movingobj_onetime_flag", use_movingobj_onetime_flag, true);
 
@@ -34,6 +36,7 @@ Parameters::Parameters(ros::NodeHandle& nh){
 
     /* parking parameter */
     nh.param("hl_controller/parking", parking, false);
+    nh.param("hl_controller/parking_check_duration", parking_check_duration, 1.0);
     nh.param("hl_controller/use_process_parking", use_process_parking, true);
     nh.param("hl_controller/use_parking_onetime_flag", use_parking_onetime_flag, true);
 
@@ -52,6 +55,9 @@ Parameters::Parameters(ros::NodeHandle& nh){
 
     /* recovery members */
     nh.param("hl_controller/need_recovery", need_recovery, false);
+
+    /* Done members */
+    nh.param("hl_controller/reached_goal", reached_goal, false);
 }
 
 //create instance
