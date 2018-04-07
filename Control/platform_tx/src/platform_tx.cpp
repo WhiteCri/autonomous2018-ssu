@@ -4,31 +4,25 @@
 #include <deque>
 #include <thread>
 #include <mutex>
-
-
+#include "platform_controller/cmd_platform.h"
 
 #define TX_PACKET_LENGTH 14
+#define TX_SERIAL_FREQUENCY 25
 
-#define PI 3.141592
-#define RAD2SERIAL (180.0 / PI) * 100.0         // rad ->[ 86%] Built target robot_localization deg -> serial
-#define M_S2SERIAL (3600.0 / 1000.0) * 10.0     // m/s -> km/h -> serial
-#define MAX_STEER_ANGLE 20.0                    // maximum steering angle = 20 [deg]
-#define MAX_BRAKE 200
 
-#define TX_SERIAL_FREQUENCY 50
+/*
+ 실제 차량의 dynamic에 의해 제한되는 최대조향각과 최대가속도, 최대속도값은 teb_local_planner의 parameter 튜닝으로 설정함.
+ 여기서는 Boundary Check만 진행 (원래 여기에 걸리는 것도 문제가 있음)
+ 여기서 걸리지 않게 테스트하면서 teb_local_planner parameter 튜닝할 필요가 있지만, 이 작업은 시간이 있으면 진행하는게 좋을듯
+*/
+
+
 //#define TX_DEBUG
 #define RX_SUBSCRIBE
 
-static double angleToSerialValue;
-static double maxSteeringAngle;
-static double minSteeringAngle;
+
+static std::string cmd_platform_topic_name;
 static int alignmentBias;
-static std::string ackermann_topic_name;
-
-static double maxSpeed; // m/s
-static double m_s2serial;
-
-static int frequency;
 
 std::mutex lock;
 
@@ -50,20 +44,11 @@ void initTx(const ros::NodeHandle& nh){
     packet[13] = static_cast<uint8_t>(0x0A);//0x0A
 
     //setup
-    nh.param("/platform_tx/frequency", frequency, 50);
-    nh.param<std::string>("/platform_tx/ackermann_topic_name", ackermann_topic_name, "platform_tx_test");
+    nh.param<std::string>("/platform_tx/cmd_platform_topic_name", cmd_platform_topic_name, "/control/cmd_platform");
 
     //steering member
-    nh.param("/platform_tx/angleToSerialValue", angleToSerialValue, RAD2SERIAL);
-    nh.param("/platform_tx/maxSteeringAngle", maxSteeringAngle, MAX_STEER_ANGLE);
-    nh.param("/platform_tx/minSteeringAngle", minSteeringAngle, -MAX_STEER_ANGLE);
-    nh.param("/platform_tx/alignmentBias", alignmentBias, -160);
-
-    //speed member
-    nh.param("/platform_tx/maxSpeed", maxSpeed, 20.0);
-    nh.param("/platform_tx/m_s2serial", m_s2serial, M_S2SERIAL);
+    nh.param("/platform_tx/alignmentBias", alignmentBias, 0);
 }
-
 
 
 //rx log variable
@@ -73,34 +58,12 @@ std::deque<platform_rx_msg::platform_rx_msg> rxMsgdeq(10);
 //for pid. I'm not sure but maybe this will be needed in the future
 void rxMsgCallBack(const platform_rx_msg::platform_rx_msg::ConstPtr& msg){
     platform_rx_msg::platform_rx_msg temp;
-    temp.speed = msg->steer;
-    temp.steer = msg->steer;
-    temp.brake = msg->brake;
     rxMsgdeq.push_front(temp);
     rxMsgdeq.pop_back();
     ROS_INFO("rxMsgSubscribing Done!");
 }
 #endif
 
-
-
-inline void checkSpeedBound(double& speed){
-    speed = (speed <= maxSpeed) ? speed : maxSpeed;
-    return;
-}
-
-
-inline void checkBrakeBound(double& brake_percent){
-    brake_percent = (brake_percent <= 100) ? brake_percent : 100;
-}
-
-
-inline void checkSteeringBound(double& steeringAngle){
-    if(steeringAngle > maxSteeringAngle)
-        steeringAngle = maxSteeringAngle;
-    else if(steeringAngle < minSteeringAngle)
-        steeringAngle = minSteeringAngle;
-}
 
 void serialWrite(){
     ros::Rate loop_rate(TX_SERIAL_FREQUENCY);
@@ -112,49 +75,46 @@ void serialWrite(){
     }
 }
 
-void createSerialPacket(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
-    ros::NodeHandle Node;
+
+void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
     static uint8_t alive = 0;
-    /*  gear
-        0x00 : forward
-        0x01 : neutral
-        0x02 : backward
-    */
+/*  
+    GEAR
+    0x00 : forward
+    0x01 : neutral
+    0x02 : backward
+*/
+    packet[5] = static_cast<uint8_t>(msg->gear);
+    
+// SPEED (원래는 accel이 맞는데 혼란을 피하기 위해 변수 이름들은 그냥 speed로 했음)
+    int speed = fabs(msg->accel); //   checkSpeedBound(speed);
+    uint16_t serialSpeed = speed;
+    *(uint16_t*)(packet + 7) = static_cast<uint16_t>(serialSpeed);
+    ROS_INFO("serial speed : %u", serialSpeed);
 
-    packet[5] = (msg->drive.speed >= 0) ?
-         static_cast<uint8_t>(0x00) : static_cast<uint8_t>(0x02);
-
-//  //speed. should put value (KPH * 10);
-    //1 m/s = 3.6 kph
-    double speed = fabs(msg->drive.speed);
-    checkSpeedBound(speed);
-    double speed_param;
-    Node.getParam("Tx/speed_param",speed_param);
-    uint16_t serialSpeed = ( speed + speed_param) * m_s2serial;
-    *(uint16_t*)(packet + 7) = static_cast<uint16_t>(50);
-ROS_INFO("serial speed : %u",serialSpeed);
-//  //steer. should put value (actual steering degree * 71)
-    double angle = -msg->drive.steering_angle * 180 / 3.141592;
-    checkSteeringBound(angle);
-    int16_t serialSteeringAngle = angle * angleToSerialValue + alignmentBias;
+// STEER
+    int angle = - msg->steer; //   checkSteeringBound(angle);
+    int16_t serialSteeringAngle = angle + alignmentBias;
     *(int8_t*)(packet + 8) = *((int8_t*)(&serialSteeringAngle) + 1);
     *(int8_t*)(packet + 9) = *(int8_t*)(&serialSteeringAngle);
-ROS_INFO("serial angle : %d",serialSteeringAngle);
-  //brake. low number is low braking. 1 ~ 200
-    double brake_param;
-    Node.getParam("Tx/brake_param",brake_param);
-    uint8_t brake = brake_param / 100 * MAX_BRAKE;
-    packet[10] = static_cast<uint8_t>(0);
-    //checkBrakeBound()
+    ROS_INFO("serial angle : %d", serialSteeringAngle);
 
-    packet[11] = static_cast<uint8_t>(alive);//alive
-    alive = (alive + 1) % 256;
+// BRAKE
+    int brake = msg->brake; //   checkBrakeBound(brake); 
+    packet[10] = static_cast<uint8_t>(brake);
+    ROS_INFO("serial brake : %u", brake);
+
+// ALIVE
+    packet[11] = static_cast<uint8_t>(alive);    alive = (alive + 1) % 256;
 }
 
 
-void ackermannCallBack_(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg){
-   createSerialPacket(msg);
+
+void Cmd_CallBack_(const platform_controller::cmd_platform::ConstPtr& msg){
+    createSerialPacket(msg);
 }
+
+
 
 int main(int argc, char *argv[]){
     if(argc < 2){
@@ -166,7 +126,7 @@ int main(int argc, char *argv[]){
 
     initTx(nh);
 
-    ros::Subscriber sub = nh.subscribe(ackermann_topic_name, 100, &ackermannCallBack_);
+    ros::Subscriber sub = nh.subscribe(cmd_platform_topic_name, 100, &Cmd_CallBack_);
 
     //open serial
     ser = new serial::Serial();
@@ -178,17 +138,16 @@ int main(int argc, char *argv[]){
     if(!ser->isOpen()) throw serial::IOException("ser.isOpen() error!",__LINE__,"ser.isOpen() error!");
     ROS_INFO("serial setting done");
 
-    ros::Rate loop_rate(frequency);
-
     std::thread tr(serialWrite);
     tr.detach();
 
 #ifndef TX_DEBUG
-    while(ros::ok()){
-        ros::spinOnce();
-        //ser->write(packet,TX_PACKET_LENGTH);
-        loop_rate.sleep();
-    }
+    ros::spin();
+///    while(ros::ok()){
+///        ros::spinOnce();
+///        //ser->write(packet,TX_PACKET_LENGTH);
+///        loop_rate.sleep();
+///    }
 #else
     //5hz->9.75
     //10hz->9.95
