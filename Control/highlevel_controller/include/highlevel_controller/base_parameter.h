@@ -18,7 +18,7 @@ public:
     bool use_process_crosswalk;
     bool use_crosswalk_onetime_flag;
 
-    double crosswalk_ckeck_duration;
+    double crosswalk_check_duration;
     double crosswalk_driving_duration;
     double crosswalk_stop_duration;
     bool crosswalk_onetime_flag;
@@ -28,7 +28,7 @@ public:
     bool use_process_movingobj;
     bool use_movingobj_onetime_flag;
 
-    double movingobj_ckeck_duration;
+    double movingobj_check_duration;
     double movingobj_driving_duration;
     double movingobj_stop_duration;
     bool movingobj_onetime_flag;
@@ -38,7 +38,7 @@ public:
     bool use_process_parking;
     bool use_parking_onetime_flag;
 
-    double parking_ckeck_duration;
+    double parking_check_duration;
     double parknig_stop_duration;
     bool parking_onetime_flag;
 
@@ -58,8 +58,11 @@ public:
     /* Done members */
     bool reached_goal;
 
+    //nodehandle
+    ros::NodeHandle nh;
+
     //explicit inline declaration
-    inline void load_param(ros::NodeHandle& nh){
+    inline void load_param(){
         nh.getParam("hl_controller/crosswalk",              crosswalk);
         nh.getParam("hl_controller/crosswalk_onetime_flag", crosswalk_onetime_flag);
         nh.getParam("hl_controller/movingobj",              movingobj);
@@ -86,9 +89,9 @@ public:
     }
 
     //singletone
-    static Parameters* getInstance(ros::NodeHandle& nh);
+    static Parameters* getInstance();
 private:
-    Parameters(ros::NodeHandle& nh);
+    Parameters();
     static Parameters* obj_ptr;
 };
 

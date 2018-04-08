@@ -1,11 +1,11 @@
 #include "highlevel_controller/base_parameter.h"
 
-Parameters* Parameters::getInstance(ros::NodeHandle& nh){
-    if(!obj_ptr) obj_ptr = new Parameters(nh);
+Parameters* Parameters::getInstance(){
+    if(!obj_ptr) obj_ptr = new Parameters();
     return obj_ptr;
 }
 
-Parameters::Parameters(ros::NodeHandle& nh){
+Parameters::Parameters(){
         
     /* global parameter */
     nh.param("hl_contoller/frequency", frequency, 5);
@@ -60,5 +60,4 @@ Parameters::Parameters(ros::NodeHandle& nh){
     nh.param("hl_controller/reached_goal", reached_goal, false);
 }
 
-//create instance
 Parameters* Parameters::obj_ptr = nullptr;
