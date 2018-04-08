@@ -25,7 +25,7 @@ find_package(catkin REQUIRED)
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
 find_package(catkin REQUIRED COMPONENTS
-  roscpp roslaunch geometry_msgs sensor_msgs tf
+  roscpp roslaunch geometry_msgs sensor_msgs tf obstacle_detector
 )
 find_package(Armadillo REQUIRED)
 find_package(Boost 1.54.0 REQUIRED system)
