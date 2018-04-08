@@ -95,8 +95,8 @@ find_package(Boost 1.54.0 REQUIRED system)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES improve_lidar
-#  CATKIN_DEPENDS other_catkin_pkg
+#  LIBRARIES obstacle_detector
+#  CATKIN_DEPENDS obstalce_detector
 #  DEPENDS system_lib
 )
 include_directories(include ${catkin_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})

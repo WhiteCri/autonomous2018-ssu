@@ -38,6 +38,10 @@
  	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
     		<rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
  	</node>
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="dynamic_filter">
+        <rosparam file="$(find laser_filters)/cfg/range_cut.yaml" command="load"/>  
+		<remap from="/scan"  to="/uturn_scan"/>  
+ 	</node>
 		
 	<!--arg name="cam_num" default="1"/>	
 	<arg name="frequency" default="30"/>
