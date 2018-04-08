@@ -54,7 +54,10 @@ Parameters::Parameters(){
     nh.param("hl_controller/parking_far_back_point_y",parking_far_back_point_y, -200.0);
 
     /* recovery members */
-    nh.param("hl_controller/need_recovery", need_recovery, false);
+    nh.param("hl_controller/recovery", recovery, false);
+    nh.param("hl_controller/use_process_recovery", use_process_recovery, true);
+    nh.param("hl_controller/recovery_check_duration", recovery_check_duration, 0.5);
+    
 
     /* Done members */
     nh.param("hl_controller/reached_goal", reached_goal, false);

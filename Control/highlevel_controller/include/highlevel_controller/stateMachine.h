@@ -4,7 +4,7 @@ void init();
 
 void toward_goal();
 
-void process_croswalk();
+void process_crosswalk();
 
 void process_movingobj();
 

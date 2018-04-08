@@ -4,7 +4,7 @@
  *
 */
 
-#include "HybridAutomata.h"
+#include "highlevel_controller/HybridAutomata.h"
 
 HybridAutomata::HybridAutomata(const unsigned int init, const unsigned int exit)
 {

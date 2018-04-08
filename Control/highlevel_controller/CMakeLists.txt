@@ -35,6 +35,9 @@ include_directories(
 add_executable(highlevel_controller
   src/highlevel_controller.cpp
   src/base_parameter.cpp
+  src/stateMachine.cpp
+  src/condition.cpp
+  src/HybridAutomata.cpp
 )
 add_dependencies(highlevel_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(highlevel_controller

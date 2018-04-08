@@ -2,6 +2,16 @@
 #include <ros/ros.h>
 #include <highlevel_controller/params.h>
 
+enum {
+    INIT = 0,
+    TOWARD_GOAL,
+    PROCESS_CROSSWALK,
+    PROCESS_MOVINGOBJ,
+    PROCESS_PARKING,
+    PROCESS_RECOVERY,
+    DONE
+};
+
 // when you add new param, you should config base_parameter.h, base_parameter.cpp, hl_controller.yaml
 class Parameters{
 public:
@@ -53,7 +63,10 @@ public:
     double parking_far_back_point_y;
 
     /* recovery members */
-    bool need_recovery;
+    bool recovery;
+    bool use_process_recovery;
+
+    double recovery_check_duration;
 
     /* Done members */
     bool reached_goal;
@@ -69,7 +82,7 @@ public:
         nh.getParam("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag);
         nh.getParam("hl_controller/parking",                parking);
         nh.getParam("hl_controller/parking_onetime_flag",   parking_onetime_flag);
-        nh.getParam("hl_controller/need_recovery",          need_recovery);
+        nh.getParam("hl_controller/recovery",          recovery);
         
         if (publish_param){
             static size_t seq = 0;
@@ -82,7 +95,7 @@ public:
             msg.crosswalk = crosswalk;
             msg.movingobj = movingobj;
             msg.parking = parking;
-            msg.need_recovery = need_recovery;
+            msg.recovery = recovery;
 
             param_pub.publish(msg);
         }
@@ -93,8 +106,4 @@ public:
 private:
     Parameters();
     static Parameters* obj_ptr;
-};
-
-enum{
-    INIT, TOWARD_GOAL, PROCESS_CROSSWALK, PROCESS_MOVINGOBJ, PROCESS_PARKING, PROCESS_RECOVERY, DONE
 };

@@ -1,6 +1,6 @@
 bool crosswalk
 bool movingobj
 bool parking
-bool need_recovery
+bool recovery
 time stamp
 uint32 seq

@@ -1,17 +1,18 @@
-#include "condition.h"
+#include "highlevel_controller/condition.h"
+#include "highlevel_controller/base_parameter.h"
 
-extern Parameter param;
+extern Parameters* param_ptr;
 
 bool Init_to_toward_goal::check(HybridAutomata *HA){
     return true;
 }
 
 /* crosswalk */
-bool Toward_goal_to_process:timedCheck(HybridAutomata *HA){
+bool Toward_goal_to_process_crosswalk::timedCheck(HybridAutomata *HA){
     bool ret = true;
-    ret &= param.crosswalk;
-    if (param.use_crosswalk_onetime_flag)
-        ret &= !param.crosswalk_onetime_flag;
+    ret &= param_ptr->crosswalk;
+    if (param_ptr->use_crosswalk_onetime_flag)
+        ret &= !param_ptr->crosswalk_onetime_flag;
     return ret; 
 }
 
@@ -22,22 +23,22 @@ bool Process_crosswalk_to_toward_goal::check(HybridAutomata *HA){
 /* movingobj */
 bool Toward_goal_to_process_movingobj::timedCheck(HybridAutomata* HA){
     bool ret = true;
-    ret &= param.movingobj;
-    if (param.use_movingobj_onetime_flag)
-        ret &= !param.movingobj_onetime_flag;
+    ret &= param_ptr->movingobj;
+    if (param_ptr->use_movingobj_onetime_flag)
+        ret &= !param_ptr->movingobj_onetime_flag;
     return ret;
 }
 
 bool Process_movingobj_to_toward_goal::check(HybridAutomata *HA){
-    return !param.movingobj;
+    return !param_ptr->movingobj;
 }
 
 /* parking */
 bool Toward_goal_to_process_parking::timedCheck(HybridAutomata* HA){
     bool ret = true;
-    ret &= param.parking;
-    if (param.use_parking_onetime_flag)
-        ret &= !param.parking_onetime_flag;
+    ret &= param_ptr->parking;
+    if (param_ptr->use_parking_onetime_flag)
+        ret &= !param_ptr->parking_onetime_flag;
     return ret;
 }
 
@@ -48,7 +49,7 @@ bool Process_parking_to_toward_goal::check(HybridAutomata *HA){
 /* recovery */
 bool Toward_goal_to_process_recovery::timedCheck(HybridAutomata* HA){
     bool ret = true;
-    ret &= param.recovery;
+    ret &= param_ptr->recovery;
     return ret;
 }
 
@@ -58,5 +59,5 @@ bool Process_recovery_to_toward_goal::check(HybridAutomata *HA){
 
 /* Done */
 bool Toward_goal_to_done::check(HybridAutomata* HA){
-    return param.reached_goal;
+    return param_ptr->reached_goal;
 }
