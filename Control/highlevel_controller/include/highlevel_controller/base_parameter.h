@@ -20,6 +20,9 @@ public:
     int frequency;
     bool publish_param;
 
+    /* goal list */
+    std::vector<double> x_goal, y_goal, yaw_goal;
+
     /* tx control parameter */
     bool tx_stop;
 

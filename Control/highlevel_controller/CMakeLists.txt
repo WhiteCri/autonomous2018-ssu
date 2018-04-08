@@ -8,6 +8,8 @@ find_package(catkin REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   roscpp
+  actionlib
+  actionlib_msgs
 )
 
 add_message_files(FILES
@@ -21,6 +23,8 @@ generate_messages(DEPENDENCIES
 catkin_package(
   CATKIN_DEPENDS
   message_runtime
+  actionlib 
+  actionlib_msgs 
 )
 
 
@@ -38,6 +42,7 @@ add_executable(highlevel_controller
   src/stateMachine.cpp
   src/condition.cpp
   src/HybridAutomata.cpp
+  src/goalSender.cpp
 )
 add_dependencies(highlevel_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(highlevel_controller

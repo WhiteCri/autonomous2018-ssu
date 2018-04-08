@@ -11,6 +11,11 @@ Parameters::Parameters(){
     nh.param("hl_contoller/frequency", frequency, 5);
     nh.param("hl_controller/publish_param", publish_param, true);
 
+    /* goal list */
+    nh.param("hl_controller/x_goal", x_goal);
+    nh.param("hl_controller/y_goal", y_goal);
+    nh.param("hl_controller/yaw_goal", yaw_goal);
+
     /* tx control parameter */
     nh.param("hl_controller/tx_stop", tx_stop, false);
 

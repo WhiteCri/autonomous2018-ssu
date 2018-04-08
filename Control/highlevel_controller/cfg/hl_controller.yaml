@@ -1,5 +1,10 @@
 hl_controller:
-  
+#goal
+  x_goal: [12.5]
+  y_goal: [0]
+  yaw_goal: [-2.1]
+
+#config controller
   frequency: 5
   publish_param: false
 
@@ -47,3 +52,7 @@ hl_controller:
 
 #Done
   reached_goal: false
+
+#goal_sender params
+  use_auto_goal_sender: false
+  auto_goal_sender_frequency: 3
