@@ -1,5 +1,5 @@
 <launch>
     <node pkg="send_goal_test_with_fake" type="move_base_client" name="move_base_client">
-        <rosparam file="$(find send_goal_test_with_fake)/cfg/send_goal.yaml" command="load"/>
+        <rosparam file="$(find move_base_ssu)/cfg/send_goal.yaml" command="load"/>
     </node>
 </launch>

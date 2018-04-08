@@ -105,6 +105,9 @@ ROS_INFO("gap[%ld] : %d, encoder : %d",seq, encoderGap[0],encoder[0]);
         msg.brake = getParsingData<uint8_t>(packet_main, 10);
         msg.seq = seq++;
 
+        bool estop = getParsingData<uint8_t>(packet_main, 4);
+        nh.setParam("estop", estop);
+
         if(seq > 5)
             pub.publish(msg);     
         loop_rate.sleep();

@@ -8,7 +8,7 @@
 
 #define TX_PACKET_LENGTH 14
 #define TX_SERIAL_FREQUENCY 25
-
+#define TX_STOP_CHECK_PERIOD 10
 
 /*
  실제 차량의 dynamic에 의해 제한되는 최대조향각과 최대가속도, 최대속도값은 teb_local_planner의 parameter 튜닝으로 설정함.
@@ -23,13 +23,13 @@
 
 static std::string cmd_platform_topic_name;
 static int alignmentBias;
-
-std::mutex lock;
+static bool tx_stop;
 
 uint8_t packet[TX_PACKET_LENGTH] = {};
 
 //serial
 serial::Serial *ser;
+std::mutex lock;
 
 void initTx(const ros::NodeHandle& nh){
     packet[0] = static_cast<uint8_t>(0x53);
@@ -69,8 +69,22 @@ void serialWrite(){
     ros::Rate loop_rate(TX_SERIAL_FREQUENCY);
     while(true){
         lock.lock();
+        if(tx_stop){
+            *(uint16_t*)(packet + 7) = static_cast<uint16_t>(0);//speed
+            *(int8_t*)(packet + 8) = 0;
+            *(int8_t*)(packet + 9) = 0; //steer
+            packet[10] = static_cast<uint8_t>(0); // brake
+        }
         ser->write(packet,TX_PACKET_LENGTH);
         lock.unlock();
+        loop_rate.sleep();
+    }
+}
+
+void processTxStop(ros::NodeHandle& nh){
+    ros::Rate loop_rate(TX_STOP_CHECK_PERIOD);
+    while(true){ 
+        nh.getParam("hl_controller/tx_stop", tx_stop);
         loop_rate.sleep();
     }
 }
@@ -140,6 +154,8 @@ int main(int argc, char *argv[]){
 
     std::thread tr(serialWrite);
     tr.detach();
+    std::thread tr2(std::bind(processTxStop, nh));
+    tr2.detach();
 
 #ifndef TX_DEBUG
     ros::spin();
