@@ -792,7 +792,7 @@ namespace lane_detect_algo{
                         }
                     }
 		int temp_bottom = 0, max_bottom = 0;
-	    	for(int row = 1, row < numOfLables; row++){
+	    	for(int row = 1; row < numOfLables; row++){
 			int* bottom_data = stats.ptr<int>(row);
 			temp_bottom = bottom_data[cv::CC_STAT_TOP]+bottom_data[cv::CC_STAT_HEIGHT];
 			if(temp_bottom>max_bottom){
@@ -906,7 +906,7 @@ namespace lane_detect_algo{
                         }
                     }
                 int temp_bottom = 0, max_bottom = 0;
-			 for(int row = 1, row < numOfLables; row++){
+			 for(int row = 1;  row < numOfLables; row++){
 		                int* bottom_data = stats.ptr<int>(row);
 		                temp_bottom = bottom_data[cv::CC_STAT_TOP]+bottom_data[cv::CC_STAT_HEIGHT];
 		                if(temp_bottom>max_bottom){
