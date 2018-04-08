@@ -66,7 +66,7 @@ int main(int argc, char** argv){
 
   while(nh.ok()){
 
-    if(ros::param::get("cross_walk",is_cross_walk)){
+    if(ros::param::get("HA/crosswalk",is_cross_walk)){
       //차량정지 및 파라미터값 복구 작성 예정
     } 
      

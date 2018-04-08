@@ -37,8 +37,8 @@
 		<rosparam file="$(find move_base_ssu)/cfg/amcl_params.yaml" command="load" />
 
 	    <param name="initial_pose_x"            value="35.5"/>
-		<param name="initial_pose_y"            value="7"/>
-		<param name="initial_pose_a"            value="3.14"/>
+		<param name="initial_pose_y"            value="15"/>
+		<param name="initial_pose_a"            value="-1.57"/>
 	</node>
 	
 
