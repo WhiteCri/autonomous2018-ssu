@@ -51,7 +51,8 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     }
      for(int i=0; i<object->segments.size(); i++)
     {
-        ROS_INFO("%lf",dataarry[i][0]);
+        ROS_INFO("x is %lf",dataarry[i][0]);
+        ROS_INFO("y is %lf",dataarry[i][1]);
     }
 }
 

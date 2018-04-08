@@ -3,8 +3,8 @@ scan_filter_chain:
   type: LaserScanRangeFilter
   params:
     use_message_range_limits: false
-    lower_threshold: 4
-    upper_threshold: 9
+    lower_threshold: 2
+    upper_threshold: 7
     lower_replacement_value: -.inf
     upper_replacement_value: .inf
 - name: angle
