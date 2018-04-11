@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(camera_image)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -213,15 +213,5 @@ add_dependencies(camera_image ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPOR
 target_link_libraries(camera_image
   ${catkin_LIBRARIES}
   # add by Park
-  ${OpenCV_LIBS}
-)
-
-add_executable(camera_image_sub
-  src/camera_image_sub.cpp
-)
-add_dependencies(camera_image_sub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(camera_image_sub
-  ${catkin_LIBRARIES}
-  #add by Park
   ${OpenCV_LIBS}
 )

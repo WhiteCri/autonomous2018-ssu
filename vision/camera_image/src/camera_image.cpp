@@ -6,7 +6,9 @@
 // argv[0] : camera_number, argv[1] : frequency
 
 
-static const bool DEBUG = false; // 디버깅 스위치
+static const bool DEBUG = true; // 디버깅 스위치
+static const bool CALIBRATION = true;
+static const bool SIZEUP = true;
 static const std::string OPENCV_WINDOW = "Raw Image Window";
 
 template < typename T > std::string to_string( const T& n );
@@ -17,13 +19,19 @@ class CameraImage{
     image_transport::Publisher camera_image_pub_;
 
 public:
-    CameraImage(int par_camera_num,int par_frequency)
-        : it_(nh_), camera_number(par_camera_num), frequency(par_frequency)
+    CameraImage(int par_camera_num,int par_frequency, cv::Mat camMat, cv::Mat distMat)
+        : it_(nh_), camera_number(par_camera_num), frequency(par_frequency), cameraMatrix(camMat), distCoeffs(distMat)
     { 
         createTopicName();  
         if(DEBUG) std::cout<<"topic_name : "<<topic_name<<std::endl;
         camera_image_pub_ = it_.advertise(topic_name,1);
         cap.open(camera_number);
+        
+        if(CALIBRATION){
+            cameraMatrix=(cv::Mat1d(3, 3) << 625.546173, 0, 329.374745, 0, 625.809222, 221.233758, 0, 0, 1);
+            distCoeffs=(cv::Mat1d(1, 5) << 0.103856, -0.124799, -0.001845, 0.012219, 0);
+        }
+        
     }
 
     ~CameraImage()
@@ -39,7 +47,9 @@ private:
     int frequency;    
     cv::VideoCapture cap;
     std::string topic_name;
-    sensor_msgs::ImagePtr msg;    
+    sensor_msgs::ImagePtr msg; 
+    cv::Mat cameraMatrix;
+    cv::Mat distCoeffs;  
     
 };
 
@@ -65,10 +75,13 @@ int main(int argc, char** argv){
         return 1;
     }
 
-    CameraImage cimage(camera_number, frequency);
+    cv::Mat cameraMatrix = cv::Mat::eye(3, 3, CV_64FC1);
+    cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64FC1);
+
+    CameraImage cimage(camera_number, frequency, cameraMatrix, distCoeffs);
 
     if(DEBUG) ROS_INFO("Start publishing");
-   
+    
     cimage.sendImage();
    
     if(DEBUG) ROS_INFO("Publishing done");
@@ -85,13 +98,20 @@ int main(int argc, char** argv){
 void CameraImage::sendImage(){
     ros::Rate loop_rate(frequency);
         cv::Mat frame;
+        cv::Mat temp;
     while(nh_.ok()){
         cap >> frame;
         if(!frame.empty()){
-        if(DEBUG) cv::imshow(OPENCV_WINDOW,frame);
 
-        msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-        camera_image_pub_.publish(msg);             
+            if(SIZEUP) cv::resize(frame, frame, cv::Size(frame.cols * 2, frame.rows * 2), 0, 0, CV_INTER_NN);
+            if(CALIBRATION) {
+                cv::undistort(frame, temp, cameraMatrix, distCoeffs);
+                frame = temp;
+            }
+            if(DEBUG) cv::imshow(OPENCV_WINDOW,frame);
+            
+            msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
+            camera_image_pub_.publish(msg);             
         }                        
         int ckey = cv::waitKey(1);
         if(ckey == 27)break;
