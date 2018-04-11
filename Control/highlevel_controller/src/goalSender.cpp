@@ -21,10 +21,6 @@ GoalSender::GoalSender() : ac("move_base", true)
 void GoalSender::sendGoal(){
     ac.cancelAllGoals();
     ac.sendGoal(goal);
-    ROS_INFO("send goal(x: %lf, y: %lf)",
-        goal.target_pose.pose.position.x,
-        goal.target_pose.pose.position.y
-    );
 }
 
 void GoalSender::setGoal(double x, double y, double yaw){
@@ -34,10 +30,6 @@ void GoalSender::setGoal(double x, double y, double yaw){
     goal.target_pose.pose.position.x = x;
     goal.target_pose.pose.position.y = y;
     goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
-    ROS_INFO("set goal(x: %lf, y: %lf)",
-        goal.target_pose.pose.position.x,
-        goal.target_pose.pose.position.y
-    );
 }
 
 GoalSender::GoalStates GoalSender::getState(){
@@ -50,9 +42,11 @@ GoalSender::GoalStates GoalSender::getState(){
         ret = GoalStates::STATE_ACTIVE;     
     else if (state == actionlib::SimpleClientGoalState::PENDING)
         ret = GoalStates::STATE_PENDING;    
+    else if (state == actionlib::SimpleClientGoalState::LOST)
+        ret = GoalStates::STATE_LOST;
     else {
         ROS_INFO("unhandling move_base server state: %s", state.toString().c_str());
-        ret = GoalStates::STATE_PENDING;
+        throw std::runtime_error("unhandling state");
     }
 
     return ret;
@@ -69,3 +63,10 @@ void GoalSender::auto_goal_sender(){
         loop_rate.sleep();
     }
 }
+
+GoalSender* GoalSender::getInstancePtr() {
+    if (!objptr) objptr = new GoalSender();
+    return objptr;
+}
+
+GoalSender* GoalSender::objptr = nullptr;
