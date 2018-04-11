@@ -36,7 +36,6 @@ public:
       cnt = 0;
     return false;
   }
-  int getCnt() {return cnt;}
   virtual bool timedCheck(HybridAutomata *HA) = 0;
   virtual ~TimedCondition() {}
 private:

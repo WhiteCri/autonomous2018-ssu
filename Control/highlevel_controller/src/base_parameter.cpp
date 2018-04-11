@@ -1,6 +1,6 @@
 #include "highlevel_controller/base_parameter.h"
 
-Parameters* Parameters::getInstance(){
+Parameters* Parameters::getInstancePtr(){
     if(!obj_ptr) obj_ptr = new Parameters();
     return obj_ptr;
 }

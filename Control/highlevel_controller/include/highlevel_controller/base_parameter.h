@@ -105,7 +105,7 @@ public:
     }
 
     //singletone
-    static Parameters* getInstance();
+    static Parameters* getInstancePtr();
 private:
     Parameters();
     static Parameters* obj_ptr;
