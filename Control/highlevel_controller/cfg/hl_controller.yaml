@@ -3,6 +3,7 @@ hl_controller:
   x_goal: [12.5]
   y_goal: [0]
   yaw_goal: [-2.1]
+  goal_type: ["N"]
 
 #config controller
   frequency: 5
