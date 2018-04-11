@@ -37,7 +37,7 @@ hl_controller:
   use_parking_onetime_flag: true
   parking_onetime_flag: false
 
-  parknig_stop_duration: 10.0
+  parking_stop_duration: 10.0
 
   parking_near_arrive_point_x: -200.0
   parking_near_arrive_point_y: -200.0

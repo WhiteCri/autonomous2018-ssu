@@ -54,7 +54,7 @@ public:
     bool use_parking_onetime_flag;
 
     double parking_check_duration;
-    double parknig_stop_duration;
+    double parking_stop_duration;
     bool parking_onetime_flag;
 
     //goalpoint members    

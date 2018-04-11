@@ -52,7 +52,7 @@ Parameters::Parameters(){
     nh.param("hl_controller/use_process_parking", use_process_parking, true);
     nh.param("hl_controller/use_parking_onetime_flag", use_parking_onetime_flag, true);
 
-    nh.param("hl_controller/parking_stop_duration", parknig_stop_duration, 10.0);
+    nh.param("hl_controller/parking_stop_duration", parking_stop_duration, 10.0);
     nh.param("hl_controller/parking_onetime_flag", parking_onetime_flag, true);
 
     //goalpoint members    
