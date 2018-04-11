@@ -43,6 +43,7 @@ public:
     bool use_movingobj_onetime_flag;
 
     double movingobj_check_duration;
+    double movingobj_escape_duration;
     double movingobj_driving_duration;
     double movingobj_stop_duration;
     bool movingobj_onetime_flag;

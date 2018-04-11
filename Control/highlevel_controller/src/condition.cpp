@@ -3,7 +3,7 @@
 
 extern Parameters* param_ptr;
 
-bool Init_to_toward_goal::check(HybridAutomata *HA){
+bool Init_to_toward_goal::timedCheck(HybridAutomata *HA){
     return true;
 }
 
@@ -17,7 +17,7 @@ bool Toward_goal_to_process_crosswalk::timedCheck(HybridAutomata *HA){
     return ret; 
 }
 
-bool Process_crosswalk_to_toward_goal::check(HybridAutomata *HA){
+bool Process_crosswalk_to_toward_goal::timedCheck(HybridAutomata *HA){
     return true;
 }
 
@@ -31,7 +31,7 @@ bool Toward_goal_to_process_movingobj::timedCheck(HybridAutomata* HA){
     return ret;
 }
 
-bool Process_movingobj_to_toward_goal::check(HybridAutomata *HA){
+bool Process_movingobj_to_toward_goal::timedCheck(HybridAutomata *HA){
     bool ret = !param_ptr->movingobj;
 
     return ret;
@@ -47,7 +47,7 @@ bool Toward_goal_to_process_parking::timedCheck(HybridAutomata* HA){
     return ret;
 }
 
-bool Process_parking_to_toward_goal::check(HybridAutomata *HA){
+bool Process_parking_to_toward_goal::timedCheck(HybridAutomata *HA){
     return true;
 }
 
@@ -59,12 +59,12 @@ bool Toward_goal_to_process_recovery::timedCheck(HybridAutomata* HA){
     return ret;
 }
 
-bool Process_recovery_to_toward_goal::check(HybridAutomata *HA){
+bool Process_recovery_to_toward_goal::timedCheck(HybridAutomata *HA){
     return true;
 }
 
 /* Done */
-bool Toward_goal_to_done::check(HybridAutomata* HA){
+bool Toward_goal_to_done::timedCheck(HybridAutomata* HA){
     bool ret = param_ptr->reached_goal;
     return ret;
 }

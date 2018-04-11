@@ -38,6 +38,7 @@ Parameters::Parameters(){
     /* movingobj paramter */
     nh.param("hl_controller/movingobj", movingobj, false);
     nh.param("hl_controller/movingobj_check_duration", movingobj_check_duration, 1.0);
+    nh.param("hl_controller/movingobj_escape_duration", movingobj_escape_duration, 1.0);
     nh.param("hl_controller/use_process_movingobj", use_process_movingobj, true);
     nh.param("hl_controller/use_movingobj_onetime_flag", use_movingobj_onetime_flag, true);
 

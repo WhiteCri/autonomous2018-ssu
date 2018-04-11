@@ -8,6 +8,7 @@
 #include <ros/ros.h>
 
 #define MAX_STATES 100
+#define MAX_CONDCOUNT 10000
 
 using namespace std;
 
@@ -26,6 +27,7 @@ public:
   TimedCondition(unsigned int condCount) : condCount_(condCount)
   { 
     if(condCount_ == 0) condCount_ = 1;
+    if(condCount_ >= MAX_CONDCOUNT) throw std::runtime_error("too big condCount!");
   }
   virtual bool check(HybridAutomata *HA)
   {
@@ -41,8 +43,8 @@ public:
   virtual bool timedCheck(HybridAutomata *HA) = 0;
   virtual ~TimedCondition() {}
 private:
-  unsigned int condCount_;
-  unsigned cnt;
+  int condCount_;
+  int cnt;
 };
 //added by TawWook End
 class HybridAutomata

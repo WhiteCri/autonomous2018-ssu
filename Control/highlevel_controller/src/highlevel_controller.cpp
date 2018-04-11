@@ -25,9 +25,9 @@ int main(int argc, char *argv[]){
         //init
         ha.setState(INIT, init);
         ha.setState(TOWARD_GOAL, toward_goal);
-        ha.setCondition(INIT, new Init_to_toward_goal(), TOWARD_GOAL);
+        ha.setCondition(INIT, new Init_to_toward_goal(0), TOWARD_GOAL);
         ha.setState(DONE, done);
-        ha.setCondition(TOWARD_GOAL, new Toward_goal_to_done(), DONE);
+        ha.setCondition(TOWARD_GOAL, new Toward_goal_to_done(0), DONE);
 
         //register crosswalk
         if (param_ptr->use_process_crosswalk){
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
             );
             ha.setCondition(
                 PROCESS_CROSSWALK,
-                new Process_crosswalk_to_toward_goal(),
+                new Process_crosswalk_to_toward_goal(0),
                 TOWARD_GOAL
             );
         }
@@ -51,6 +51,7 @@ int main(int argc, char *argv[]){
             ha.setState(PROCESS_MOVINGOBJ, process_movingobj);
 
             int movingobj_check_frequency = ha_frequency * param_ptr->movingobj_check_duration;
+            int movingobj_escape_frequency = ha_frequency * param_ptr->movingobj_escape_duration;
             ha.setCondition(
                 TOWARD_GOAL,
                 new Toward_goal_to_process_movingobj(movingobj_check_frequency),
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]){
             );
             ha.setCondition(
                 PROCESS_MOVINGOBJ,
-                new Process_movingobj_to_toward_goal(),
+                new Process_movingobj_to_toward_goal(movingobj_escape_frequency),
                 TOWARD_GOAL
             );
         }
@@ -68,6 +69,7 @@ int main(int argc, char *argv[]){
             ha.setState(PROCESS_PARKING, process_parking);
 
             int parking_check_frequency = ha_frequency * param_ptr->parking_check_duration;
+            
             ha.setCondition(
                 TOWARD_GOAL,
                 new Toward_goal_to_process_parking(parking_check_frequency),
@@ -75,7 +77,7 @@ int main(int argc, char *argv[]){
             );
             ha.setCondition(
                 PROCESS_PARKING,
-                new Process_parking_to_toward_goal(),
+                new Process_parking_to_toward_goal(0),
                 TOWARD_GOAL
             );
         }
@@ -92,7 +94,7 @@ int main(int argc, char *argv[]){
             );
             ha.setCondition(
                 PROCESS_RECOVERY,
-                new Process_recovery_to_toward_goal(),
+                new Process_recovery_to_toward_goal(0),
                 TOWARD_GOAL
             );
         }
