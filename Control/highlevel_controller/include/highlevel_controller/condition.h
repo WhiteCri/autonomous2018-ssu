@@ -1,9 +1,10 @@
 #pragma once
 #include "HybridAutomata.h"
 
-class Init_to_toward_goal : public Condition{
+class Init_to_toward_goal : public TimedCondition{
 public:
-    virtual bool check(HybridAutomata *HA);
+    Init_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
     std::string toString() const {return "Init_to_toward_goal";}
 };
 
@@ -15,9 +16,10 @@ public:
     std::string toString() const {return "Toward_goal_to_process_crosswalk";}
 };
 
-class Process_crosswalk_to_toward_goal : public Condition{
+class Process_crosswalk_to_toward_goal: public TimedCondition{
 public:
-    virtual bool check(HybridAutomata *HA);
+    Process_crosswalk_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
     std::string toString() const {return "process_crosswalk_to_toward_goal";}
 };
 
@@ -29,9 +31,10 @@ public:
     std::string toString() const {return "toward_goal_to_process_movingobj";}
 };
 
-class Process_movingobj_to_toward_goal : public Condition{
+class Process_movingobj_to_toward_goal : public TimedCondition{
 public:
-    virtual bool check(HybridAutomata *HA);
+    Process_movingobj_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
     std::string toString() const {return "Process_movingobj_to_toward_goal";}
 };
 
@@ -43,9 +46,10 @@ public:
     std::string toString() const {return "Toward_goal_to_process_parking";}
 };
 
-class Process_parking_to_toward_goal : public Condition{
+class Process_parking_to_toward_goal : public TimedCondition{
 public:
-    virtual bool check(HybridAutomata *HA);
+    Process_parking_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
     std::string toString() const {return "Process_parking_to_toward_goal";}
 };
 
@@ -57,15 +61,17 @@ public:
     std::string toString() const {return "Toward_goal_to_process_recovery";}
 };
 
-class Process_recovery_to_toward_goal : public Condition{
+class Process_recovery_to_toward_goal : public TimedCondition{
 public:
-    virtual bool check(HybridAutomata *HA);
+    Process_recovery_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
     std::string toString() const {return "Process_recovery_to_toward_goal";}
 };
 
 /* Done */
-class Toward_goal_to_done : public Condition{
+class Toward_goal_to_done : public TimedCondition{
 public:
-    virtual bool check(HybridAutomata *HA);
+    Toward_goal_to_done(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
     std::string toString() const {return "Toward_goal_to_done";}
 };
