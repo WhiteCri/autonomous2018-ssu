@@ -27,7 +27,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "move_base");
   ros::NodeHandle n;
 ROS_INFO("starting movebase server...");
-  MoveBaseServer server(n, "move_base_server", boost::bind(&execute, _1, &server), false);
+  MoveBaseServer server(n, "move_base", boost::bind(&execute, _1, &server), false);
   server.start();
   ros::spin();
   return 0;

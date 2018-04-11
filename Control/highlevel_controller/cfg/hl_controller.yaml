@@ -1,8 +1,9 @@
 hl_controller:
 #goal
-  x_goal: [12.5]
-  y_goal: [0]
-  yaw_goal: [-2.1]
+  x_goal: [12.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  y_goal: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  yaw_goal: [-2.1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  goal_type: ["N","N","N","N","N","N","N","N","N","N","N","N","N","N","N","N"]
 
 #config controller
   frequency: 5

@@ -2,16 +2,19 @@
 #include <iostream>
 #include "highlevel_controller/base_parameter.h"
 #include "highlevel_controller/condition.h"
-#include "highlevel_controller/stateMachine.h"
+#include "highlevel_controller/StateHandler.h"
+#include "highlevel_controller/goalSender.h"
 
 Parameters* param_ptr;
+GoalSender* goalSender_ptr;
 
 int main(int argc, char *argv[]){
 
     ros::init(argc, argv, "highlevel_controller");
 
     //do not relocate this code. it must locate under the declaration of nodeHandle
-    param_ptr = Parameters::getInstance();
+    param_ptr = Parameters::getInstancePtr();
+    goalSender_ptr = GoalSender::getInstancePtr();
 
     //get ha frequency
     int ha_frequency = param_ptr->frequency;

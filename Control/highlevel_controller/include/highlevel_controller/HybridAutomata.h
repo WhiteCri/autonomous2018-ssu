@@ -5,6 +5,7 @@
 */
 #pragma once
 #include <iostream>
+#include <ros/ros.h>
 
 #define MAX_STATES 100
 
@@ -16,6 +17,7 @@ class Condition
 public:
   virtual bool check(HybridAutomata *HA) = 0;
   virtual ~Condition() {}
+  virtual std::string toString() const = 0;
 };
 //added by TaeWook
 class TimedCondition : public Condition
@@ -36,7 +38,6 @@ public:
       cnt = 0;
     return false;
   }
-  int getCnt() {return cnt;}
   virtual bool timedCheck(HybridAutomata *HA) = 0;
   virtual ~TimedCondition() {}
 private:

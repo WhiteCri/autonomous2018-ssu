@@ -1,6 +1,6 @@
 #include "highlevel_controller/base_parameter.h"
-
-Parameters* Parameters::getInstance(){
+#include <exception>
+Parameters* Parameters::getInstancePtr(){
     if(!obj_ptr) obj_ptr = new Parameters();
     return obj_ptr;
 }
@@ -12,9 +12,15 @@ Parameters::Parameters(){
     nh.param("hl_controller/publish_param", publish_param, true);
 
     /* goal list */
-    nh.param("hl_controller/x_goal", x_goal);
-    nh.param("hl_controller/y_goal", y_goal);
-    nh.param("hl_controller/yaw_goal", yaw_goal);
+    if (!nh.getParam("hl_controller/x_goal", x_goal)) throw std::runtime_error("no x goal!");
+    if (!nh.getParam("hl_controller/y_goal", y_goal)) throw std::runtime_error("no y goal!");
+    if (!nh.getParam("hl_controller/yaw_goal", yaw_goal)) throw std::runtime_error("no yaw goal!");
+    if (!nh.getParam("hl_controller/goal_type", goal_type)) throw std::runtime_error("no goal_type !");
+    //reverse
+    x_goal = std::vector<double>(x_goal.rbegin(), x_goal.rend());
+    y_goal = std::vector<double>(y_goal.rbegin(), y_goal.rend());
+    yaw_goal = std::vector<double>(yaw_goal.rbegin(), yaw_goal.rend());
+    goal_type = std::vector<std::string>(goal_type.rbegin(), goal_type.rend());
 
     /* tx control parameter */
     nh.param("hl_controller/tx_stop", tx_stop, false);

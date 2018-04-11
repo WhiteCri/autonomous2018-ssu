@@ -133,6 +133,10 @@ int HybridAutomata::checkConditions()
          idx++;
       }
    }
+
+   //add by TaeWook
+   if (idx == 0) return curState;
+   
    while (true)
    {
       temp = temp % idx;
@@ -140,7 +144,13 @@ int HybridAutomata::checkConditions()
       cand = conditions[curState][candidateArr[temp]];
       if(cand == NULL) return candidateArr[temp];
       isAvail = cand->check(this);
-      if (isAvail == true) return candidateArr[temp];
+      if (isAvail == true) { 
+          //add by TW
+          ROS_WARN(" ");
+          ROS_WARN("STATUES : %s", cand->toString().c_str());
+          //add by TW end
+          return candidateArr[temp];
+      }
 
       ++temp;
       //add by TaeWook

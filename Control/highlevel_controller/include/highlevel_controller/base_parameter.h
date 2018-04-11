@@ -22,6 +22,7 @@ public:
 
     /* goal list */
     std::vector<double> x_goal, y_goal, yaw_goal;
+    std::vector<std::string> goal_type;
 
     /* tx control parameter */
     bool tx_stop;
@@ -85,7 +86,8 @@ public:
         nh.getParam("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag);
         nh.getParam("hl_controller/parking",                parking);
         nh.getParam("hl_controller/parking_onetime_flag",   parking_onetime_flag);
-        nh.getParam("hl_controller/recovery",          recovery);
+        nh.getParam("hl_controller/recovery",               recovery);
+        nh.getParam("hl_controller/reached_goal",           reached_goal);
         
         if (publish_param){
             static size_t seq = 0;
@@ -105,7 +107,7 @@ public:
     }
 
     //singletone
-    static Parameters* getInstance();
+    static Parameters* getInstancePtr();
 private:
     Parameters();
     static Parameters* obj_ptr;

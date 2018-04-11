@@ -39,7 +39,7 @@ include_directories(
 add_executable(highlevel_controller
   src/highlevel_controller.cpp
   src/base_parameter.cpp
-  src/stateMachine.cpp
+  src/StateHandler.cpp
   src/condition.cpp
   src/HybridAutomata.cpp
   src/goalSender.cpp
