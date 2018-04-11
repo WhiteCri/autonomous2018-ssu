@@ -10,7 +10,7 @@
 #define NO_ACCEL 0
 #define MAX_ACCEL 200
 #define NO_BRAKE 1
-#define NO_SLIP_BRAKE 70
+#define NO_SLIP_BRAKE 60
 #define MAX_BRAKE 200
 #define MAX_STEER 1970
 #define GEAR_FORWARD 0

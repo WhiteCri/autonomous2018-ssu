@@ -44,7 +44,7 @@
 
 
 	<!--  ****** Maps ******  -->
-	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/namu.yaml" output="screen">
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/front_of_three.yaml" output="screen">
 		<param name="frame_id" value="map"/>
 	</node>
 
@@ -63,7 +63,7 @@
 		<param name="planner_patience" value="5.0" />
 
 		<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-		<param name="controller_frequency" value="5.0" />
+		<param name="controller_frequency" value="7.0" />
 		<param name="controller_patience" value="15.0" />
 
     	<param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
