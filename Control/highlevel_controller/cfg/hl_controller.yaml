@@ -1,0 +1,59 @@
+hl_controller:
+#goal
+  x_goal: [12.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  y_goal: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  yaw_goal: [-2.1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  goal_type: ["N","N","N","N","N","N","N","N","N","N","N","N","N","N","N","N"]
+
+#config controller
+  frequency: 5
+  publish_param: false
+
+#tx
+  tx_stop: false
+
+#crosswalk
+  use_process_crosswalk: true
+  crosswalk_check_duration: 1.0
+  use_crosswalk_onetime_flag: true
+  crosswalk_onetime_flag: false
+
+  crosswalk_driving_duration: 1.0
+  crosswalk_stop_duration: 3.0
+
+#movingobj
+  use_process_movingobj: true
+  movingobj_check_duration: 1.0
+  use_movingobj_onetime_flag: true
+  movingobj_onetime_flag: false
+
+  movingobj_driving_duration: 1.0
+  movingobj_stop_duration: 5.0
+
+#parking
+  use_process_parking: true
+  parking_check_duration: 1.0
+  use_parking_onetime_flag: true
+  parking_onetime_flag: false
+
+  parknig_stop_duration: 10.0
+
+  parking_near_arrive_point_x: -200.0
+  parking_near_arrive_point_y: -200.0
+  parking_far_arrive_point_x: -200.0
+  parking_far_arrive_point_y: -200.0
+  parking_near_back_point_x: -200.0
+  parking_near_back_point_y: -200.0
+  parking_far_back_point_x: -200.0
+  parking_far_back_point_y: -200.0
+
+#recovery 
+  use_process_recovery: true
+  recovery_check_duration: 0.5
+
+#Done
+  reached_goal: false
+
+#goal_sender params
+  use_auto_goal_sender: false
+  auto_goal_sender_frequency: 3

@@ -10,7 +10,7 @@
 #define NO_ACCEL 0
 #define MAX_ACCEL 200
 #define NO_BRAKE 1
-#define NO_SLIP_BRAKE 50
+#define NO_SLIP_BRAKE 60
 #define MAX_BRAKE 200
 #define MAX_STEER 1970
 #define GEAR_FORWARD 0
@@ -40,7 +40,7 @@ PlatformController()
     , ref_steer_(0.0), current_steer_(0.0), err_steer_(0.0)
     , cmd_accel_(0.0), cmd_steer_(0.0), cmd_brake_(0.0)
     , kp_steer_(1.0), ki_steer_(0.0), kd_steer_(0.0)
-    , kp_brake_(33.0), ki_brake_(0.0), kd_brake_(0.0)
+    , kp_brake_(30.0), ki_brake_(0.0), kd_brake_(0.0)
     , settling_time_(0.5)
     , dt_(0.0), index_(0)
 {
@@ -60,7 +60,7 @@ void Init(int argc, char **argv) // Controller 돌리기 전에 initialize (dt �
     priv_nh_.param<double>("/control/steer/ki", ki_steer_, 0.0);
     priv_nh_.param<double>("/control/steer/kd", kd_steer_, 0.0);
     
-    priv_nh_.param<double>("/control/brake/kp", kp_brake_, 1.0);
+    priv_nh_.param<double>("/control/brake/kp", kp_brake_, 30.0);
     priv_nh_.param<double>("/control/brake/ki", ki_brake_, 0.0);
     priv_nh_.param<double>("/control/brake/kd", kd_brake_, 0.0);
 
@@ -189,6 +189,15 @@ inline int BoundaryCheck_Brake(const int brake){
     }
 }
 
+inline int BoundaryCheck_No_Slip_Brake(const int brake){
+    if(brake <= NO_BRAKE){
+        return NO_BRAKE;
+    }
+    else{
+        return (brake <= NO_SLIP_BRAKE) ? brake : NO_SLIP_BRAKE;
+    }
+}
+
 inline int BoundaryCheck_Steer(const int steer){
     return (fabs(steer) <= MAX_STEER) ? steer : MAX_STEER*(steer/fabs(steer));
 }
@@ -204,7 +213,7 @@ inline int Calc_gear(double ref_speed){
     }
 }
 
-void Calc_accleration(void){ // 나중에 Brake에 대한 가속도 실험 후 수정 필요(감속부분)
+void Calc_accleration(void){
     /*
     Desired direction: Forward   err = (+) - (?) 
         1. Reference > Current : (+) acceleration (to forward)
@@ -224,8 +233,11 @@ void Calc_accleration(void){ // 나중에 Brake에 대한 가속도 실험 후 �
     }
     else{ // 감속(Deceleration)
         cmd_accel_ = fabs(ref_speed_) * M_S2SERIAL; // ref_speed가 수렴속도일 때 platform에 넣어야 할 값 계산 (steady-state speed)
-        //cmd_brake_ = fabs(err_speed_) * (kp_brake_ + ki_brake_*dt_ + kd_brake_/dt_);
-        cmd_brake_ = NO_SLIP_BRAKE;
+        
+        cmd_brake_ = fabs(err_speed_) * (kp_brake_ + ki_brake_*dt_ + kd_brake_/dt_);
+        cmd_brake_ = BoundaryCheck_No_Slip_Brake(cmd_brake_);
+        
+        //cmd_brake_ = NO_SLIP_BRAKE;
     }
     
     cmd_.accel = BoundaryCheck_Accel(cmd_accel_);

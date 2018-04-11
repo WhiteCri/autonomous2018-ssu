@@ -10,7 +10,7 @@ int main(int argc, char** argv){
     ros::init(argc, argv, "move_base_client");
 
     //tell the action client that we want to spin a thread by default
-    MoveBaseClient ac("move_base", true);
+    MoveBaseClient ac("move_base_server", true);
 
     //get param
     ros::NodeHandle nh;
@@ -28,31 +28,25 @@ int main(int argc, char** argv){
 
     move_base_msgs::MoveBaseGoal goal;
 
+    goal.target_pose.header.frame_id = "base_link";
+    goal.target_pose.header.stamp = ros::Time::now();
+
+    ROS_INFO("send_goal");
+    ac.sendGoal(goal);
     //we'll send a goal to the robot to move 1 meter forward
 
     size_t idx = 0;
     size_t goal_count = x_goal.size();
-    while(idx < goal_count){
-        goal.target_pose.header.frame_id = "base_link";
-        goal.target_pose.header.stamp = ros::Time::now();
-
-        goal.target_pose.pose.position.x = static_cast<int>(x_goal[idx]);
-        goal.target_pose.pose.position.y = static_cast<int>(y_goal[idx]);
-        goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(
-            static_cast<double>(yaw_goal[idx])
-        );
-
-        ROS_INFO("Sending goal : %d %d %lf", x_goal[idx], y_goal[idx], yaw_goal[idx] / RAD2DEG);
-        ac.sendGoal(goal);
-
-        ac.waitForResult();
-
-        if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
-            ROS_INFO("Hooray, the base moved 1 meter forward");
-            idx++;
+    ros::Rate loop_rate(10);
+    while(true){
+        idx++;
+        actionlib::SimpleClientGoalState state = ac.getState();
+        ROS_INFO("Action finished : %s",state.toString().c_str());
+        loop_rate.sleep();
+        if(idx == 10) {
+            ac.cancelAllGoals();
+            ac.sendGoal(goal);
         }
-        else
-            ROS_INFO("The base failed to move forward 1 meter for some reason");
     }
     return 0;
 }
