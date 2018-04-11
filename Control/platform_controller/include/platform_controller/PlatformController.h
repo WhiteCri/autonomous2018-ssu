@@ -40,7 +40,7 @@ PlatformController()
     , ref_steer_(0.0), current_steer_(0.0), err_steer_(0.0)
     , cmd_accel_(0.0), cmd_steer_(0.0), cmd_brake_(0.0)
     , kp_steer_(1.0), ki_steer_(0.0), kd_steer_(0.0)
-    , kp_brake_(33.0), ki_brake_(0.0), kd_brake_(0.0)
+    , kp_brake_(30.0), ki_brake_(0.0), kd_brake_(0.0)
     , settling_time_(0.5)
     , dt_(0.0), index_(0)
 {
@@ -60,7 +60,7 @@ void Init(int argc, char **argv) // Controller 돌리기 전에 initialize (dt �
     priv_nh_.param<double>("/control/steer/ki", ki_steer_, 0.0);
     priv_nh_.param<double>("/control/steer/kd", kd_steer_, 0.0);
     
-    priv_nh_.param<double>("/control/brake/kp", kp_brake_, 33.0);
+    priv_nh_.param<double>("/control/brake/kp", kp_brake_, 30.0);
     priv_nh_.param<double>("/control/brake/ki", ki_brake_, 0.0);
     priv_nh_.param<double>("/control/brake/kd", kd_brake_, 0.0);
 

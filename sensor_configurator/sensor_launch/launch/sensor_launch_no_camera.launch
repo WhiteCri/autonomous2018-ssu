@@ -12,7 +12,7 @@
     <node pkg="platform_controller" type="PlatformController_node" name="control" >
         <param name="/accel/settling_time" value="0.5"/>
         
-        <param name="/brake/kp" value="33.0"/>
+        <param name="/brake/kp" value="30.0"/>
         <param name="/brake/ki" value="0.2"/>
         <param name="/brake/kd" value="0.0"/>
 
