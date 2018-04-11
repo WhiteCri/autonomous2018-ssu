@@ -1,26 +1,23 @@
 #include <ros/ros.h>
 #include <ackermann_msgs/AckermannDriveStamped.h>
+#include <geometry_msgs/Twist.h>
 
 
-#define FRE 5
+#define FRE 10
 int main(int argc, char *argv[]){
-    ros::init(argc, argv, "ackermann_pub");
+    ros::init(argc, argv, "test_cmd_pub");
     ros::NodeHandle nh;
-    ros::Publisher ackermann_publisher =
-        nh.advertise<ackermann_msgs::AckermannDriveStamped>("platform_tx_test",100);
+    ros::Publisher ackermann_publisher = nh.advertise<geometry_msgs::Twist>("cmd_vel",100);
     ros::Rate loop_rate(FRE);
-    uint32_t seq = 0;
 
-    ackermann_msgs::AckermannDriveStamped msg;
-    msg.header.frame_id = "whereeeeee";
+    geometry_msgs::Twist msg;
     
     bool flag = true;
-    while(ros::ok()){
-        msg.header.seq = seq++;
-        msg.header.stamp = ros::Time::now();
-        msg.drive.steering_angle = 0;
-        msg.drive.speed = 0.5;
-        nh.getParam("txSpeed",msg.drive.speed);
+    while(ros::ok()){ 
+        int test;
+        nh.getParam("test", test);
+        msg.linear.x = test;
+
         //if(flag) msg.drive.speed = -msg.drive.speed;
         //flag = !flag;
         ackermann_publisher.publish(msg);

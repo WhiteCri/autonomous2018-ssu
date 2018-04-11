@@ -791,6 +791,14 @@ namespace lane_detect_algo{
                         max_height = temp_height;
                         }
                     }
+		int temp_bottom = 0, max_bottom = 0;
+	    	for(int row = 1, row < numOfLables; row++){
+			int* bottom_data = stats.ptr<int>(row);
+			temp_bottom = bottom_data[cv::CC_STAT_TOP]+bottom_data[cv::CC_STAT_HEIGHT];
+			if(temp_bottom>max_bottom){
+				max_bottom = temp_bottom;
+			}
+		}	
 
                 for (int row = 1; row < numOfLables; row++) {
                 
@@ -808,7 +816,7 @@ namespace lane_detect_algo{
                 }
 
               //-for max area and extra-//  if (area == max_area && width<height && left<src.cols / 2 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
-                if (height == max_height) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
+                if (abs(max_height - height)<40 && abs(max_bottom-(top+height))<50) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                     for (int delete_row = dst.rows - 1, coordi_index = 0; delete_row >= 0; --delete_row, ++coordi_index) {
                         uchar* delete_data = dst.ptr<uchar>(delete_row);
                         
@@ -897,7 +905,14 @@ namespace lane_detect_algo{
                             max_height = temp_height;
                         }
                     }
-                
+                int temp_bottom = 0, max_bottom = 0;
+			 for(int row = 1, row < numOfLables; row++){
+		                int* bottom_data = stats.ptr<int>(row);
+		                temp_bottom = bottom_data[cv::CC_STAT_TOP]+bottom_data[cv::CC_STAT_HEIGHT];
+		                if(temp_bottom>max_bottom){
+		                      max_bottom = temp_bottom;
+		                   }
+		               }
                 for (int row = 1; row < numOfLables; row++) {
 
                     int* data = stats.ptr<int>(row);
@@ -912,7 +927,7 @@ namespace lane_detect_algo{
                 }
 
                 //--for max area and extra//    if (area == max_area && width<height && left>src.cols / 3 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
-                    if (height == max_height ) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
+                    if (abs(max_height - height)<40 && abs(max_bottom - (top+height))<50) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                         for (int delete_row = dst.rows-1; delete_row >= 0; --delete_row) {
                             uchar* delete_data = dst.ptr<uchar>(delete_row);
                             for (int delete_col = 0; delete_col < dst.cols; ++delete_col) {
