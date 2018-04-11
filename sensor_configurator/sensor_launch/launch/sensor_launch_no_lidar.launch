@@ -1,6 +1,5 @@
 <launch>
-	<node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node"
-    	      args="/dev/ttyUSB0 10"/>
+	<node pkg="platform_rx_thread_test" type="rx_thread_test" name="rx_thread_test" />
 	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py"
 	 	name="cmd_vel_to_ackermann_drive.py"/>
 	<node pkg="platform_tx" type="platform_tx" name="platform_tx" output="screen" args="/dev/ttyUSB0">
