@@ -1,6 +1,13 @@
 
-# --- standard pioneer footprint (in meters) ---
-footprint: [[1.7,-1],[-0.5,-1],[-0.5,1],[1.7,1]]
+#---standard pioneer footprint---
+#---(in meters)---
+#footprint: [ [0.254, -0.0508], [0.1778, -0.0508], [0.1778, -0.1778], [-0.1905, -0.1778], [-0.254, 0], [-0.1905, 0.1778], [0.1778, 0.1778], [0.1778, 0.0508], [0.254, 0.0508] ]
+
+
+#footprint: [[-0.1,-0.125],[0.5,-0.125],[0.5,0.125],[-0.1,0.125]]
+# Modefied by Hayeon
+# footprint 값 조정. x와 y의 방향은 차량의 axes와 동일
+footprint: [[-0.22,-0.58],[1.5,-0.58],[1.5,0.58],[-0.22,0.58]]
 
 
 transform_tolerance: 0.2
@@ -11,7 +18,7 @@ obstacle_layer:
  obstacle_range: 3.0
  raytrace_range: 3.5
  inflation_radius: 20
- track_unknown_space: true
+ track_unknown_space: false
  combination_method: 1
 
  observation_sources: laser_scan_sensor
