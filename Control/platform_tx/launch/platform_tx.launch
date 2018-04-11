@@ -1,17 +1,8 @@
 <launch>
     <node pkg="platform_tx" type="platform_tx" name="platform_tx" output="screen" args="/dev/ttyUSB0">
-        <param name="angleToSerialValue" value="71.0"/>
-        <param name="maxSteeringAngle" value="24.0"/>
-        <param name="minSteeringAngle" value="-24.0"/>
-        <param name="alignmentBias" value="-288"/>
-        <!-- maxSpeed(m/s)-->
-        <param name="maxSpeed" value="3"/>
-        <!-- serial value = kph * 10-->
-        <param name="m_s2serial" value="36"/>
         <param name="frequency" value="50"/>
-        <param name="ackermann_topic_name" value="platform_tx_test"/>
-        <!-- Tuning Param-->
-        <param name="Tx/speed_param" value="0"/>
-        <param name="Tx/brake_param" value="0.5"/>
+        <param name="cmd_platform_topic_name" value="control/cmd_platform"/>
+
+        <param name="alignmentBias" value="0"/>
     </node>
 </launch>
