@@ -7,4 +7,5 @@
         <rosparam file="$(find laser_filters)/cfg/dynamic_cut.yaml" command="load"/>  
 		<remap from="/scan"  to="/dynamic_scan"/>
 	</node>
+  <include file="$(find obstacle_detector)/launch/nodes.launch" />
 </launch>

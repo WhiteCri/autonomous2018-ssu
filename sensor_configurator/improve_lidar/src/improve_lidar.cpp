@@ -16,9 +16,12 @@
 #define dynamic_distance_point 0.2
 #define UTurn_distance_point 0.1
 
+
 #define min_y_distance 0.5
 #define max_y_distance 2
+#define min_x_obstacle 5
 #define max_x_distance 0.03
+
 #define min_delta_y 0.04
 #define max_delta_y 0.08
 
@@ -69,7 +72,7 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     for(int i=0; i<object->segments.size(); i++)
     {
         if( (fabs(dataarry[i][1] - dataarry[i][3]) > min_y_distance)  && (fabs(dataarry[i][1] - dataarry[i][3]) < max_y_distance) &&
-            (fabs(dataarry[i][0] - dataarry[i][2] < max_x_distance)) )
+            (fabs(dataarry[i][0] - dataarry[i][2] < max_x_distance)) && (fabs(dataarry[i][0]) > min_x_obstacle) && (fabs(dataarry[i][2]) > min_x_obstacle) )
         {
             num = i;
             dynamic_flag = true;
@@ -81,6 +84,8 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
         delta_y = fabs(priv.priv_first_point_y - object->segments.at(num).first_point.y);
         ROS_INFO("%lf",delta_y);
     }
+    else if(!dynamic_flag)
+        return;
     /* delta y가 특정값이면 true flag */
     if(delta_y > min_delta_y && delta_y < max_delta_y)
      {
@@ -92,7 +97,7 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
      for(int i=0; i<object->segments.size(); i++)
     {
         if( (fabs(dataarry[i][1] - dataarry[i][3]) > min_y_distance)  && (fabs(dataarry[i][1] - dataarry[i][3]) < max_y_distance) &&
-            (fabs(dataarry[i][0] - dataarry[i][2] < max_x_distance)) )
+            (fabs(dataarry[i][0] - dataarry[i][2] < max_x_distance))  && (fabs(dataarry[i][0]) > min_x_obstacle) && (fabs(dataarry[i][2]) > min_x_obstacle) )
         {
             priv.priv_first_point_y = dataarry[i][1];
             priv.priv_last_point_y = dataarry[i][3];
