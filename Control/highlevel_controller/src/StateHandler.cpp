@@ -26,6 +26,7 @@ void init(){
 
 void toward_goal(){
     typedef GoalSender::GoalStates GoalStates;
+    param_ptr->nh.setParam("hl_controller/tx_stop", false);
 
     auto state = goalSender_ptr->getState();
     if (state == GoalStates::STATE_SUCCEEDED){
@@ -70,19 +71,119 @@ void toward_goal(){
 }
 
 void process_crosswalk(){
-    param_ptr->nh.setParam("hl_controller/crosswalk_onetime_flag",true);    
+    ROS_INFO("crosswalk start");
+
+    //maintaining car's status
+    double crosswalk_driving_duration = param_ptr->crosswalk_driving_duration;
+    if (crosswalk_driving_duration > 0){
+        ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->crosswalk_driving_duration);
+        ros::Rate(param_ptr->crosswalk_driving_duration).sleep();
+    }
+
+    //take car to stop
+    ROS_INFO("stop...");
+    param_ptr->nh.setParam("hl_controller/tx_stop", true);
+
+    //take car to wait
+    ros::Rate(1 / param_ptr->crosswalk_stop_duration).sleep();
+
+    //check that process_crosswalk had been done.
+    param_ptr->nh.setParam("hl_controller/crosswalk_onetime_flag",true);
+
+    ROS_INFO("crosswalk done");    
 }
 
 void process_movingobj(){
+    ROS_INFO("movingobj start");
+
+    //maintaining car's status
+    double movingobj_driving_duration = param_ptr->movingobj_driving_duration;
+    if (movingobj_driving_duration > 0){
+        ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->movingobj_driving_duration);
+        ros::Rate(param_ptr->movingobj_driving_duration).sleep();
+    }
+    //take car to stop
+    ROS_INFO("stop...");
+    param_ptr->nh.setParam("hl_controller/tx_stop", true);
+
+    //take car to wait
+    ros::Rate(1 / param_ptr->movingobj_stop_duration).sleep();
+    
+    //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/movingobj_onetime_flag",true);
+
+    ROS_INFO("movingobj done");
 }
 
 void process_parking(){
+    ROS_INFO("process parking start");
+
+    ROS_INFO("finding parking point...");
+    /* 
+        I haven't find the solution to select the goal. So temporarily, just select the near goal.
+        this code should be modified until the contest
+    */
+    double parking_point_x   = param_ptr->parking_near_arrive_point_x;
+    double parking_point_y   = param_ptr->parking_near_arrive_point_y;
+    double parking_point_yaw = 0;
+    double backing_point_x   = param_ptr->parking_near_back_point_x;
+    double backing_point_y   = param_ptr->parking_near_back_point_y;
+    double backing_point_yaw = 0;
+    ROS_INFO("set near point as a goal...");
+    
+    //set goal to parking point
+    ROS_INFO("to the parking point...");
+    goalSender_ptr->setGoal(
+        parking_point_x,
+        parking_point_y,
+        parking_point_yaw
+    );
+    goalSender_ptr->sendGoal();
+
+    //wait until arrive.
+    while(true){
+        auto state = goalSender_ptr->getState();
+        if (state == GoalSender::GoalStates::STATE_SUCCEEDED) break;
+        ros::Rate(param_ptr->frequency).sleep();
+        ROS_INFO("parking point has not been arrived...");
+    }
+    ROS_INFO("Arrived parking point...");
+
+    //take car to stop
+    ROS_INFO("stop...");
+    param_ptr->nh.setParam("hl_controller/tx_stop", true);
+
+    //take car to wait
+    ros::Rate(1 / param_ptr->parking_stop_duration).sleep();
+
+    //set goal to backing point
+    ROS_INFO("set tx_stop false");
+    param_ptr->nh.setParam("hl_controller/tx_stop", false);
+
+    ROS_INFO("to the backing point...");
+    goalSender_ptr->setGoal(
+        backing_point_x,
+        backing_point_y,
+        backing_point_yaw
+    );
+    goalSender_ptr->sendGoal();
+
+    //wait until arrive.
+    while(true){
+        auto state = goalSender_ptr->getState();
+        if (state == GoalSender::GoalStates::STATE_SUCCEEDED) break;
+        ros::Rate(param_ptr->frequency).sleep();
+        ROS_INFO("backing point has not been arrived...");
+    }
+    ROS_INFO("Arrived backing point...");
+
     param_ptr->nh.setParam("hl_controller/parking_onetime_flag",true);
 }
 
 void process_recovery(){
+    param_ptr->nh.setParam("hl_controller/recovery",false);
 }
 
 void done(){
+    ROS_INFO("ALL GOAL had been processed");
 }
