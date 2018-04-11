@@ -10,10 +10,10 @@ using namespace cv;
 
 int main(int argc, char** argv){
     
-    int camera_number = 0;
+    int camera_number = 1;
     int frequency = 30;
 
-    VideoCapture cap(0);
+    VideoCapture cap(1);
     
     int key;
     int num = 1;

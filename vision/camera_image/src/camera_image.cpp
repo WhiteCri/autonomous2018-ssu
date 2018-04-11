@@ -7,8 +7,8 @@
 
 
 static const bool DEBUG = true; // 디버깅 스위치
-static const bool CALIBRATION = true;
-static const bool SIZEUP = true;
+static const bool CALIBRATION = false;
+static const bool SIZEUP = false;
 static const std::string OPENCV_WINDOW = "Raw Image Window";
 
 template < typename T > std::string to_string( const T& n );
