@@ -8,6 +8,7 @@
 
 serial::Serial ser;
 std::mutex lock;
+ros::Time stamp;
 
 class ParamReader{
 public:
@@ -50,6 +51,7 @@ void readSerial(int serial_read_loop_rate){
         if((check[0] == 0x53) & (check[1] == 0x54) & (check[2] == 0x58) & check[16] == 0x0D & check[17] == 0x0a ){
             lock.lock();
             for(int i = 0 ; i < 18; ++i) *(packet + i) = *(check + i);        
+            stamp = ros::Time::now();
             lock.unlock();
         }
         loop_rate.sleep();
@@ -114,7 +116,7 @@ int main (int argc, char** argv){
 
         encoder.push_front(std::make_pair(
             getParsingData<int32_t>(packet_main, 11),
-            ros::Time::now()
+            stamp
         ));
         encoder.pop_back();
 
