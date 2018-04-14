@@ -24,13 +24,12 @@
 #define C1 0.0184 // acceleration [m/s^2] = 0.108*exp(0.0184*platform) -> C1 = 0.0184
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
-#define FILTER_SIZE 3
+#define FILTER_SIZE 3 // Reference Steering Angle 진동 잡기 위한 이동평균필터 크기
+#define EPSILON 0.15  // log(negative) 방지 (settling time 1.0까지 커버)
 
 /* Debug */
 //#define MY_DEBUG
 //#define MY_TEST
-
-
 
 
 class PlatformController {
@@ -48,8 +47,7 @@ PlatformController()
 }
 
 
-void Init(int argc, char **argv) // Controller 돌리기 전에 initialize (dt 계산을 위한 time 초기값)
-{
+void Init(int argc, char **argv){ // Controller 돌리기 전에 initialize (dt 계산을 위한 time 초기값)
     ros::init(argc, argv, "Platform_Controller");
     ros::NodeHandle priv_nh_("~");
     ros::NodeHandle nh_;
@@ -69,10 +67,7 @@ void Init(int argc, char **argv) // Controller 돌리기 전에 initialize (dt �
     timestamp_ = ros::Time::now();
 }
 
-
-
-void Calc_PID(void) // read_state, read_reference로 읽은 후에 Platform_TX(SI Unit -> Platform Unit) 하기 전에 호출
-{    
+void Calc_PID(void){ // read_state, read_reference로 읽은 후에 Platform_TX(SI Unit -> Platform Unit) 하기 전에 호출
     ros::Time now = ros::Time::now();
     dt_ = (now - timestamp_).toSec();
     timestamp_ = now;
@@ -84,30 +79,17 @@ void Calc_PID(void) // read_state, read_reference로 읽은 후에 Platform_TX(S
     Calc_steer(); // STEER CONTROL
 }
 
-
-void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data)
-{
+void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data){
     current_speed_ = rx_data->speed;
     current_steer_ = rx_data->steer;
 }
 
-
-void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist)
-{
+void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist){
     ref_speed_ = twist->linear.x;
     ref_steer_ = mv_avg_filter( BoundaryCheck_Steer(RAD2SERIAL*(twist->angular.z)) );
 }
 
-
-//void Ack_Callback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& ack_data)
-//{
-//    ref_speed_ = ack_data->drive.speed;
-//    ref_steer_ = RAD2SERIAL*(ack_data->drive.steering_angle);
-//}
-
-
-void publish()
-{
+void publish(){
     pub_.publish(cmd_);
 
     #ifdef MY_TEST // rqt_plot으로 비교하기 위한 용도로 테스트
@@ -213,22 +195,22 @@ inline int Calc_gear(double ref_speed){
     }
 }
 
-void Calc_accleration(void){
-    /*
+/*
     Desired direction: Forward   err = (+) - (?) 
         1. Reference > Current : (+) acceleration (to forward)
         2. Reference < Current : (-) deceleration (->with brake)
-
+    
     Desired direction: Backward (-) - (?)
         1. Reference > Current : (+) deceleration (->with brake)
         2. Reference < Current : (-) acceleration (to backward)
-    */
+*/
     
+void Calc_accleration(void){
     const int dir = Calc_gear(ref_speed_);
     err_speed_ = ref_speed_ - current_speed_; // error speed 단위: [m/s]
     
-    if(err_speed_ * dir > 0.0){ // 가속(Acceleration)
-        cmd_accel_ = (int)log( fabs(err_speed_) / (C0 * settling_time_) ) / C1; // command acceleration, 단위: [Platform Unit 0 ~ 200]
+    if(err_speed_ * dir > EPSILON){ // 가속(Acceleration)
+        cmd_accel_ = (int)(log( fabs(err_speed_) / (C0 * settling_time_) ) / C1); // command acceleration, 단위: [Platform Unit 0 ~ 200]
         cmd_brake_ = NO_BRAKE; // Brake = 1 : No brake !
     }
     else{ // 감속(Deceleration)
@@ -248,14 +230,5 @@ void Calc_accleration(void){
 void Calc_steer(void){
     cmd_.steer = BoundaryCheck_Steer(ref_steer_);
 }
-
-//void Calc_steer(void){
-//    err_steer_ = BoundaryCheck_Steer(ref_steer_) - current_steer_;
-//    
-//    cmd_steer_ = (int)( err_steer_ * (kp_steer_ + ki_steer_*dt_ + kd_steer_/dt_) );
-//
-//    //cmd_.steer = BoundaryCheck_Steer(current_steer_ + cmd_steer_);
-//    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
-//}
 
 };
