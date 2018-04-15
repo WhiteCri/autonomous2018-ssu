@@ -146,8 +146,8 @@ int HybridAutomata::checkConditions()
       isAvail = cand->check(this);
       if (isAvail == true) { 
           //add by TW
-          ROS_WARN(" ");
-          ROS_WARN("STATUES : %s", cand->toString().c_str());
+          ROS_ERROR(" ");
+          ROS_ERROR("STATUES : %s", cand->toString().c_str());
           //add by TW end
           return candidateArr[temp];
       }
