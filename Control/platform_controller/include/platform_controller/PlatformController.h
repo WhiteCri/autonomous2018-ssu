@@ -91,6 +91,9 @@ void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data){
 void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist){
     ref_speed_ = twist->linear.x;
     ref_steer_ = mv_avg_filter( BoundaryCheck_Steer(RAD2SERIAL*(twist->angular.z)) );
+
+    Calc_PID();
+    publish();
 }
 
 void publish(){

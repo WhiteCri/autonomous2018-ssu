@@ -4,7 +4,7 @@
 
 
 static PlatformController ctrl;
-static int rate = 5;
+//static int rate = 5;
 
 int main(int argc, char **argv){
 
@@ -14,13 +14,14 @@ int main(int argc, char **argv){
   ros::Subscriber sub_1 = nh.subscribe("/raw/platform_rx", 100, &PlatformController::RX_Callback, &ctrl);
   ros::Subscriber sub_2 = nh.subscribe("/cmd_vel", 100, &PlatformController::Cmd_Callback, &ctrl);
 
-  ros::Rate loop_rate(rate);
-
-  while(ros::ok()){
-    ros::spinOnce();
-    ctrl.Calc_PID();
-    ctrl.publish();
-    loop_rate.sleep();
-  }    
-  return 0;
+  ros::spin();
+//  ros::Rate loop_rate(rate);
+//
+//  while(ros::ok()){
+//    ros::spinOnce();
+////    ctrl.Calc_PID();
+////    ctrl.publish();
+//    loop_rate.sleep();
+//  }    
+//  return 0;
 }
