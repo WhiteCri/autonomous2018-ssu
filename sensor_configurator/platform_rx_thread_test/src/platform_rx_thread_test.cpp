@@ -121,13 +121,12 @@ int main (int argc, char** argv){
             alive
         ));
         encoder.pop_back();
-        seq += abs(encoder.front().first - (encoder.begin() + 1)->first);
+        seq += abs((int)encoder.front().first - (encoder.begin() + 1)->first);
 
         msg.speed = calc_speed();
         msg.steer = getParsingData<int16_t>(packet_main, 8);
         msg.brake = getParsingData<uint8_t>(packet_main, 10);
-        msg.seq = seq++;
-ROS_INFO("%d %d",encoder.front().first, encoder.front().second);
+        msg.seq = seq;
         bool estop = getParsingData<uint8_t>(packet_main, 4);
         nh.setParam("estop", estop);
 
