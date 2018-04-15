@@ -36,9 +36,9 @@
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">
 		<rosparam file="$(find move_base_ssu)/cfg/amcl_params.yaml" command="load" />
 
-	    <param name="initial_pose_x"            value="35.5"/>
-		<param name="initial_pose_y"            value="15"/>
-		<param name="initial_pose_a"            value="-1.57"/>
+	    <param name="initial_pose_x"            value="307"/>
+		<param name="initial_pose_y"            value="-1"/>
+		<param name="initial_pose_a"            value="0"/>
 	</node>
 	
 

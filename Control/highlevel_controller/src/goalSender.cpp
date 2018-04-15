@@ -24,7 +24,7 @@ void GoalSender::sendGoal(){
 }
 
 void GoalSender::setGoal(double x, double y, double yaw){
-    goal.target_pose.header.frame_id = "base_link";
+    goal.target_pose.header.frame_id = "map";
     goal.target_pose.header.stamp = ros::Time::now();
 
     goal.target_pose.pose.position.x = x;
