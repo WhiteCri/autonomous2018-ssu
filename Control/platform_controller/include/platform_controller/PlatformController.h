@@ -15,6 +15,7 @@
 #define MAX_STEER 1970
 #define GEAR_FORWARD 0
 #define GEAR_BACKWARD 2
+#define SWITHCING_GEAR_SPEED_TOLERANCE 0.2
 
 /* Platform Dynamics 관련 */
 #define PI 3.141592
@@ -25,12 +26,11 @@
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
 #define FILTER_SIZE 3 // Reference Steering Angle 진동 잡기 위한 이동평균필터 크기
-#define EPSILON 0.15  // log(negative) 방지 (settling time 1.0까지 커버)
+#define EPSILON 0.1   // log(negative) 방지
 
 /* Debug */
 //#define MY_DEBUG
 //#define MY_TEST
-
 
 class PlatformController {
 public:
@@ -42,6 +42,8 @@ PlatformController()
     , kp_brake_(30.0), ki_brake_(0.0), kd_brake_(0.0)
     , settling_time_(0.5)
     , dt_(0.0), index_(0)
+    , ss_speed_(0), ss_speed_weight_(1.0), ss_speed_shift_(0.0)
+    , target_accel_(0.0), current_gear_(GEAR_FORWARD), target_gear_(GEAR_FORWARD) 
 {
      
 }
@@ -53,6 +55,8 @@ void Init(int argc, char **argv){ // Controller 돌리기 전에 initialize (dt 
     ros::NodeHandle nh_;
 
     priv_nh_.param<double>("/control/accel/settling_time", settling_time_, 0.5);
+    priv_nh_.param<double>("/control/speed/weight", ss_speed_weight_, 1.0);
+    priv_nh_.param<double>("/control/speed/shift", ss_speed_shift_, 0.0);
 
     priv_nh_.param<double>("/control/steer/kp", kp_steer_, 1.0);
     priv_nh_.param<double>("/control/steer/ki", ki_steer_, 0.0);
@@ -74,9 +78,9 @@ void Calc_PID(void){ // read_state, read_reference로 읽은 후에 Platform_TX(
 
     UpdateParameters(); // PID Gain Parameter Update
 
-    Calc_accleration(); // SPEED CONTROL
+    Calc_longitudinal(); // SPEED CONTROL
 
-    Calc_steer(); // STEER CONTROL
+    Calc_lateral(); // STEER CONTROL
 }
 
 void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data){
@@ -114,19 +118,20 @@ ros::Time timestamp_;
 
 platform_controller::cmd_platform cmd_;
 
-double dt_;
+double filter_[FILTER_SIZE];
+int index_;
 
+double dt_;
 double ref_speed_, current_speed_, err_speed_;
 double ref_steer_, current_steer_, err_steer_;
+double target_accel_;
+int current_gear_, target_gear_, ss_speed_;
 int cmd_accel_, cmd_steer_, cmd_brake_;
 
 double settling_time_;
 double kp_steer_, ki_steer_, kd_steer_;
 double kp_brake_, ki_brake_, kd_brake_;
-
-double filter_[FILTER_SIZE];
-int index_;
-
+double ss_speed_weight_, ss_speed_shift_;
 
 
 
@@ -143,10 +148,13 @@ inline void UpdateParameters(void){
     ros::NodeHandle priv_nh_("~");
     
     priv_nh_.getParam("/control/accel/settling_time", settling_time_);
+    priv_nh_.getParam("/control/speed/weight", ss_speed_weight_);
+    priv_nh_.getParam("/control/speed/shift", ss_speed_shift_);
 
     priv_nh_.getParam("/control/steer/kp", kp_steer_);
     priv_nh_.getParam("/control/steer/ki", ki_steer_);
     priv_nh_.getParam("/control/steer/kd", kd_steer_);
+    
 
     priv_nh_.getParam("/control/brake/kp", kp_brake_);
     priv_nh_.getParam("/control/brake/ki", ki_brake_);
@@ -184,15 +192,40 @@ inline int BoundaryCheck_Steer(const int steer){
     return (fabs(steer) <= MAX_STEER) ? steer : MAX_STEER*(steer/fabs(steer));
 }
 
-inline int Calc_gear(double ref_speed){
-    if(ref_speed >= 0.0){
-        cmd_.gear = GEAR_FORWARD;
-        return 1;
+void Calc_lateral(void){
+    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
+}
+
+bool Calc_longitudinal(void){
+    target_gear_ = (ref_speed_ >= 0.0) ? GEAR_FORWARD : GEAR_BACKWARD;
+    if(current_gear_ != target_gear_){
+        if(fabs(current_speed_) > SWITHCING_GEAR_SPEED_TOLERANCE){
+            cmd_.accel = NO_ACCEL;
+            cmd_.brake = NO_SLIP_BRAKE; 
+            return false;
+        }
+        else{
+            cmd_.gear = target_gear_;
+            current_gear_ = target_gear_;
+        }
     }
-    else{
-        cmd_.gear = GEAR_BACKWARD;
-        return -1;
+    const double dir = (current_gear_ == GEAR_FORWARD) ? 1.0 : -1.0;
+    err_speed_ = dir * (ref_speed_ - current_speed_);
+    target_accel_ = err_speed_ / settling_time_;
+    ss_speed_ = (int)(ss_speed_shift_ + ss_speed_weight_ * fabs(ref_speed_) * M_S2SERIAL);
+    if(target_accel_ > C0 + EPSILON){ // 가속(Acceleration)
+        double min_accel =  C0 * exp(C1 * ref_speed_*M_S2SERIAL);
+        cmd_accel_ = (target_accel_ > min_accel) ? (int)(log(target_accel_ / C0) / C1) : ss_speed_;
+        cmd_brake_ = NO_BRAKE;
     }
+    else{ // 가속 필요 X or 감속(Deceleration)
+        cmd_accel_ = ss_speed_;
+        cmd_brake_ = fabs(err_speed_) * (kp_brake_ + ki_brake_*dt_ + kd_brake_/dt_);
+        cmd_brake_ = BoundaryCheck_No_Slip_Brake(cmd_brake_);
+    }
+    cmd_.accel = cmd_accel_;
+    cmd_.brake = cmd_brake_;
+    return true;
 }
 
 /*
@@ -204,31 +237,8 @@ inline int Calc_gear(double ref_speed){
         1. Reference > Current : (+) deceleration (->with brake)
         2. Reference < Current : (-) acceleration (to backward)
 */
-    
-void Calc_accleration(void){
-    const int dir = Calc_gear(ref_speed_);
-    err_speed_ = ref_speed_ - current_speed_; // error speed 단위: [m/s]
-    
-    if(err_speed_ * dir > EPSILON){ // 가속(Acceleration)
-        cmd_accel_ = (int)(log( fabs(err_speed_) / (C0 * settling_time_) ) / C1); // command acceleration, 단위: [Platform Unit 0 ~ 200]
-        cmd_brake_ = NO_BRAKE; // Brake = 1 : No brake !
-    }
-    else{ // 감속(Deceleration)
-        cmd_accel_ = fabs(ref_speed_) * M_S2SERIAL; // ref_speed가 수렴속도일 때 platform에 넣어야 할 값 계산 (steady-state speed)
-        
-        cmd_brake_ = fabs(err_speed_) * (kp_brake_ + ki_brake_*dt_ + kd_brake_/dt_);
-        cmd_brake_ = BoundaryCheck_No_Slip_Brake(cmd_brake_);
-        
-        //cmd_brake_ = NO_SLIP_BRAKE;
-    }
-    
-    cmd_.accel = BoundaryCheck_Accel(cmd_accel_);
-    //cmd_.brake = BoundaryCheck_Brake(cmd_brake_);
-    cmd_.brake = cmd_brake_;
-}
 
-void Calc_steer(void){
-    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
-}
+
+
 
 };

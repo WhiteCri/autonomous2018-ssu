@@ -1,49 +1,49 @@
-<launch>
 <!--
-
-<include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
-
-
-<param name="test" value="1"/>
-<node pkg="platform_tx" type="ackermann_pub" name="test_node"/>
-
+    Acceleration 제어 parameter: "/accel/settling_time"
+        - 어제는 steering angle만 테스트 하느라 1000.0으로 때려 넣음
+        - settling time을 작게 할 수록 tracking은 잘 되지만 overshoot, oscillation이 심해 짐
+        - 대충 0.1 ~ 0.5 sec 사이의 값을 찾으면 됨
+    Acceleration 제어 parameter: "/brake/*"
+        - 실험으로 값 찾아내는게 우선 (그 후 튜닝)
+    
+    **실제 속도제한은 teb_local_planner로 조절 (x방향 속도, 가속도 limit 주는 parameter로 조절하면 됨)
+        - v_x_limit은 실제로는 11m/s까지 가능 (platform value 200 넣었을 때)
+        - a_x_limit은 실제로 3~4m/s^2까지 가능 (platform value 200 넣었을 때)
+        - 하지만 자체적으로 limit을 주려면 teb_local_planner에서!
 -->
 
-    <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node" args="/dev/ttyUSB0 10"/>
-    
+<launch>
+
+<!--
+<include file="$(find teb_local_planner_tutorials)/launch/robot_carlike_in_stage.launch"/>
+-->
+
+    <param name="test" value="2"/>
+    <node pkg="platform_tx" type="ackermann_pub" name="test_node"/>
+
+
+
+    <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test">
+        <param name="path" value="/dev/ttyUSB0"/>
+        <param name="serial_frequency" value="20"/>
+        <param name="publish_frequency" value="10"/>
+        <param name="moving_average_element_number" value="8"/>
+    </node>
+
+
 
     <node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
-
-        <!--
-            Acceleration 제어 parameter: "/accel/settling_time"
-                - 어제는 steering angle만 테스트 하느라 1000.0으로 때려 넣음
-                - settling time을 작게 할 수록 tracking은 잘 되지만 overshoot, oscillation이 심해 짐
-                - 대충 0.1 ~ 0.5 sec 사이의 값을 찾으면 될 듯
-
-            Acceleration 제어 parameter: "/brake/*"
-                - 실험으로 값 찾아내는게 우선 (그 후 튜닝)
-            
-            **실제 속도제한은 teb_local_planner로 조절 (x방향 속도, 가속도 limit 주는 parameter로 조절하면 됨)
-                - v_x_limit은 실제로는 11m/s까지 가능 (platform value 200 넣었을 때)
-                - a_x_limit은 실제로 3~4m/s^2까지 가능 (platform value 200 넣었을 때)
-                - 하지만 자체적으로 limit을 주려면 teb_local_planner에서!
-        -->
         <param name="/accel/settling_time" value="0.5"/>
-        
+        <param name="/speed/weight" value="1.0"/>
+        <param name="/speed/shift" value="0.0"/>
+
         <param name="/brake/kp" value="30.0"/>
-        <param name="/brake/ki" value="0.2"/>
+        <param name="/brake/ki" value="0.0"/>
         <param name="/brake/kd" value="0.0"/>
 
-        <!--
-            Steering Angle 제어 parameter: "/steer/*"
-                - kp: 비례계수, ki: 적분계수, kd: 미분계수
-                - 튜닝필요
-        -->
         <param name="/steer/kp" value="1.0"/>    0.8  / 0.7  / 0.5
         <param name="/steer/ki" value="0.0"/>    10.0 / 1.0  / 1.0
         <param name="/steer/kd" value="0.0"/>    0.01 / 0.01 / 0.008
-
-
     </node>
 
 
