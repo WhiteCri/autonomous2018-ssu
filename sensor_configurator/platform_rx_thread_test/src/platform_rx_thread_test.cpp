@@ -8,7 +8,6 @@
 
 serial::Serial ser;
 std::mutex lock;
-ros::Time stamp;
 
 class ParamReader{
 public:
@@ -51,7 +50,6 @@ void readSerial(int serial_read_loop_rate){
         if((check[0] == 0x53) & (check[1] == 0x54) & (check[2] == 0x58) & check[16] == 0x0D & check[17] == 0x0a ){
             lock.lock();
             for(int i = 0 ; i < 18; ++i) *(packet + i) = *(check + i);        
-            stamp = ros::Time::now();
             lock.unlock();
         }
         loop_rate.sleep();
@@ -77,7 +75,7 @@ int main (int argc, char** argv){
     }
     catch (serial::IOException& e)
     {
-        ROS_ERROR_STREAM("Unable to open port ");
+        ROS_ERROR("Unable to open port : %s",e.what());
         return -1;
     }
 
@@ -96,14 +94,15 @@ int main (int argc, char** argv){
     uint8_t packet_main[18] ={0};
 
     //speed calcuration member
-    std::deque<std::pair<int32_t, ros::Time> > encoder(reader.moving_average_element_number);
+    typedef int8_t ALIVE_datatype;
+    std::deque<std::pair<int32_t, ALIVE_datatype> > encoder(reader.moving_average_element_number);
 
  //speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
          //   / timeInterval / interval;
     auto calc_speed =[&]()->double{
         double total_encoder_gap = encoder.front().first - encoder.back().first;
-        double time_interval = 
-            encoder.front().second.toSec() - encoder.back().second.toSec();
+        ALIVE_datatype alive_gap = encoder.front().second - encoder.back().second;
+        double time_interval = alive_gap * 1.0 / 18; // platform send information for 50hz
         double speed = total_encoder_gap / 99.2 * 1.655 / time_interval;
         return speed;
     };
@@ -114,17 +113,21 @@ int main (int argc, char** argv){
         for(int i = 0 ; i < 18; ++i) *(packet_main + i) = *(packet + i);
         lock.unlock();
 
+        //get serial sequence
+        ALIVE_datatype alive = getParsingData<ALIVE_datatype>(packet_main, 15);
+        
         encoder.push_front(std::make_pair(
             getParsingData<int32_t>(packet_main, 11),
-            stamp
+            alive
         ));
         encoder.pop_back();
+        seq += abs(encoder.front().first - (encoder.begin() + 1)->first);
 
         msg.speed = calc_speed();
         msg.steer = getParsingData<int16_t>(packet_main, 8);
         msg.brake = getParsingData<uint8_t>(packet_main, 10);
         msg.seq = seq++;
-
+ROS_INFO("%d %d",encoder.front().first, encoder.front().second);
         bool estop = getParsingData<uint8_t>(packet_main, 4);
         nh.setParam("estop", estop);
 
