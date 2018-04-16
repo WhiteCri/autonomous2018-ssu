@@ -106,7 +106,7 @@ InitImgObjectforROS::InitImgObjectforROS():it(nh){
                     cv::setTrackbarPos("v max", "TRACKBAR_WHITE", 255);
                     }
                 check_stop_count = 0;
-                is_stop_checked = false;
+                //is_stop_checked = false;
                 
 }
 
@@ -187,10 +187,10 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                 int crosswalk_check = 0;
                 int *crosswalk = &crosswalk_check;
                 callane.makeContoursRightLane(white_hsv, white_labeling, crosswalk);
-                nh.setParam("HA/crosswalk",false);
+                nh.setParam("hl_controller/crosswalk",false);
                 if(crosswalk_check){
                         ROS_INFO("param set crosswalk true!\n");
-                        nh.setParam("HA/crosswalk",true);                       
+                        nh.setParam("hl_controller/crosswalk",true);                       
                         crosswalk_check = 0;
                     }
                 }
@@ -224,7 +224,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                 coordi_array.data.clear();
                 coordi_array.data.push_back(10);
 
-                for(int y = output_origin.rows-1; y>=310; y--){
+                for(int y = output_origin.rows-1; y>=210; y--){
                     uchar* origin_data = output_origin.ptr<uchar>(y);
                     uchar* pub_img_data = pub_img.ptr<uchar>(y*0.5);//resize 복구(0.5 -> 1))
                         for(int x = 0; x<output_origin.cols; x++){
@@ -244,7 +244,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
 
                 cv::HoughLinesP(newlane, lines, 1, CV_PI / 180.0, 80, 80, 5);
                 if(!is_stop_checked){
-                    nh.setParam("HA/crosswalk",false);
+                   // nh.setParam("hl_controller/crosswalk",false);
                 }
                 if(!lines.empty()){
                     float ladian;
@@ -252,7 +252,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                     it = lines.end() - 1;
                     ladian = atan2f((*it)[3] - (*it)[1], (*it)[2] - (*it)[0]);
                     degree = ladian * 180 / CV_PI; 
-                    if(abs(degree)>=0 && abs(degree)<=1 && coordi_count > COORDI_COUNT){
+                    if(abs(degree)>=0 && abs(degree)<=5){
                     
                     cv::line(my_test_hough, cv::Point((*it)[0], (*it)[1]),
                                             cv::Point((*it)[2] , (*it)[3] ),
@@ -265,21 +265,22 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                     
                     check_stop_count++;
                     
-                    if(check_stop_count>3 && !is_stop_checked){
-                        is_stop_checked++;
-                        nh.setParam("HA/crosswalk",true);
-                        check_stop_count = 0;
+                   // if(check_stop_count>0){
+                        //is_stop_checked++;
+                        nh.setParam("hl_controller/crosswalk",true);
+                        check_stop_count = 1;
                         is_stop_checked = true;
                         ROS_INFO("param set crosswalk true!\n");
-                    }                       
+                        imshow("stop_lane_before_crosswalk",my_test_hough);
+                   // }                       
                     if(is_stop_checked){
-		     is_stop_checked = false;
+		     //is_stop_checked = false;
 		    } 
                     if(DEBUG_SW){
                         std::cout<<"coordi_count : "<<coordi_count<<std::endl;    
                         }
                     }
-                    imshow("stop_lane_before_crosswalk",my_test_hough);
+                    
                 }
                 coordi_array.data[0] = coordi_count;
 

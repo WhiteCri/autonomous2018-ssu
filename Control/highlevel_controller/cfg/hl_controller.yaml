@@ -1,9 +1,9 @@
 hl_controller:
 #goal
-  x_goal: [12.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-  y_goal: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-  yaw_goal: [-2.1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-  goal_type: ["N","N","N","N","N","N","N","N","N","N","N","N","N","N","N","N"]
+  x_goal: [330,331,333]
+  y_goal: [0.125,7.5,16]
+  yaw_goal: [3,0,3,3,3,3]
+  goal_type: ["before crosswalk","g"]
 
 #config controller
   frequency: 5
@@ -14,7 +14,7 @@ hl_controller:
 
 #crosswalk
   use_process_crosswalk: true
-  crosswalk_check_duration: 1.0
+  crosswalk_check_duration: 0.2
   use_crosswalk_onetime_flag: true
   crosswalk_onetime_flag: false
 
@@ -37,7 +37,7 @@ hl_controller:
   use_parking_onetime_flag: true
   parking_onetime_flag: false
 
-  parknig_stop_duration: 10.0
+  parking_stop_duration: 10.0
 
   parking_near_arrive_point_x: -200.0
   parking_near_arrive_point_y: -200.0
