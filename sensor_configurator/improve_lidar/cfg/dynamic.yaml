@@ -1,0 +1,10 @@
+improve_lidar :
+  size_N : 4
+  min_y_distance : 0.5
+  max_y_distance : 2
+
+  min_x_obstacle : 5
+  max_x_distance : 0.015
+
+  min_delta_y : 0.0035
+  max_delta_y : 0.08

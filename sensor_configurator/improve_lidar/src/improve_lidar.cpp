@@ -16,7 +16,7 @@
 #define dynamic_distance_point 0.2
 #define UTurn_distance_point 0.1
 
-/* dynamic check */
+/* dynamic check 
 #define size_N 4
 
 #define min_y_distance 0.5
@@ -27,7 +27,7 @@
 
 #define min_delta_y 0.0035
 #define max_delta_y 0.08
-
+*/
 #define test_uturn
 #define test_dynamic
 
@@ -39,7 +39,17 @@ struct priv{
     std::vector<double> priv_data_first_y;
     std::vector<double> delta_y;
 };
+struct dynamic{
+    int size_N;
+    double min_y_distance;
+    double max_y_distance;
+    double min_x_obstacle;
+    double max_x_distance;
+    double min_delta_y;
+    double max_delta_y;
+};
 
+static dynamic dynamic_param;
 static priv priv;
 
 using namespace obstacle_detector;
@@ -72,30 +82,31 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     /* find arry num */
     for(int i=0; i<object->segments.size(); i++)
     {
-        if( (fabs(dataarry[i][1] - dataarry[i][3]) > min_y_distance)  && (fabs(dataarry[i][1] - dataarry[i][3]) < max_y_distance) &&
-            (fabs(dataarry[i][0] - dataarry[i][2]) < max_x_distance) && (fabs(dataarry[i][0]) > min_x_obstacle) && (fabs(dataarry[i][2]) > min_x_obstacle) )
+        if( (fabs(dataarry[i][1] - dataarry[i][3]) > dynamic_param.min_y_distance)  && (fabs(dataarry[i][1] - dataarry[i][3]) < dynamic_param.max_y_distance) &&
+            (fabs(dataarry[i][0] - dataarry[i][2]) < dynamic_param.max_x_distance) && (fabs(dataarry[i][0]) > dynamic_param.min_x_obstacle) 
+            && (fabs(dataarry[i][2]) > dynamic_param.min_x_obstacle) )
         {
             priv.priv_data_first_y.push_back(dataarry[i][1]);
         }
     }
 
     /* 이전 data와 비교해서 delta_y 추출 */
-    if( priv.priv_data_first_y.size() == size_N )
+    if( priv.priv_data_first_y.size() == dynamic_param.size_N )
     {
         for(std::vector<double>::size_type i = 0; i < priv.priv_data_first_y.size()-1; i++)
         {
             delta_y = fabs(priv.priv_data_first_y[i] - priv.priv_data_first_y[i+1]);
             priv.delta_y.push_back(delta_y);
-        }
+        }   
         priv.priv_data_first_y.clear();
     }
     /* delta y에 대한 샘플링 시작 */
-    if(priv.delta_y.size() == (size_N - 1)) 
+    if(priv.delta_y.size() == (dynamic_param.size_N - 1)) 
     {
         for(std::vector<double>::size_type i = 0; i < priv.delta_y.size(); i++)
         {
             ROS_INFO("delta[%ld] y : %lf",i,priv.delta_y[i]);
-            if(priv.delta_y[i] > min_delta_y && priv.delta_y[i] < max_delta_y)
+            if(priv.delta_y[i] > dynamic_param.min_delta_y && priv.delta_y[i] < dynamic_param.max_delta_y)
                 dynamic_obstacle = true;
             else
             {
@@ -236,11 +247,18 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "improve_lidar");
     ros::NodeHandle Node;
     ros::NodeHandle n("~");
+
     n.param<bool>("hl_controller/movingobj",dynamic_obstacle,false);
     n.param<bool>("hl_controller/Uturn",u_turn,false);
-
+    n.getParam("size_N",dynamic_param.size_N);
+    n.getParam("min_y_distance",dynamic_param.min_y_distance);
+    n.getParam("max_y_distance",dynamic_param.max_y_distance);
+    n.getParam("min_x_obstacle",dynamic_param.min_x_obstacle);
+    n.getParam("max_x_distance",dynamic_param.max_x_distance);
+    n.getParam("min_delta_y",dynamic_param.min_delta_y);
+    n.getParam("max_delta_y",dynamic_param.max_delta_y);
+    
     ros::Subscriber sub = Node.subscribe("raw_obstacles",100,obstaclecheck);
-
 
 //    std::thread dynamicnode(subscribeuturn);
  //   dynamicnode.detach();
