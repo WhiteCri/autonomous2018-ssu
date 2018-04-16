@@ -7,7 +7,7 @@ hl_controller:
 
 #config controller
   frequency: 5
-  publish_param: false
+  publish_param: true
 
 #tx
   tx_stop: false
@@ -23,7 +23,7 @@ hl_controller:
 
 #movingobj
   use_process_movingobj: true
-  movingobj_check_duration: 1.0
+  movingobj_check_duration: 0.2
   movingobj_escape_duration: 1.0
   use_movingobj_onetime_flag: true
   movingobj_onetime_flag: false

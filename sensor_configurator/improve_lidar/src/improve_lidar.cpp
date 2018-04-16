@@ -1,28 +1,31 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <obstacle_detector/Obstacles.h>
-#include <geometry_msgs/Point.h>
-#include <math.h>
+#include <cmath>
 #include <thread>
 #include <vector>
 
 
+/* U_turn check */
 #define Laser_Filter_start 200
 #define Laser_Filter_end 300
-#define frequency 0.8
+#define frequency 10
 
 #define check_dynamic 1
 #define check_UTurn 3
 #define dynamic_distance_point 0.2
 #define UTurn_distance_point 0.1
 
+/* dynamic check */
+#define size_N 4
 
 #define min_y_distance 0.5
 #define max_y_distance 2
-#define min_x_obstacle 5
-#define max_x_distance 0.03
 
-#define min_delta_y 0.04
+#define min_x_obstacle 5
+#define max_x_distance 0.015
+
+#define min_delta_y 0.0035
 #define max_delta_y 0.08
 
 #define test_uturn
@@ -33,9 +36,8 @@ static bool dynamic_obstacle, u_turn;
 static int before_detect = 0;
 
 struct priv{
-    double priv_first_point_y;
-    double priv_last_point_y;
-    bool priv_exist = false;
+    std::vector<double> priv_data_first_y;
+    std::vector<double> delta_y;
 };
 
 static priv priv;
@@ -51,8 +53,7 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     ros::NodeHandle Node;
     std::vector<std::vector<double>> dataarry;
     double delta_y;
-    int num;
-    bool dynamic_flag = false;
+    bool dynamic_obstacle = false;
 
     for(int i=0; i<object->segments.size(); i++)
     {
@@ -72,43 +73,45 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     for(int i=0; i<object->segments.size(); i++)
     {
         if( (fabs(dataarry[i][1] - dataarry[i][3]) > min_y_distance)  && (fabs(dataarry[i][1] - dataarry[i][3]) < max_y_distance) &&
-            (fabs(dataarry[i][0] - dataarry[i][2] < max_x_distance)) && (fabs(dataarry[i][0]) > min_x_obstacle) && (fabs(dataarry[i][2]) > min_x_obstacle) )
+            (fabs(dataarry[i][0] - dataarry[i][2]) < max_x_distance) && (fabs(dataarry[i][0]) > min_x_obstacle) && (fabs(dataarry[i][2]) > min_x_obstacle) )
         {
-            num = i;
-            dynamic_flag = true;
+            priv.priv_data_first_y.push_back(dataarry[i][1]);
         }
     }
+
     /* 이전 data와 비교해서 delta_y 추출 */
-    if(priv.priv_exist && dynamic_flag )
+    if( priv.priv_data_first_y.size() == size_N )
     {
-        delta_y = fabs(priv.priv_first_point_y - object->segments.at(num).first_point.y);
-        ROS_INFO("%lf",delta_y);
-    }
-    else if(!dynamic_flag)
-        return;
-    /* delta y가 특정값이면 true flag */
-    if(delta_y > min_delta_y && delta_y < max_delta_y)
-     {
-        dynamic_obstacle = true;
-     }
-     else
-        dynamic_obstacle = false; 
-    /* 길이를 먼저 재자... 단 조건은 x로 일직선 길이는 1m이상*/
-     for(int i=0; i<object->segments.size(); i++)
-    {
-        if( (fabs(dataarry[i][1] - dataarry[i][3]) > min_y_distance)  && (fabs(dataarry[i][1] - dataarry[i][3]) < max_y_distance) &&
-            (fabs(dataarry[i][0] - dataarry[i][2] < max_x_distance))  && (fabs(dataarry[i][0]) > min_x_obstacle) && (fabs(dataarry[i][2]) > min_x_obstacle) )
+        for(std::vector<double>::size_type i = 0; i < priv.priv_data_first_y.size()-1; i++)
         {
-            priv.priv_first_point_y = dataarry[i][1];
-            priv.priv_last_point_y = dataarry[i][3];
-            priv.priv_exist = true;
+            delta_y = fabs(priv.priv_data_first_y[i] - priv.priv_data_first_y[i+1]);
+            priv.delta_y.push_back(delta_y);
         }
+        priv.priv_data_first_y.clear();
     }
-    Node.setParam("dynamic_obstacle",dynamic_obstacle);
+    /* delta y에 대한 샘플링 시작 */
+    if(priv.delta_y.size() == (size_N - 1)) 
+    {
+        for(std::vector<double>::size_type i = 0; i < priv.delta_y.size(); i++)
+        {
+            ROS_INFO("delta[%ld] y : %lf",i,priv.delta_y[i]);
+            if(priv.delta_y[i] > min_delta_y && priv.delta_y[i] < max_delta_y)
+                dynamic_obstacle = true;
+            else
+            {
+                dynamic_obstacle = false;
+                break;
+            }
+        }
+        priv.delta_y.clear();
+    }
+
+    Node.setParam("hl_controller/movingobj",dynamic_obstacle);
 
     #ifdef test_dynamic
         if(dynamic_obstacle)
-            ROS_INFO("detected_dynamic");
+          {  ROS_INFO("detected_dynamic");
+          }
     #endif
 
 
@@ -210,15 +213,15 @@ void uturncall(const sensor_msgs::LaserScan::ConstPtr& scan)
             u_turn = false;
         }
     }
-    Node.setParam("u_turn",u_turn);
+    Node.setParam("hl_controller/Uturn",u_turn);
 
 
 }
 
-void subscribeobstacle()
+void subscribeuturn()
 {
     ros::NodeHandle Node;
-    ros::Subscriber sub = Node.subscribe("raw_obstacles",100,obstaclecheck);
+    ros::Subscriber scan_sub = Node.subscribe("uturn_scan",100,uturncall);
     ros::Rate loop_rate(frequency);
 
     while(ros::ok())
@@ -233,12 +236,14 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "improve_lidar");
     ros::NodeHandle Node;
     ros::NodeHandle n("~");
-    n.param<bool>("dynamic_obstacle",dynamic_obstacle,false);
-    n.param<bool>("u_turn",u_turn,false);
-    ros::Subscriber scan_sub = Node.subscribe("uturn_scan",100,uturncall);
+    n.param<bool>("hl_controller/movingobj",dynamic_obstacle,false);
+    n.param<bool>("hl_controller/Uturn",u_turn,false);
 
-    std::thread dynamicnode(subscribeobstacle);
-    dynamicnode.detach();
+    ros::Subscriber sub = Node.subscribe("raw_obstacles",100,obstaclecheck);
+
+
+//    std::thread dynamicnode(subscribeuturn);
+ //   dynamicnode.detach();
 
     ros::Rate loop_rate(frequency);
 
