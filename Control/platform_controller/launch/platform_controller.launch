@@ -33,9 +33,9 @@
 
 
     <node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
-        <param name="/accel/settling_time" value="0.5"/>
-        <param name="/speed/weight" value="1.0"/>
-        <param name="/speed/shift" value="0.0"/>
+        <param name="/accel/settling_time" value="0.8"/>
+        <param name="/speed/weight" value="1.35"/>
+        <param name="/speed/shift" value="20.0"/>
 
         <param name="/brake/kp" value="30.0"/>
         <param name="/brake/ki" value="0.0"/>

@@ -40,9 +40,9 @@ PlatformController()
     , cmd_accel_(0.0), cmd_steer_(0.0), cmd_brake_(0.0)
     , kp_steer_(1.0), ki_steer_(0.0), kd_steer_(0.0)
     , kp_brake_(30.0), ki_brake_(0.0), kd_brake_(0.0)
-    , settling_time_(0.5)
+    , settling_time_(0.8)
     , dt_(0.0), index_(0)
-    , ss_speed_(0), ss_speed_weight_(1.0), ss_speed_shift_(0.0)
+    , ss_speed_(0), ss_speed_weight_(1.35), ss_speed_shift_(20.0)
     , target_accel_(0.0), current_gear_(GEAR_FORWARD), target_gear_(GEAR_FORWARD) 
 {
      
