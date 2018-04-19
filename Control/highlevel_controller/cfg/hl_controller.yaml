@@ -2,7 +2,8 @@ hl_controller:
 #goal
   x_goal: [330,331,333]
   y_goal: [0.125,7.5,16]
-  yaw_goal: [3,0,3,3,3,3]
+  ori_z_goal: [3,0,3,3,3,3]
+  ori_w_goal: [0.5,0.5,0.5,0.5]
   goal_type: ["before crosswalk","g"]
 
 #config controller

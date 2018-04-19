@@ -17,7 +17,7 @@ public:
     
     GoalStates getState();
     void sendGoal();
-    void setGoal(double x, double y, double yaw);
+    void setGoal(double x, double y, double ori_x, double ori_w);
 
     //teb_local_planner fails to planning when current speed suddenly decrease.
     //then we must set the goal one more, so we decided to use the default thread.
