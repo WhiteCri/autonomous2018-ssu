@@ -70,6 +70,14 @@
 	</node>
 
 
+	<!--  ****** Controller (High / Low  Level) ******  -->
+	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
+        <rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load" />
+    </node>
+
+
+
+
 	 <!--  **************** Visualisation ****************  -->
 	  <node name="rviz" pkg="rviz" type="rviz"/>
 	  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
