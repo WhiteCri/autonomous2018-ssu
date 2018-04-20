@@ -99,7 +99,7 @@ void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
     0x02 : backward
 */
     packet[5] = static_cast<uint8_t>(msg->gear);
-    
+    ROS_INFO("%s",(msg->gear == 0) ? "forward" :"back");
 // SPEED (원래는 accel이 맞는데 혼란을 피하기 위해 변수 이름들은 그냥 speed로 했음)
     int speed = fabs(msg->accel); //   checkSpeedBound(speed);
     uint16_t serialSpeed = speed;

@@ -10,9 +10,9 @@
 #define NO_ACCEL 0
 #define MAX_ACCEL 200
 #define NO_BRAKE 1
-#define NO_SLIP_BRAKE 60
+#define NO_SLIP_BRAKE 68
 #define MAX_BRAKE 200
-#define MAX_STEER 1970
+#define MAX_STEER 2000
 #define GEAR_FORWARD 0
 #define GEAR_BACKWARD 2
 #define SWITHCING_GEAR_SPEED_TOLERANCE 0.2
@@ -25,7 +25,7 @@
 #define C1 0.0184 // acceleration [m/s^2] = 0.108*exp(0.0184*platform) -> C1 = 0.0184
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
-#define FILTER_SIZE 3 // Reference Steering Angle 진동 잡기 위한 이동평균필터 크기
+#define FILTER_SIZE 2 // Reference Steering Angle 진동 잡기 위한 이동평균필터 크기
 #define EPSILON 0.1   // log(negative) 방지
 
 /* Debug */
@@ -54,15 +54,15 @@ void Init(int argc, char **argv){ // Controller 돌리기 전에 initialize (dt 
     ros::NodeHandle priv_nh_("~");
     ros::NodeHandle nh_;
 
-    priv_nh_.param<double>("/control/accel/settling_time", settling_time_, 0.5);
-    priv_nh_.param<double>("/control/speed/weight", ss_speed_weight_, 1.0);
+    priv_nh_.param<double>("/control/accel/settling_time", settling_time_, 0.8);
+    priv_nh_.param<double>("/control/speed/weight", ss_speed_weight_, 1.1);
     priv_nh_.param<double>("/control/speed/shift", ss_speed_shift_, 0.0);
 
     priv_nh_.param<double>("/control/steer/kp", kp_steer_, 1.0);
     priv_nh_.param<double>("/control/steer/ki", ki_steer_, 0.0);
     priv_nh_.param<double>("/control/steer/kd", kd_steer_, 0.0);
     
-    priv_nh_.param<double>("/control/brake/kp", kp_brake_, 30.0);
+    priv_nh_.param<double>("/control/brake/kp", kp_brake_, 50.0);
     priv_nh_.param<double>("/control/brake/ki", ki_brake_, 0.0);
     priv_nh_.param<double>("/control/brake/kd", kd_brake_, 0.0);
 
@@ -78,6 +78,7 @@ void Calc_PID(void){ // read_state, read_reference로 읽은 후에 Platform_TX(
 
     UpdateParameters(); // PID Gain Parameter Update
 
+
     Calc_longitudinal(); // SPEED CONTROL
 
     Calc_lateral(); // STEER CONTROL
@@ -86,14 +87,16 @@ void Calc_PID(void){ // read_state, read_reference로 읽은 후에 Platform_TX(
 void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data){
     current_speed_ = rx_data->speed;
     current_steer_ = rx_data->steer;
+    Calc_PID();
+    publish();
 }
 
 void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist){
     ref_speed_ = twist->linear.x;
     ref_steer_ = mv_avg_filter( BoundaryCheck_Steer(RAD2SERIAL*(twist->angular.z)) );
 
-    Calc_PID();
-    publish();
+    //Calc_PID();
+    //publish();
 }
 
 void publish(){
@@ -183,6 +186,7 @@ inline int BoundaryCheck_Brake(const int brake){
 }
 
 inline int BoundaryCheck_No_Slip_Brake(const int brake){
+
     if(brake <= NO_BRAKE){
         return NO_BRAKE;
     }
