@@ -32,18 +32,8 @@
 
 
 
-    <node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
-        <param name="/accel/settling_time" value="0.8"/>
-        <param name="/speed/weight" value="1.35"/>
-        <param name="/speed/shift" value="20.0"/>
-
-        <param name="/brake/kp" value="30.0"/>
-        <param name="/brake/ki" value="0.0"/>
-        <param name="/brake/kd" value="0.0"/>
-
-        <param name="/steer/kp" value="1.0"/>    0.8  / 0.7  / 0.5
-        <param name="/steer/ki" value="0.0"/>    10.0 / 1.0  / 1.0
-        <param name="/steer/kd" value="0.0"/>    0.01 / 0.01 / 0.008
+   	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
+        <rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load" />
     </node>
 
 
