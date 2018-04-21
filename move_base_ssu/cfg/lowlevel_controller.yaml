@@ -1,12 +1,12 @@
 accel:
-  settling_time: 1.5
+  settling_time: 2.5
   
 speed:
   weight: 1.2
   shift: 5.0
   
 brake:
-  kp: 50.0
+  kp: 100.0
   ki: 0.0
   kd: 0.0
   

@@ -2,8 +2,8 @@ global_costmap:
   ## map 프레임명
   global_frame: /map
   robot_base_frame: base_link
-  update_frequency: 1.0
-  publish_frequency: 0.5
+  update_frequency: 0.1
+  publish_frequency: 0.1
   static_map: true
  
   transform_tolerance: 0.5
