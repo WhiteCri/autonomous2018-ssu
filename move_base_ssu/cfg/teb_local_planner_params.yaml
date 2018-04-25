@@ -30,7 +30,8 @@ TebLocalPlannerROS:
 
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "polygon"
-   vertices: [[-0.25,-0.58],[1.4,-0.60],[1.4,0.58],[-0.25,0.60]]
+   vertices: [[0.25,-0.58],[-1.4,-0.60],[-1.4,0.58],[0.25,0.60]]
+   #[[-0.25,-0.58],[1.4,-0.60],[1.4,0.58],[-0.25,0.60]]
 
  # GoalTolerance
     
@@ -45,7 +46,7 @@ TebLocalPlannerROS:
  dynamic_obstacle_inflation_dist: 2.0
  include_dynamic_obstacles: True
  include_costmap_obstacles: True
- costmap_obstacles_behind_robot_dist: 1.0
+ costmap_obstacles_behind_robot_dist: 3.0
  obstacle_poses_affected: 30
  costmap_converter_plugin: ""
  costmap_converter_spin_thread: True
@@ -54,7 +55,7 @@ TebLocalPlannerROS:
  # Optimization
     
  no_inner_iterations: 4
- no_outer_iterations: 2
+ no_outer_iterations: 4
  optimization_activate: True
  optimization_verbose: False
  penalty_epsilon: 0.1
@@ -74,7 +75,7 @@ TebLocalPlannerROS:
  enable_homotopy_class_planning: True
  enable_multithreading: True
  simple_exploration: False
- max_number_classes: 4
+ max_number_classes: 2
  selection_cost_hysteresis: 1.0
  selection_obst_cost_scale: 1.0
  selection_alternative_time_cost: False
