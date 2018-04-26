@@ -594,7 +594,7 @@ namespace lane_detect_algo{
                     }
                 }
                 for(int y = 0; y<src.rows; y++){
-                    for(int x = 0; x<H[y]; x++){
+                    for(unsigned int x = 0; x<H[y]; x++){
                         dst.at<uchar>(y,x) = 255;
                     }
                 }
@@ -640,21 +640,21 @@ namespace lane_detect_algo{
                 }
 
                 for (int y = 0; y < src.rows; y++) {
-                    for (int x = 0; x < H[y]; x++) {
+                    for (unsigned int x = 0; x < H[y]; x++) {
                     dst.at<uchar>(y, x) = 255;
                     }
                 }
                 delete[] H;
                 }
             void CalLane::medianForXHistogram(unsigned int* H_result, int H_result_size){
-                int midean;
+          //      int midean;
                 unsigned int *sorted_H_result = new unsigned int[H_result_size];
                 std::memset(sorted_H_result, 0, 4 * H_result_size);
                 std::copy(H_result, H_result + H_result_size, sorted_H_result);
                 std::sort(sorted_H_result, sorted_H_result + H_result_size);
-                midean = H_result_size / 2;
+          //      midean = H_result_size / 2;
                 for (int y = 0; y < H_result_size; y++) {
-                    for (int x = 0; x < sorted_H_result[y]; x++) {
+                    for (uint x = 0; x < sorted_H_result[y]; x++) {
                     
                     }std::cout << "H : " << sorted_H_result[y] << std::endl;
                 }std::cout << "___" << std::endl;
@@ -668,11 +668,11 @@ namespace lane_detect_algo{
                 
                 uint *vote_lane_array = new uint[src.cols*3];//data order is 'value, x, y'
                 std::memset(vote_lane_array, 0, 4 * (src.cols * 3));
-                int max_lane = 0, temp = 0, vote_index=0;
+                int temp = 0, vote_index=0;
                 
                 it = it + (src.rows - 1)*src.cols;
-                for (uint i = 1; i < src.rows; ++i) {
-                    for (uint j = 0; j < src.cols*per_lane_checked; ++j) {
+                for (int i = 1; i < src.rows; ++i) {
+                    for (int j = 0; j < src.cols*per_lane_checked; ++j) {
                         check_window = j;
                         while (*(it+check_window) != (uchar)0) {
                             check_window++;
@@ -762,7 +762,7 @@ namespace lane_detect_algo{
                 cv::findContours(src, countours, hierachy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
                 dst = cv::Mat::zeros(src.size(), CV_8UC3);
 
-                for (int i = 0; i < countours.size(); ++i) {
+                for (std::vector<std::vector<cv::Point>>::size_type i = 0; i < countours.size(); ++i) {
                     cv::drawContours(dst, countours, i, CV_RGB(255, 255, 255), -1, 8, hierachy, 0, cv::Point());
                 }
                 cv::cvtColor(dst, dst, cv::COLOR_BGR2GRAY);  // Convert the image to Gray
@@ -803,7 +803,7 @@ namespace lane_detect_algo{
                 for (int row = 1; row < numOfLables; row++) {
                 
                 int* data = stats.ptr<int>(row);   
-                int area = data[cv::CC_STAT_AREA];
+          //      int area = data[cv::CC_STAT_AREA];
                 int left = data[cv::CC_STAT_LEFT];
                 int top = data[cv::CC_STAT_TOP];
                 int width = data[cv::CC_STAT_WIDTH];
@@ -870,7 +870,7 @@ namespace lane_detect_algo{
                 cv::findContours(src, countours, hierachy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
                 dst = cv::Mat::zeros(src.size(), CV_8UC3);
 
-                for (int i = 0; i < countours.size(); ++i) {
+                for (std::vector<std::vector<cv::Point>>::size_type i = 0; i < countours.size(); ++i) {
                     cv::drawContours(dst, countours, i, CV_RGB(255, 255, 255), -1, 8, hierachy, 0, cv::Point());
                 }
                 cv::cvtColor(dst, dst, cv::COLOR_BGR2GRAY);  // Convert the image to Gray
@@ -893,8 +893,8 @@ namespace lane_detect_algo{
                     }
                 }
 
-                int center_x;
-                int center_y;
+           //     int center_x;
+           //     int center_y;
                 
                 //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
@@ -916,7 +916,7 @@ namespace lane_detect_algo{
                 for (int row = 1; row < numOfLables; row++) {
 
                     int* data = stats.ptr<int>(row);
-                    int area = data[cv::CC_STAT_AREA];
+               //     int area = data[cv::CC_STAT_AREA];
                     int left = data[cv::CC_STAT_LEFT];
                     int top = data[cv::CC_STAT_TOP];
                     int width = data[cv::CC_STAT_WIDTH];
@@ -972,7 +972,7 @@ namespace lane_detect_algo{
                 cv::findContours(src, countours, hierachy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
                 dst = cv::Mat::zeros(src.size(), CV_8UC3);
 
-                for (int i = 0; i < countours.size(); ++i) {
+                for (std::vector<std::vector<cv::Point>>::size_type i = 0; i < countours.size(); ++i) {
                     cv::drawContours(dst, countours, i, CV_RGB(255, 255, 255), -1, 8, hierachy, 0, cv::Point());
                 }
                 cv::cvtColor(dst, dst, cv::COLOR_BGR2GRAY);  // Convert the image to Gray
@@ -1018,8 +1018,8 @@ namespace lane_detect_algo{
                     }
                 }
                 }
-                int center_x;
-                int center_y;
+         //       int center_x;
+         //       int center_y;
                 
                 //USE_MAX_HEIGHT 
                 int temp_height= 0, max_height = 0;
@@ -1034,7 +1034,7 @@ namespace lane_detect_algo{
                 for (int row = 1; row < numOfLables; row++) {
 
                     int* data = stats.ptr<int>(row);
-                    int area = data[cv::CC_STAT_AREA];
+           //         int area = data[cv::CC_STAT_AREA];
                     int left = data[cv::CC_STAT_LEFT];
                     int top = data[cv::CC_STAT_TOP];
                     int width = data[cv::CC_STAT_WIDTH];
