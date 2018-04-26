@@ -19,7 +19,7 @@ TebLocalPlannerROS:
  max_vel_y: 0.0
  max_vel_theta: 3.0
  max_vel_theta: 0.5 # the angular velocity is also bounded by min_turning_radius in case of a carlike robot (r = v / omega)
- acc_lim_x: 1.5
+ acc_lim_x: 0.3
  acc_lim_y: 0.01
  acc_lim_theta: 0.5
 
@@ -31,8 +31,9 @@ TebLocalPlannerROS:
 
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "polygon"
-   vertices: [[0.25,-0.58],[-1.4,-0.60],[-1.4,0.58],[0.25,0.60]]
-   #[[-0.25,-0.58],[1.4,-0.60],[1.4,0.58],[-0.25,0.60]]
+   vertices: [[0.45,-0.65],[-1.3,-0.65],[-1.3,0.65],[0.45,0.65]]
+   #[[0.25,-0.58],[-1.4,-0.60],[-1.4,0.58],[0.25,0.60]] ## 4/25
+   #[[-0.25,-0.58],[1.4,-0.60],[1.4,0.58],[-0.25,0.60]] ## 이전
 
  # GoalTolerance
     
@@ -42,7 +43,7 @@ TebLocalPlannerROS:
     
  # Obstacles
     
- min_obstacle_dist: 0.3 # This value must also include our robot's expansion, since footprint_model is set to "line".
+ min_obstacle_dist: 0.15 # This value must also include our robot's expansion, since footprint_model is set to "line".
  inflation_dist: 1.0
  dynamic_obstacle_inflation_dist: 2.0
  include_dynamic_obstacles: True
@@ -67,9 +68,9 @@ TebLocalPlannerROS:
  weight_kinematics_nh: 1000
  weight_kinematics_forward_drive: 100
  weight_kinematics_turning_radius: 100
- weight_optimaltime: 100
- weight_obstacle: 100
- weight_dynamic_obstacle: 10 # not in use yet
+ weight_optimaltime: 120
+ weight_obstacle: 150
+ weight_dynamic_obstacle: 150 # not in use yet
 
  # Homotopy Class Planner
 

@@ -1,5 +1,5 @@
 accel:
-  settling_time: 1.0
+  settling_time: 1.6
   
 speed:
   weight: 1.1
