@@ -171,7 +171,7 @@ world_frame: odom_combined       # Defaults to the value of odom_frame if unspec
 
 ### odom0 (main: GPS) ###
 odom0: odom/GPS
-odom0_config: [false, false, false,
+odom0_config: [true,  true,  false,
                false, false, false,
                false, false, false,
                false, false, false,
@@ -202,7 +202,7 @@ odom1_twist_rejection_threshold: 1
 
 imu0: raw/imu
 imu0_config: [false, false, false,
-              false, false, false,
+              false, false, true,
               false, false, false,
               false, false, false,
               false, false, false]
