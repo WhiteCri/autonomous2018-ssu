@@ -1,7 +1,7 @@
 <launch>
-    <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10">
-        <param name="angle_alignment" value="113"/>
+    <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB0 10">
+        <param name="shift" value="113"/>
         <param name="debugingFlag" value="true"/>
-        <param name="imu_yaw_covariance" value="0.5"/>
+        <param name="covariance" value="0.5"/>
     </node>
 </launch>
