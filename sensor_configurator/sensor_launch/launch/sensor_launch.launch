@@ -50,6 +50,7 @@
 		<arg name="frequency" value="$(arg frequency)"/>
 	</include> 
 	<node name="lane_detection" pkg="lane_detection" type="lane_detection" respawn="true" output="screen">
+		<rosparam file="$(find lane_detection)/cfg/lane_detection.yaml" command="load"/>
 	</node>
 	<node name="cal_distance" pkg="cal_distance" type="cal_distance" respawn="true">
 	</node>
