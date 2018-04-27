@@ -103,7 +103,8 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
       0, 0, 0, 0, rot_cov, 0,
       0, 0, 0, 0, 0, rot_cov
     }};
-//    
+     odom.pose.covariance = covariance;
+
     //boost::array<double, 36> covariance = fix->position_covariance;
 //    
     node.getParam("GPS/cov/flag",cov_flag);
@@ -111,7 +112,8 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
     /*임의로 covariance 세팅해서 사용하면 됨 */
     if(cov_flag)
     {
-      boost::array<double, 36> covariance = {{
+      ROS_INFO("hihihihihihi");
+      boost::array<double, 36> covariance2 = {{
       cov_max, 0, 0, 0, 0, 0,
       0, cov_max, 0, 0, 0, 0,
       0, 0, cov_max, 0, 0, 0,
@@ -119,12 +121,15 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
       0, 0, 0, 0, cov_max, 0,
       0, 0, 0, 0, 0, cov_max
     }};
+    odom.pose.covariance = covariance2;
     }
  //
 
   
 
-    odom.pose.covariance = covariance;
+  
+        
+
 
     odom_pub.publish(odom);
   }

@@ -11,7 +11,7 @@
    
     <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
     <node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
-    <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
+    <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM"  />
  
 
 
