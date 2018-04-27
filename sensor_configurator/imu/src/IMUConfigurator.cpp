@@ -75,8 +75,10 @@ void IMUConfigurator::RPY(std::string parse)
      yaw = std::stod(Y);
      yaw = -yaw;
      yaw += shift;
+     
      if(yaw >= 180.0) yaw -= 360;
      if(yaw <= -180.0) yaw += 360;
+     yaw = 180+yaw;
      if(debugingFlag == true)
         ROS_INFO("get : %.2lf(degree)",yaw);
 }

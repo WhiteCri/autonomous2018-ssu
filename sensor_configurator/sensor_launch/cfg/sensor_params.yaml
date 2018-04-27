@@ -12,9 +12,9 @@ platform_tx:
   ackermann_topic_name: "platform_tx_test"
 
 imu:
-  shift: 0
+  shift: 30
   debugingFlag: true
-  covariance: 0.5
+  covariance: 0.009
 
 LMS1xx_node:
   host: "192.168.0.204"

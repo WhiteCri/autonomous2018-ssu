@@ -9,6 +9,8 @@
 serial::Serial ser;
 std::mutex lock;
 
+#define EPSILON 0.1
+
 class ParamReader{
 public:
     ParamReader(ros::NodeHandle& nh){
@@ -128,6 +130,10 @@ int main (int argc, char** argv){
         msg.brake = getParsingData<uint8_t>(packet_main, 10);
         msg.seq = seq;
         bool estop = getParsingData<uint8_t>(packet_main, 4);
+//
+        bool speed_flag = (fabs(msg.speed) < EPSILON) ? true : false;  
+        nh.setParam("GPS/cov/flag",speed_flag);
+//  
         nh.setParam("estop", estop);
 
         //dirty code...I want to erase...
