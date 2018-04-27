@@ -26,7 +26,7 @@
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
 #define FILTER_SIZE 2 // Reference Steering Angle 진동 잡기 위한 이동평균필터 크기
-#define EPSILON 0.1   // log(negative) 방지
+#define EPSILON 0.05   // log(negative) 방지
 
 /* Debug */
 //#define MY_DEBUG
