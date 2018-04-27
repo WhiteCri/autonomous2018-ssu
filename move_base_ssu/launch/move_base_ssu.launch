@@ -12,7 +12,7 @@
         <param name="/initial_y" value="0.0"/>
         <param name="/initial_heading" value="0.0"/>
         <param name="/trans_cov" value="0.1"/>
-        <param name="/rot_cov" value="5.0"/>
+        <param name="/rot_cov" value="0.005"/>
     </node>
 
 <!--	
@@ -36,8 +36,8 @@
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">
 		<rosparam file="$(find move_base_ssu)/cfg/amcl_params.yaml" command="load" />
 
-	    <param name="initial_pose_x"            value="307"/>
-		<param name="initial_pose_y"            value="-1"/>
+	    <param name="initial_pose_x"            value="0"/>
+		<param name="initial_pose_y"            value="0"/>
 		<param name="initial_pose_a"            value="0"/>
 	</node>
 	
@@ -63,7 +63,7 @@
 		<param name="planner_patience" value="5.0" />
 
 		<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-		<param name="controller_frequency" value="7.0" />
+		<param name="controller_frequency" value="5.0" />
 		<param name="controller_patience" value="15.0" />
 
     	<param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
