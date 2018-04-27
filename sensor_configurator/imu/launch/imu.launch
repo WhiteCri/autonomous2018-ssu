@@ -2,6 +2,6 @@
     <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10" output="screen">
         <param name="shift" value="113"/>
         <param name="debugingFlag" value="true"/>
-        <param name="covariance" value="0.5"/>
+        <param name="covariance" value="0.1"/>
     </node>
 </launch>
