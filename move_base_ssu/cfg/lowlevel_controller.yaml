@@ -1,0 +1,16 @@
+accel:
+  settling_time: 1.0
+  
+speed:
+  weight: 1.1
+  shift: 20.0
+  
+brake:
+  kp: 35.0
+  ki: 0.0
+  kd: 0.0
+  
+steer:
+  kp: 1.0
+  ki: 0.0
+  kd: 0.0
