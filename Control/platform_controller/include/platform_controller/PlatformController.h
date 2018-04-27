@@ -10,7 +10,7 @@
 #define NO_ACCEL 0
 #define MAX_ACCEL 200
 #define NO_BRAKE 1
-#define NO_SLIP_BRAKE 68
+#define NO_SLIP_BRAKE 70
 #define MAX_BRAKE 200
 #define MAX_STEER 2000
 #define GEAR_FORWARD 0
@@ -40,7 +40,7 @@ PlatformController()
     , cmd_accel_(0.0), cmd_steer_(0.0), cmd_brake_(0.0)
     , kp_steer_(1.0), ki_steer_(0.0), kd_steer_(0.0)
     , kp_brake_(30.0), ki_brake_(0.0), kd_brake_(0.0)
-    , settling_time_(0.8)
+    , settling_time_(0.8), brake_max_(NO_SLIP_BRAKE)
     , dt_(0.0), index_(0)
     , ss_speed_(0), ss_speed_weight_(1.35), ss_speed_shift_(20.0)
     , target_accel_(0.0), current_gear_(GEAR_FORWARD), target_gear_(GEAR_FORWARD) 
@@ -61,7 +61,8 @@ void Init(int argc, char **argv){ // Controller 돌리기 전에 initialize (dt 
     priv_nh_.param<double>("/control/steer/kp", kp_steer_, 1.0);
     priv_nh_.param<double>("/control/steer/ki", ki_steer_, 0.0);
     priv_nh_.param<double>("/control/steer/kd", kd_steer_, 0.0);
-    
+
+    priv_nh_.param<int>("/control/brake/max", brake_max_, NO_SLIP_BRAKE);
     priv_nh_.param<double>("/control/brake/kp", kp_brake_, 50.0);
     priv_nh_.param<double>("/control/brake/ki", ki_brake_, 0.0);
     priv_nh_.param<double>("/control/brake/kd", kd_brake_, 0.0);
@@ -131,7 +132,7 @@ double dt_;
 double ref_speed_, current_speed_, err_speed_;
 double ref_steer_, current_steer_, err_steer_;
 double target_accel_;
-int current_gear_, target_gear_, ss_speed_;
+int current_gear_, target_gear_, ss_speed_, brake_max_;
 int cmd_accel_, cmd_steer_, cmd_brake_;
 
 double settling_time_;
@@ -161,7 +162,7 @@ inline void UpdateParameters(void){
     priv_nh_.getParam("/control/steer/ki", ki_steer_);
     priv_nh_.getParam("/control/steer/kd", kd_steer_);
     
-
+    priv_nh_.getParam("/control/brake/max", brake_max_);
     priv_nh_.getParam("/control/brake/kp", kp_brake_);
     priv_nh_.getParam("/control/brake/ki", ki_brake_);
     priv_nh_.getParam("/control/brake/kd", kd_brake_);
@@ -181,7 +182,7 @@ inline int BoundaryCheck_Brake(const int brake){
         return NO_BRAKE;
     }
     else{
-        return (brake <= MAX_BRAKE) ? brake : MAX_BRAKE;
+        return (brake <= brake_max_) ? brake : brake_max_;
     }
 }
 
