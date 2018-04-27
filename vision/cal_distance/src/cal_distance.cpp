@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
-
+#include <sstream>
+#include <string>
 #include "ros/ros.h"
 
 #include "std_msgs/MultiArrayLayout.h"
@@ -8,12 +9,129 @@
 #include "std_msgs/Int32MultiArray.h"
 #include "std_msgs/Float32MultiArray.h"
 
-#define X_CENTER 460.0
-#define Y_CENTER 277.0
-
-// xGap = xCenter - xTarget, yGap = yTarget - yCenter
-
 static const bool DEBUG = false;
+static std::string groupName;
+
+
+/*
+  1. 픽셀 파일 읽기 => 2차원 백터
+  1'. 변환 함수(pixel -> 실좌표)
+  struct pos
+  2. 무한루프
+*/
+
+using namespace std;
+
+struct Pos{
+  double x,y;
+};
+
+class Transformer{
+public:
+  Transform(std::string& filename) : fileVec(0){
+    std::ifstream ifs(filename);
+    int i=0;
+
+    //save Center
+    ifs >> p.x >> p.y;
+
+    while(true){
+      std::string temp;
+      std::getline(ifs, temp);
+      if(ifs.eof()) break;
+
+      fileVec.push_back(std::vector<Pos>(0));
+      std::stringstream ss(temp);
+      std::string word="";
+      while(word[0] != '\n'){
+        Pos p;
+        std::getline(ss, word, ',');
+        p.x = std::stod(word);
+        std::getline(ss, word, ',');
+        p.y = std::stod(word);
+        fileVec[i].push_back(p);
+      }
+      i++;
+    }
+
+    this->realVec = fileVec;
+    int x, y;
+    ifs >> x >> y;
+    fileVec[0].emplace_back(x, y); // 맨 윗 실좌표 구성
+    for (size_t i = 1 ; i < fileVec[0].size(); ++i)
+      realVec[0].emplace_back(
+        realVec[i-1].x ,
+        realVec[i-1].y - 0.5
+      );
+    for(size_t i = 1 ; i < fileVec.size(); ++i){
+      for( size_t j = 0 ; j < fileVec[0].size(); ++j){
+        realVec[i].emplace_back(
+          realVec[i-1].x - 0.5,
+          realVec[i-1].y
+        );
+      }
+    }
+  }
+
+  Pos operator()(const Pos& pos){
+    int idx_x = -1, idx_y = -1;
+    //find upper y (in pixel coordinate)
+    for(size_t i = 0 ; i < fileVec.size(); ++i){
+      if (fileVec[i] > pos.y) {
+        idx_y = i;
+        break;
+      }
+    }
+    //find upper x (in pixel coordinate)
+    for(size_t i = 0 ; i < fileVec[0].size(); ++i){
+      if (fileVec[idx_y][i] > pos.x) {
+        idx_x = i;
+        break;
+      }
+    }
+    //exception handling
+    if (idx_y <= 0) return Pos(0,0);
+    else if (idx_x <= 0) return Pos(0,0);
+
+    // 주위 네 점 구하기
+    Pos file_ur, file_ul, file_dr, file_dl;
+    Pos real_ur, real_ul, real_dr, real_dl;
+
+    file_dr = fileVec[idx_y][idx_x];
+    file_dl = fileVec[idx_y][idx_x - 1];
+    file_ur = fileVec[idx_y - 1][idx_x];
+    file_ul = fileVec[idx_y - 1][idx_x - 1];
+
+    real_dr = realVec[idx_y][idx_x];
+    real_dl = realVec[idx_y][idx_x - 1];
+    real_ur = realVec[idx_y - 1][idx_x];
+    real_ul = realVec[idx_y - 1][idx_x - 1];
+
+    // 타겟 지점부터 상하좌우 직선 좌표차
+    double up, down, right, left;
+    up   = abs( pos.y - ( HGradient[idx_y - 1] * pos.x + HIntercept[idx_y-1] ) );
+    down = abs( pos.y - ( HGradient[idx_y]     * pos.x + HIntercept[idx_y] ) );
+    right = abs( pos.x - ( pos.y - VIntercept[idx_x] ) / VGradient[idx_x] );
+    left = abs( pos.x -  pos.y - VIntercept[idx_x - 1] ) / VGradient[idx_x - 1] );
+
+    Pos distance( real_dr.y +  0.5 * down * ( up + down ), real_dr.x - 0.5 * right * ( left + right ) );
+
+    return distance;
+  }
+
+  void laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData);
+  void sendDist();
+
+private:
+  Pos center;
+  std::vector<vector<Pos> > fileVec;
+  std::vector<vector<Pos> > realVec;
+  std::vector<double> VGradient; // 수직 기울기
+  std::vector<double> HGradient; // 수평 기울기
+  std::vector<double> VIntercept; // 수직 Y절편
+  std::vector<double> HIntercept; // 수평 Y절편
+
+}
 
 class CalDistance{
     ros::NodeHandle nh_;
@@ -21,14 +139,15 @@ class CalDistance{
     ros::Publisher pub_;
 public:
     CalDistance()
-        : xCenter(X_CENTER), yCenter(Y_CENTER), yGap(0.0), yGap50(0.0), yDist(0.0), xGap(0.0), xDist(0.0)
     {
-        sub_ = nh_.subscribe("/cam1/lane",100,&CalDistance::laneCb,this);
-        pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/cam1/dist", 100);
+      // 싱글카메라
+      sub_ = nh_.subscribe("/cam1/lane",100,&CalDistance::laneCb,this);
+      pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/cam1/dist", 100);
+
+      // 멀티카메라
+      // sub_ = nh_.subscribe("/"+groupName+"/lane",100,&CalDistance::laneCb,this);
+      // pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/"+groupName+"/dist", 100);
     }
-    void calXdist();
-    void calYgap50();
-    void calYdist();
     void laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData);
     void sendDist();
     ros::NodeHandle getNh();
@@ -38,26 +157,27 @@ private:
     std::vector<float> laneXData;
     std::vector<float> laneYData;
     std_msgs::Float32MultiArray distData;
-    float xCenter;
-    float yCenter;
-    float yGap;
-    float yGap50;
     float yDist;
-    float xGap;
     float xDist;
     int size;
+    Transformer transformer;
+
 };
 
 
 int main(int argc, char** argv){
     ros::init(argc, argv, "cal_distance");
+    groupName = argv[1];
+
+    //file read
+    std::ifstream ifs("../calibration.txt");
+    std::stringstream ss;
 
     CalDistance calDist;
     while(calDist.getNh().ok()){
         calDist.sendDist();
         ros::spinOnce();
     }
-    
 
     return 0;
 }
@@ -81,21 +201,6 @@ void CalDistance::sendDist(){
 
 }
 
-
-void CalDistance::calXdist(){
-    xDist = 2.8162*std::exp(0.0054*xGap);
-}
-
-void CalDistance::calYgap50(){
-    yGap50 = ( 0.0843*std::pow(xDist, 6) - 2.5819*std::pow(xDist, 5) + 32.429*std::pow(xDist, 4)
-        - 214.4*std::pow(xDist, 3) + 792.81*std::pow(xDist, 2) - 1588.6*xDist + 1473.1 ) * -1;
-}
-
-void CalDistance::calYdist(){
-    yDist = 0.5*yGap / yGap50;
-}
-
-
 void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
 
@@ -115,24 +220,16 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
     while(it != laneData->data.end()){
         try{
-            yGap = (*it)-yCenter;
-            if(DEBUG){
-              std::cout<<"vec y : "<<(*it)<<std::endl;
-            }
+            Pos targetPixel;
+            Pos targetDist;
+            targetPixel.x = (*it);
+            ++it;
+            targetPixel.y = (*it);
             ++it;
 
-            xGap = xCenter - (*it);            
-            if(DEBUG){
-              std::cout<<"vec x : "<<(*it)<<std::endl;
-            }
-            ++it;
-
-            calXdist();
-            laneXData.push_back(xDist);
-
-            calYdist();
-            calYgap50();
-            laneYData.push_back(yDist);
+            targetDist = transformer.(targetPixel);
+            laneXData.push_back(targetDist.x);
+            laneYData.push_back(targetDist.y);
 
         }
         catch(std::exception& e){
@@ -147,7 +244,7 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
         }
     }
 
-    
+
 }
 
 ros::NodeHandle CalDistance::getNh(){ return nh_; }

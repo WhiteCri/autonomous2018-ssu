@@ -40,8 +40,14 @@
 
 #include <ros/ros.h>
 #include <nodelet/loader.h>
+#include <string>
+#include <iostream>
+
+static std::string groupName;
 
 int main(int argc, char **argv){
+  groupName = argv[1];
+
   ros::init(argc, argv, "pointcloud_to_laserscan_node");
   ros::NodeHandle private_nh("~");
   int concurrency_level;
@@ -53,7 +59,7 @@ int main(int argc, char **argv){
   std::string nodelet_name = ros::this_node::getName();
   nodelet.load(nodelet_name, "pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet", remap, nargv);
 
-  boost::shared_ptr<ros::MultiThreadedSpinner> spinner;
+  boost::shared_ptr<ros::MultiThreadedSpinner> spinner;/tf
   if(concurrency_level) {
     spinner.reset(new ros::MultiThreadedSpinner(concurrency_level));
   }else{

@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 
 <launch>
-
-    <arg name="cam_num" default="1"/>	
+    <arg name="groupName" default="cam5"/>
     <!-- run pointcloud_to_laserscan node -->
-    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
-        <remap from="cloud_in"  to="/cam1/point_cloud"/>
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" arg="groupName" output="screen">
+        <remap from="cloud_in"  to="/cam0/point_cloud"/>
         <remap from="scan" to="/scan"/>
+        <!-- #target_frame: camera_main # Leave disabled to output scan in pointcloud frame -->
         <rosparam>
-            target_frame: camera_main # Leave disabled to output scan in pointcloud frame
-            
+
+
             transform_tolerance: 0.01
             min_height: 0.0
             max_height: 10.0
@@ -28,8 +28,8 @@
             # 1 : Single threaded
             # 2->inf : Parallelism level
             concurrency_level: 0
-        </rosparam> 
-
+        </rosparam>
+        <param name="groupName" value="$(arg groupName)"/>
     </node>
 
 </launch>

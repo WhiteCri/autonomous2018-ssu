@@ -1,5 +1,4 @@
 
-
 #include <ros/ros.h>
 #include "sensor_msgs/PointCloud2.h"
 #include <pcl_conversions/pcl_conversions.h>
@@ -20,9 +19,10 @@
 #include <ctime>
 #include <sensor_msgs/LaserScan.h>
 #include <laser_geometry/laser_geometry.h>
+#include <string>
 
 static const bool DEBUG = false;
-
+static std::string groupName;
 
 class ConvertCloud{
   ros::NodeHandle nh_;
@@ -32,9 +32,9 @@ class ConvertCloud{
 
 public:
     ConvertCloud(){
-        sub_ = nh_.subscribe("/cam1/dist",100,&ConvertCloud::distCb,this);
-        sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
-        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/cam1/point_cloud",100);
+        sub_ = nh_.subscribe("/"+groupName+"/dist",100,&ConvertCloud::distCb,this);
+        sub_scan = nh_.subscribe("/"+groupName+"/scan",100,&ConvertCloud::laserCb,this);
+        pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/"+groupName+"/point_cloud",100);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
     }
@@ -59,6 +59,8 @@ private:
 
 int main(int argc, char** argv){
   ros::init(argc,argv,"convert_cloud");
+  groupName = argv[1];
+
   ConvertCloud cvtCloud;
   ros::NodeHandle nh = cvtCloud.getNh();
   ros::Publisher pub = cvtCloud.getPub();
@@ -68,8 +70,8 @@ int main(int argc, char** argv){
 
     if(ros::param::get("hl_controller/crosswalk",is_cross_walk)){
       //차량정지 및 파라미터값 복구 작성 예정
-    } 
-     
+    }
+
     pub.publish(cvtCloud.getPc_out());
     ros::spinOnce();
   }
@@ -77,12 +79,12 @@ int main(int argc, char** argv){
   return 0;
 }
 void ConvertCloud::laserCb(const sensor_msgs::LaserScan input){
-    
+
 }
-void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData){    
+void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData){
 
     if(DEBUG) std::cout<<"start call back"<<std::endl;
-    
+
     distXdata.clear();
     distYdata.clear();
     distXdata.resize(0);
@@ -91,7 +93,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
     std::vector<float>::const_iterator it;
 
     if(DEBUG) std::cout<<"before push_back"<<std::endl;
-    
+
     it = distData->data.begin();
 
     size = (int)(*it);
@@ -103,14 +105,14 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
             ++it;
 
             distYdata.push_back(*it);
-            ++it;       
+            ++it;
         }
         catch(std::exception& e){
             break;
         }
     }
 //    ROS_INFO("size : %u",size);
-    if(DEBUG) {    
+    if(DEBUG) {
         std::cout<<"size : "<<distVec.size()<<std::endl;
         for(int i=0; i<distXdata.size(); i++){
             std::cout<<"X : "<<distXdata[i]<<" / Y : "<<distYdata[i]<<std::endl;
@@ -145,7 +147,8 @@ void ConvertCloud::convert(){
   pc->clear();
 
   // Create header
-  std::string frame_id("camera_main");
+  std::string frame_id(groupName+"/camera_main");
+  // std::string frame_id("/camera_main");
 
   pc->header.frame_id = frame_id;
   pc->header.seq = ros::Time::now().toNSec()/1e3;
@@ -156,7 +159,7 @@ void ConvertCloud::convert(){
 
   pcl::PointCloud<pcl::PointXYZ>::iterator pc_iter = pc->begin();
   std::vector<cv::Vec3f>::iterator data_iter = distVec.begin();
-    
+
   int count = 0;
   while(data_iter != distVec.end()){
     pcl::PointXYZ inputPoint((*data_iter)[0],(*data_iter)[1],(*data_iter)[2]);
@@ -167,10 +170,10 @@ void ConvertCloud::convert(){
 
   pcl::toROSMsg(*pc, pc_out);
   if(DEBUG) std::cout<<"make cloud done"<<std::endl;
-  
+
   pc->clear();
 
-    
+
 }
 
 ros::NodeHandle ConvertCloud::getNh(){ return nh_; }
