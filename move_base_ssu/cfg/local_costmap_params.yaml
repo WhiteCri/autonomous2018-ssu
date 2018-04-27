@@ -6,11 +6,12 @@ local_costmap:
   static_map: false
   rolling_window: true
 
-  width: 10.0
-  height: 10.0
-  resolution: 0.2
+  width: 8.0
+  height: 8.0
+  resolution: 0.1
   transform_tolerance: 0.5  
   footprint_padding: 0.1
   plugins:
    - {name: static_layer,        type: "costmap_2d::StaticLayer"}
    - {name: obstacle_layer,      type: "costmap_2d::ObstacleLayer"}
+   - {name: inflation_layer,     type: "costmap_2d::InflationLayer"}
