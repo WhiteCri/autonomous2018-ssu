@@ -1,0 +1,22 @@
+GPS_Odometry_initial: false
+
+rx_thread_test:
+  path: "/dev/ttyUSB0"
+  serial_frequency: 20
+  publish_frequency: 10
+  moving_average_element_number: 5
+
+platform_tx:
+  alignmentBias: 0
+  frequency: 50
+  ackermann_topic_name: "platform_tx_test"
+
+imu:
+  shift: 30
+  debugingFlag: true
+  covariance: 0.009
+
+LMS1xx_node:
+  host: "192.168.0.204"
+  publish_min_range_as_inf: false
+

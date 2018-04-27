@@ -28,7 +28,8 @@ private:
     sensor_msgs::Imu imu_msg;
     ros::NodeHandle *nhPtr_;
     double yaw;
-    double angle_alignment;
+    double shift;
+    double cov;
     bool debugingFlag;
     boost::array<double, 9> covariance;
 };
