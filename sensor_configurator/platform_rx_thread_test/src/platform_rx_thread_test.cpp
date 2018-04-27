@@ -108,6 +108,34 @@ int main (int argc, char** argv){
         double speed = total_encoder_gap / 99.2 * 1.655 / time_interval;
         return speed;
     };
+    for(int i = 0 ; i < 5; ++i){
+        //get packet
+        lock.lock();
+        for(int i = 0 ; i < 18; ++i) *(packet_main + i) = *(packet + i);
+        lock.unlock();
+
+        //get serial sequence
+        ALIVE_datatype alive = getParsingData<ALIVE_datatype>(packet_main, 15);
+        
+        encoder.push_front(std::make_pair(
+            getParsingData<int32_t>(packet_main, 11),
+            alive
+        ));
+        encoder.pop_back();
+        seq += abs((int)encoder.front().first - (encoder.begin() + 1)->first);
+
+        msg.speed = calc_speed();
+        msg.steer = getParsingData<int16_t>(packet_main, 8);
+        msg.brake = getParsingData<uint8_t>(packet_main, 10);
+        msg.seq = seq;
+        bool estop = getParsingData<uint8_t>(packet_main, 4);
+//
+        bool speed_flag = (fabs(msg.speed) < EPSILON) ? true : false;  
+        nh.setParam("GPS/cov/flag",speed_flag);
+//  
+        nh.setParam("estop", estop); 
+        loop_rate.sleep();
+    }
     //init
     while(ros::ok()){
         //get packet
@@ -137,8 +165,7 @@ int main (int argc, char** argv){
         nh.setParam("estop", estop);
 
         //dirty code...I want to erase...
-        if(seq > (reader.moving_average_element_number + 5))
-            pub.publish(msg);     
+        pub.publish(msg);     
         loop_rate.sleep();
     }
 }
