@@ -33,8 +33,12 @@ public:
     int i=0;
 
     //save Center
-    ifs >> p.x >> p.y;
+    ifs >> center.x >> center.y;
 
+    //flush head
+    std::string temp;
+    std::getline(ifs, temp);
+      
     while(true){
       std::string temp;
       std::getline(ifs, temp);
@@ -55,9 +59,7 @@ public:
     }
 
     this->realVec = fileVec;
-    int x, y;
-    ifs >> x >> y;
-    fileVec[0].emplace_back(x, y); // 맨 윗 실좌표 구성
+    fileVec[0].emplace_back(center.x, center.y); // 맨 윗 실좌표 구성
     for (size_t i = 1 ; i < fileVec[0].size(); ++i)
       realVec[0].emplace_back(
         realVec[i-1].x ,
