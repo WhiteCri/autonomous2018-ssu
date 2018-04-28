@@ -59,7 +59,7 @@ int main(int argc, char **argv){
   std::string nodelet_name = ros::this_node::getName();
   nodelet.load(nodelet_name, "pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet", remap, nargv);
 
-  boost::shared_ptr<ros::MultiThreadedSpinner> spinner;/tf
+  boost::shared_ptr<ros::MultiThreadedSpinner> spinner;
   if(concurrency_level) {
     spinner.reset(new ros::MultiThreadedSpinner(concurrency_level));
   }else{

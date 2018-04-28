@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include "ros/ros.h"
 
@@ -23,55 +24,95 @@ static std::string groupName;
 using namespace std;
 
 struct Pos{
-  double x,y;
+  Pos(): x(0), y(0) {}
+  Pos(int, int) : x(0), y(0) {}
+  Pos(double, double): x(0.0), y(0.0) {}
+  double x;
+  double y;
+};
+
+struct Line{
+  double slope;
+  double intercept;
 };
 
 class Transformer{
 public:
-  Transform(std::string& filename) : fileVec(0){
-    std::ifstream ifs(filename);
+    Transformer(std::string pixelName, std::string lineName){
+      /* save pixel data */
+    std::ifstream ifs(pixelName);
     int i=0;
 
     //save Center
     ifs >> center.x >> center.y;
-
     //flush head
     std::string temp;
     std::getline(ifs, temp);
-      
+
+    //load pixel
     while(true){
       std::string temp;
       std::getline(ifs, temp);
-      if(ifs.eof()) break;
+      if(temp.size() <= 1) break;
 
+      temp.pop_back();
       fileVec.push_back(std::vector<Pos>(0));
       std::stringstream ss(temp);
       std::string word="";
-      while(word[0] != '\n'){
+      while(true){
         Pos p;
         std::getline(ss, word, ',');
-        p.x = std::stod(word);
+        if(ss.eof()) break;
+        p.x = std::stoi(word);
         std::getline(ss, word, ',');
-        p.y = std::stod(word);
+        p.y = std::stoi(word);
         fileVec[i].push_back(p);
       }
       i++;
     }
+    ifs.close();
+    /* load pixel data end */
 
-    this->realVec = fileVec;
-    fileVec[0].emplace_back(center.x, center.y); // 맨 윗 실좌표 구성
+    /* load line Data */
+    std::ifstream ifs2(lineName);
+    std::string str;
+    
+    //hlines
+    ifs2 >> str;
+    std::stringstream ss(str);
+    std::string word;
+    while(std::getline(ss,word,','))
+      if(ss.eof()) break;
+  
+    ifs2 >> str;
+    ss.clear();
+    ss.str(str);
+    while(std::getline(ss, word, ','))
+      if(ss.eof()) break;
+    ifs2.close();
+    
+    ROS_INFO("load lines end..");
+
+    this->realVec.resize(fileVec.size());
+    realVec[0].emplace_back(center.x, center.y); // 맨 윗 실좌표 구성
     for (size_t i = 1 ; i < fileVec[0].size(); ++i)
       realVec[0].emplace_back(
-        realVec[i-1].x ,
-        realVec[i-1].y - 0.5
+        realVec[0][i-1].x ,
+        realVec[0][i-1].y - 0.5
       );
     for(size_t i = 1 ; i < fileVec.size(); ++i){
       for( size_t j = 0 ; j < fileVec[0].size(); ++j){
         realVec[i].emplace_back(
-          realVec[i-1].x - 0.5,
-          realVec[i-1].y
+          realVec[i-1][j].x - 0.5,
+          realVec[i-1][j].y
         );
       }
+    }
+    for (int i = 0 ; i < fileVec.size(); ++i){
+      for (int j =0 ; j < fileVec[0].size(); ++j){
+        std::cout << fileVec[i][j].x << ',' << fileVec[i][j].y <<' ';
+      }
+      std::cout << std::endl;
     }
   }
 
@@ -79,14 +120,14 @@ public:
     int idx_x = -1, idx_y = -1;
     //find upper y (in pixel coordinate)
     for(size_t i = 0 ; i < fileVec.size(); ++i){
-      if (fileVec[i] > pos.y) {
+      if (fileVec[i][0].y > pos.y) {
         idx_y = i;
         break;
       }
     }
     //find upper x (in pixel coordinate)
     for(size_t i = 0 ; i < fileVec[0].size(); ++i){
-      if (fileVec[idx_y][i] > pos.x) {
+      if (fileVec[idx_y][i].x > pos.x) {
         idx_x = i;
         break;
       }
@@ -114,7 +155,7 @@ public:
     up   = abs( pos.y - ( HGradient[idx_y - 1] * pos.x + HIntercept[idx_y-1] ) );
     down = abs( pos.y - ( HGradient[idx_y]     * pos.x + HIntercept[idx_y] ) );
     right = abs( pos.x - ( pos.y - VIntercept[idx_x] ) / VGradient[idx_x] );
-    left = abs( pos.x -  pos.y - VIntercept[idx_x - 1] ) / VGradient[idx_x - 1] );
+    left = abs( pos.x -  ( pos.y - VIntercept[idx_x - 1] ) / VGradient[idx_x - 1] );
 
     Pos distance( real_dr.y +  0.5 * down * ( up + down ), real_dr.x - 0.5 * right * ( left + right ) );
 
@@ -128,19 +169,20 @@ private:
   Pos center;
   std::vector<vector<Pos> > fileVec;
   std::vector<vector<Pos> > realVec;
-  std::vector<double> VGradient; // 수직 기울기
-  std::vector<double> HGradient; // 수평 기울기
-  std::vector<double> VIntercept; // 수직 Y절편
-  std::vector<double> HIntercept; // 수평 Y절편
-
-}
+  //std::vector<double> VGradient; // 수직 기울기
+  //std::vector<double> HGradient; // 수평 기울기
+  //std::vector<double> VIntercept; // 수직 Y절편
+  //std::vector<double> HIntercept; // 수평 Y절편
+  std::vector<Line> hlines; // 수직방향 직선
+  std::vector<Line> vlines; //수평방향 직선
+};
 
 class CalDistance{
     ros::NodeHandle nh_;
     ros::Subscriber sub_;
     ros::Publisher pub_;
 public:
-    CalDistance()
+    CalDistance(): transformer("home/whiteherb/calibration.txt", "home/whiteherb/calibrationLine.txt")
     {
       // 싱글카메라
       sub_ = nh_.subscribe("/cam1/lane",100,&CalDistance::laneCb,this);
@@ -172,7 +214,7 @@ int main(int argc, char** argv){
     groupName = argv[1];
 
     //file read
-    std::ifstream ifs("../calibration.txt");
+    std::ifstream ifs("./calibration.txt");
     std::stringstream ss;
 
     CalDistance calDist;
@@ -229,7 +271,7 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
             targetPixel.y = (*it);
             ++it;
 
-            targetDist = transformer.(targetPixel);
+            targetDist = transformer(targetPixel);
             laneXData.push_back(targetDist.x);
             laneYData.push_back(targetDist.y);
 
