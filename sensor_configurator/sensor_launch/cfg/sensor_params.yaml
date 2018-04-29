@@ -8,7 +8,7 @@ rx_thread_test:
 platform_tx:
   alignmentBias: 0
   frequency: 50
-  ackermann_topic_name: "platform_tx_test"
+  cmd_platform_topic_name: "/control/cmd_platform"
   
 
 imu:

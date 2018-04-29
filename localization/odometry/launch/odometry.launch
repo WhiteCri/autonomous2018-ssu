@@ -8,7 +8,7 @@
         <param name="/initial_y" value="0.0"/>
         <param name="/initial_heading" value="0.0"/>
         <param name="/trans_cov" value="3.0"/>
-        <param name="/rot_cov" value="3.0"/>
+        <param name="/rot_cov" value="1.0"/>
     </node>
 <!--
     <include file="$(find sensor_launch)/launch/sensor_launch_no_camera.launch"/>

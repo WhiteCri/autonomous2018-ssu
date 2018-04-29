@@ -22,7 +22,7 @@ TebLocalPlannerROS:
  max_vel_y: 0.0
  max_vel_theta: 3.0
  max_vel_theta: 0.5 # the angular velocity is also bounded by min_turning_radius in case of a carlike robot (r = v / omega)
- acc_lim_x: 0.8
+ acc_lim_x: 1.2
  acc_lim_y: 0.01
  acc_lim_theta: 0.5
 
@@ -66,7 +66,7 @@ TebLocalPlannerROS:
  penalty_epsilon: 0.1
  weight_max_vel_x: 2
  weight_max_vel_theta: 1
- weight_acc_lim_x: 10
+ weight_acc_lim_x: 20
  weight_acc_lim_theta: 1
  weight_kinematics_nh: 1000
  weight_kinematics_forward_drive: 300
