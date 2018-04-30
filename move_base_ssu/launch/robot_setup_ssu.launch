@@ -1,4 +1,11 @@
 <launch>
+
+<!-- Robot Frame Setup (static tf)  -->
+    <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="0.45 0 0 0 0 0 base_link laser 100" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="-0.68 0 0 0 0 0 base_link camera_main 100" />
+
+	
 <!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
     <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
 	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
@@ -22,11 +29,6 @@
 	<node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
 	<node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
 	-->
-
-<!-- Robot Frame Setup (static tf)  -->
-    <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="0.45 0 0 0 0 0 base_link laser 100" />
-    <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="-0.68 0 0 0 0 0 base_link camera_main 100" />
 	
 <!-- Robot Pose Estimation Node -->	
 	<node pkg="odometry" type="odom_pub" name="odom_wheelbased"/>
