@@ -1,5 +1,5 @@
 <launch>
-    <param name="wheelbase" value="1.0"/>
+    <param name="wheelbase" value="1.05"/>
     
     <node pkg="odometry" type="odom_pub" name="odom_wheelbased">
         <param name="/frame_id" value="odom"/>
@@ -7,8 +7,8 @@
         <param name="/initial_x" value="0.0"/>
         <param name="/initial_y" value="0.0"/>
         <param name="/initial_heading" value="0.0"/>
-        <param name="/trans_cov" value="3.0"/>
-        <param name="/rot_cov" value="1.0"/>
+        <param name="/trans_cov" value="0.3"/>
+        <param name="/rot_cov" value="0.3"/>
     </node>
 <!--
     <include file="$(find sensor_launch)/launch/sensor_launch_no_camera.launch"/>
