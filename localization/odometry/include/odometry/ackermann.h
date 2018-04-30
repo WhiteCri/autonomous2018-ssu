@@ -37,6 +37,14 @@ public:
     */
     void init(const ros::Time& time);
 
+
+
+    /*
+     <UpdateParams 함수>
+        Update parameters
+    */
+    void UpdateParams(void);
+
     
 
     /*

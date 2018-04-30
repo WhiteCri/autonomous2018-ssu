@@ -34,15 +34,25 @@ Odometry::Odometry()
     , frame_id_("")
     , child_frame_id_("")
 {
+    priv_nh_.param<double>("/odom_wheelbased/wheelbase", wheelbase_, 1.0);
     priv_nh_.param<double>("/odom_wheelbased/initial_x",x_, 0.0);
     priv_nh_.param<double>("/odom_wheelbased/initial_y",y_, 0.0);
     priv_nh_.param<double>("/odom_wheelbased/initial_heading",heading_, 0.0);
     priv_nh_.param<double>("/odom_wheelbased/trans_cov", trans_cov_, 3.0);
-    priv_nh_.param<double>("/odom_wheelbased/rot_cov", rot_cov_, 99999.0);
-    priv_nh_.param<std::string>("/odom_wheelbased/frame_id", frame_id_, "odom_combined");
+    priv_nh_.param<double>("/odom_wheelbased/rot_cov", rot_cov_, 3.0);
+    priv_nh_.param<std::string>("/odom_wheelbased/frame_id", frame_id_, "odom");
     priv_nh_.param<std::string>("/odom_wheelbased/child_frame_id", child_frame_id_, "base_footprint");
 }
 
+
+void Odometry::UpdateParams(void)
+{
+    nh_.getParam("/odom_wheelbased/frame_id", frame_id_);
+    nh_.getParam("/odom_wheelbased/child_frame_id", child_frame_id_);    
+    nh_.getParam("/odom_wheelbased/wheelbase", wheelbase_);
+    nh_.getParam("/odom_wheelbased/trans_cov", trans_cov_);
+    nh_.getParam("/odom_wheelbased/rot_cov", rot_cov_);
+}
 
 
 void Odometry::init(const ros::Time &time)
@@ -56,7 +66,6 @@ void Odometry::init(const ros::Time &time)
     odom_.child_frame_id = child_frame_id_;
     /*     init tf     */
     odom_trans_.header.stamp = time;
-
     odom_trans_.header.frame_id = frame_id_;
     odom_trans_.child_frame_id = child_frame_id_;
 }
@@ -67,12 +76,15 @@ void Odometry::callback(const platform_rx_msg::platform_rx_msg::ConstPtr& Platfo
 {         
     ros::Time time = ros::Time::now(); // 현재 주기의 시간 측정 (Odometry Loop의 주기 측정 -> dt -> Odometry 계산)
 
+    UpdateParams();
+
     Calc_Odom(PlatformRX_data, time);  // odometry 계산
    
     Odom_Transform(time);              // odometry transform 계산
 
     Odom_Set(time);                    // odometry 정보 입력
 }
+
 
 bool Odometry::Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& PlatformRX_data,
                          const ros::Time& time)
@@ -83,7 +95,6 @@ bool Odometry::Calc_Odom(const platform_rx_msg::platform_rx_msg::ConstPtr& Platf
     velocity_ = PlatformRX_data->speed;
     steering_ = PlatformRX_data->steer * STEER_PLATFORM_TO_RAD;
 
-    nh_.getParam("wheelbase", wheelbase_);
     curvature_ = wheelbase_ / cos( PI/2 - steering_ );
     
     /*     curvature 범위 설정 (일종의 필터)    */
@@ -129,9 +140,8 @@ void Odometry::Odom_Set(const ros::Time& time)
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
     
     odom_.header.stamp = time;
-
-    nh_.getParam("/odom_wheelbased/trans_cov", trans_cov_);
-    nh_.getParam("/odom_wheelbased/rot_cov", rot_cov_);
+    odom_.header.frame_id = frame_id_;
+    odom_.child_frame_id = child_frame_id_;
 
     boost::array<double, 36> covariance = {{
     trans_cov_, 0, 0, 0, 0, 0,
@@ -161,6 +171,8 @@ void Odometry::Odom_Transform(const ros::Time& time)
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(heading_);
          
     odom_trans_.header.stamp = time;
+    odom_trans_.header.frame_id = frame_id_;
+    odom_trans_.child_frame_id = child_frame_id_;
 
     odom_trans_.transform.translation.x = x_;
     odom_trans_.transform.translation.y = y_;

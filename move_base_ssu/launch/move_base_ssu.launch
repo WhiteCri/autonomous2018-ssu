@@ -1,41 +1,4 @@
 <launch>
-
-	<!--  ****** Robot Setup ******  -->
-	<param name="wheelbase" value="1.03"/>
-
-
-	<!--  ****** Localization 1 (wheelbased odometry) ******  -->
-   
-	<include file="$(find odometry)/launch/odometry.launch"/>
-
-<!--	
- 	<node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
-
- 	<param name="/gps/easting_shift" value="319000"/>
- 	<param name="/gps/northing_shift" value="4151000"/>
-
- 	<param name="GPS_Odometry_initial" value="false"/>
--->
-
-
-	<!--  ****** Localization 2 (ekf filtered odometry) ******  
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-        <rosparam command="load" file="$(find robot_localization)/params/ekf_template.yaml" />
-    </node>
-	-->
-
-
-	<!--  ****** Localization 3 (ACML) *****  -->
-	<node pkg="amcl" type="amcl" name="amcl" output="screen">
-		<rosparam file="$(find move_base_ssu)/cfg/amcl_params.yaml" command="load" />
-
-	    <param name="initial_pose_x"            value="0"/>
-		<param name="initial_pose_y"            value="0"/>
-		<param name="initial_pose_a"            value="0"/>
-	</node>
-	
-
-
 	<!--  ****** Maps ******  -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/ssara.yaml" output="screen">
 		<param name="frame_id" value="map"/>
