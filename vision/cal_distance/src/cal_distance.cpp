@@ -133,8 +133,8 @@ class CalDistance{
     ros::Subscriber sub_;
     ros::Publisher pub_;
 public:
-    CalDistance():
-      transformer("./calibration.txt", "./calibrationLine.txt")
+    CalDistance(std::string filename, std::string linename):
+      transformer(filename, linename)
     {
       // 싱글카메라
       sub_ = nh_.subscribe("/cam1/lane",100,&CalDistance::laneCb,this);
@@ -162,7 +162,7 @@ int main(int argc, char** argv){
     ros::init(argc, argv, "cal_distance");
     groupName = argv[1];
 
-    CalDistance calDist;
+    CalDistance calDist("./calibration.txt", "./calibrationLine.txt");
     while(calDist.getNh().ok()){
         calDist.sendDist();
         ros::spinOnce();
