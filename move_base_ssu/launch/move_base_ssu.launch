@@ -1,10 +1,4 @@
 <launch>
-	<!--  ****** Maps ******  -->
-	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/ssara.yaml" output="screen">
-		<param name="frame_id" value="map"/>
-	</node>
-
-
 
 	<!--  ****** Move_Base ******  -->
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
@@ -31,7 +25,9 @@
         <rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load" />
     </node>
 
-
+		<!-- 
+			*** 여기에 High-level Controller 추가 ***
+		-->
 
 
 	 <!--  **************** Visualisation ****************  -->

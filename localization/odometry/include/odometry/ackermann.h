@@ -107,6 +107,7 @@ private:
     double velocity_, steering_, heading_;
     double trans_cov_, rot_cov_, eps_cov_;
     double ds_, dth_, dx_, dy_, x_, y_;
+    bool tf_publish_;
 
 };
 }   

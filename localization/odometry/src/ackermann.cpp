@@ -33,7 +33,9 @@ Odometry::Odometry()
     , eps_cov_(1e-6)
     , frame_id_("")
     , child_frame_id_("")
+    , tf_publish_(false)
 {
+    priv_nh_.param<bool>("/odom_wheelbased/tf_publish", tf_publish_, false);
     priv_nh_.param<double>("/odom_wheelbased/wheelbase", wheelbase_, 1.0);
     priv_nh_.param<double>("/odom_wheelbased/initial_x",x_, 0.0);
     priv_nh_.param<double>("/odom_wheelbased/initial_y",y_, 0.0);
@@ -41,7 +43,7 @@ Odometry::Odometry()
     priv_nh_.param<double>("/odom_wheelbased/trans_cov", trans_cov_, 3.0);
     priv_nh_.param<double>("/odom_wheelbased/rot_cov", rot_cov_, 3.0);
     priv_nh_.param<std::string>("/odom_wheelbased/frame_id", frame_id_, "odom");
-    priv_nh_.param<std::string>("/odom_wheelbased/child_frame_id", child_frame_id_, "base_footprint");
+    priv_nh_.param<std::string>("/odom_wheelbased/child_frame_id", child_frame_id_, "base_link");
 }
 
 
@@ -187,6 +189,7 @@ void Odometry::sendTransform(){
 
 void Odometry::publish(){
     pub_.publish(odom_);
+    if(tf_publish_) sendTransform();
 }
 
 }

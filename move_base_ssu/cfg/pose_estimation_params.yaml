@@ -1,6 +1,11 @@
+## Map Server
+map_server:
+  frame_id: "map"
+
 ## Wheel-based Odometry Parameters
 odom_wheelbased:
-  wheelbase: 1.03
+  tf_publish: true
+  wheelbase: 1.04
   frame_id: "odom"
   child_frame_id: "base_footprint"        
   initial_y: 0.0
@@ -43,7 +48,7 @@ amcl:
   laser_model_type: "likelihood_field" # "likelihood_field" or "beam"
   laser_likelihood_max_dist: 2.0
   update_min_d: 0.1
-  update_min_a: 0.2
+  update_min_a: 0.1
 
   resample_interval: 1
   transform_tolerance: 1.0
