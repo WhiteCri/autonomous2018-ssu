@@ -229,7 +229,7 @@ bool Calc_longitudinal(void){
     else{ // 가속 필요 X or 감속(Deceleration)
         cmd_accel_ = ss_speed_;
         cmd_brake_ = fabs(err_speed_) * (kp_brake_ + ki_brake_*dt_ + kd_brake_/dt_);
-        cmd_brake_ = BoundaryCheck_No_Slip_Brake(cmd_brake_);
+        cmd_brake_ = BoundaryCheck_Brake(cmd_brake_);
     }
     cmd_.accel = cmd_accel_;
     cmd_.brake = cmd_brake_;

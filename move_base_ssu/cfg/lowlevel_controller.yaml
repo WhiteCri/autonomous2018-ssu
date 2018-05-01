@@ -6,7 +6,7 @@ speed:
   shift: 20.0
   
 brake:
-  max: 200
+  max: 100
   kp: 150
   ki: 0.0
   kd: 0.0
