@@ -1,24 +1,21 @@
 
 # footprint 값 조정. x와 y의 방향은 차량의 axes와 동일
-footprint: [[0.55,-0.55],[-1.20,-0.55],[-1.20,0.55],[0.55,0.55]]
-#footprint: [[0.40,-0.55],[-1.25,-0.55],[-1.25,0.55],[0.40,0.55]] # 0.05m 줄인 값(feasibile warning 잡기 위해)
-#footprint:[[0.45,-0.60],[-1.3,-0.60],[-1.3,0.60],[0.45,0.60]] # 정확한 값 
-
-
+footprint: [[-0.25,-0.45],[1.1,-0.45],[1.1,0.45],[-0.25,0.45]]  # 0.2m 줄인 값(feasibile warning 잡기 위해)
+#footprint:[[-0.45,-0.60],[1.3,-0.60],[1.3,0.60],[-0.45,0.60]] # 정확한 값 
 
 transform_tolerance: 0.2
 map_type: costmap
 
 obstacle_layer:
- enabled: true
- obstacle_range: 3.0
- raytrace_range: 3.5
- inflation_radius: 1.0
- track_unknown_space: false
- combination_method: 1
+  enabled: true
+  obstacle_range: 3.0
+  raytrace_range: 3.5
+  inflation_radius: 1.0
+  track_unknown_space: false
+  combination_method: 1
 
- observation_sources: laser_scan_sensor
- laser_scan_sensor: {data_type: LaserScan, topic: scan, marking: true, clearing: true}
+  observation_sources: laser_scan_sensor
+  laser_scan_sensor: {data_type: LaserScan, topic: scan, marking: true, clearing: true}
 
 inflation_layer:
   enabled:              true

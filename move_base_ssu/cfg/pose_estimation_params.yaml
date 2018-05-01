@@ -5,7 +5,7 @@ map_server:
 ## Wheel-based Odometry Parameters
 odom_wheelbased:
   tf_publish: true
-  wheelbase: 1.04
+  wheelbase: 1.00
   frame_id: "odom"
   child_frame_id: "base_footprint"        
   initial_y: 0.0

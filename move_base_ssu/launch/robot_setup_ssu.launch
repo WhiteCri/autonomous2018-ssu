@@ -8,7 +8,7 @@
 
 <!-- Robot Frame Setup (static tf)  -->
     <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="0.45 0 0 0 0 0 base_link laser 100" />
+    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.0 0 0 0 0 0 base_link laser 100" />
     <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="-0.68 0 0 0 0 0 base_link camera_main 100" />
 
 
@@ -25,6 +25,7 @@
 	<!-- Platform RX/TX: USB0  -->
     <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test"/>
     <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0"/>
+[
 
 	<!-- IMU: USB1  -->
  	<!--node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10"/>
