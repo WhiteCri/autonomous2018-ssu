@@ -5,10 +5,11 @@ N_LINESAVER_BUFFER = 5
 PATH = './calibration.txt'
 PATH2 = './calibration.png'
 PATH3 = './calibrationLine.txt'
-IMG_PATH = '2.jpg'
+IMG_PATH = './2.jpg'
 mtx_ls = [708.611809, 0, 320.331083, 0, 703.012319, 260.343059, 0, 0, 1] #camera matrix
 dist = np.array([0.09776299999999999, -0.235306, 0.00463, -0.001884, 0]) #distortion matrix
-
+fx_=1 #resize x 계수
+fy_=1 #resize y 계수
 
 class LineSaver():
     MAX_SLOPE = 9999
@@ -212,7 +213,7 @@ if __name__=='__main__':
             mtx[i][j] = mtx_ls[3*i + j]
     img = cv2.imread(IMG_PATH)
     img = cv2.undistort(img, mtx, dist)
-    #img = cv2.resize(img, None, fx=2, fy=2)
+    img = cv2.resize(img, None, fx=fx_, fy=fy_)
 
     cv2.rectangle(img, (0,0), (300, Y_ADD_LINE), (0, 0, 255), cv2.FILLED)
     cv2.putText(img, 'ADD LINE', (X_ADD_LINE,Y_ADD_LINE), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 5)
