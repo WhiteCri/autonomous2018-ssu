@@ -3,7 +3,7 @@
 	<arg name="main_camera_num" default="1"/>
 
 	<group ns="$(arg main_camera_name)">
-		 <!-- <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg main_camera_name)">
+		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg main_camera_name)">
 			<param name="camera_num" value="$(arg main_camera_num)"/>
 			<param name="frequency" value="30"/>
 			<param name="debug" value="1"/>
@@ -18,8 +18,8 @@
 			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
-		</node> -->
-		<node name="send_vec" pkg="send_vec" type="send_vec"></node>
+		</node>
+		<!-- <node name="send_vec" pkg="send_vec" type="send_vec"></node> -->
 
 
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg main_camera_name)" respawn="true" output="screen">
