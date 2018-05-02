@@ -40,8 +40,14 @@
 
 #include <ros/ros.h>
 #include <nodelet/loader.h>
+#include <string>
+#include <iostream>
+
+static std::string groupName;
 
 int main(int argc, char **argv){
+  groupName = argv[1];
+
   ros::init(argc, argv, "pointcloud_to_laserscan_node");
   ros::NodeHandle private_nh("~");
   int concurrency_level;

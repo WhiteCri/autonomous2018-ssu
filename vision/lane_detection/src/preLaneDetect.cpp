@@ -19,13 +19,13 @@ static const bool COUNT_MAX_HEIGHT = true;
 //http://blog.daum.net/pg365/62 --> RANSAC algorithm 참고.
 namespace lane_detect_algo{
 
-            
+
             void CalLane::printVec4i(vec4i_t print_vec_4i){
                 for(auto &vec_4i : print_vec_4i){
                     if(DEBUG_SW) {//print vec_4i info when DEBUG_SW is true.
                         std::cout<<vec_4i<<std::endl;
                     }
-                }   
+                }
             }
             void CalLane::printVec2i(vec2i_t print_vec_2i){
                 for(auto &vec_2i : print_vec_2i){
@@ -51,11 +51,11 @@ namespace lane_detect_algo{
                         }
                     }
                 }
-                
+
             }
 
             void CalLane::storePointVec(cv::Point &lane_point, vec_p_t &lane_p_vec){
-                
+
      //**********//   vec2i_t a;
      //**********//   std::vector<vec2i_t> tt;
      //**********//   tt.push_back(a);//point말고 벡터를 넣은 벡터..이렇게하는거가 더 좋을지 생각좀...
@@ -65,7 +65,7 @@ namespace lane_detect_algo{
                 catch(cv::Exception e){
                     ROS_INFO("%s\n storeLaneVec is fail!\n",e.what());
                 }
-               
+
             }
 
             void CalLane::storeMatVec(cv::Mat lane_mat, vec_mat_t &lane_m_vec){
@@ -79,12 +79,12 @@ namespace lane_detect_algo{
 
             void CalLane::scoreBoard(cv::Mat &b_score_board, cv::Mat b_img){
                 if(b_score_board.size() == b_img.size()){
-                    
+
                 }
                 else{//b_sroce_bore.size() != b_img
                     std::cout<<"the score_board and the b_img do not match the size!"<<std::endl;
                 }
-                
+
             }
 
             cv::Mat CalLane::addMatUsingIt(vec_mat_t add_mat){
@@ -102,7 +102,7 @@ namespace lane_detect_algo{
                     it_s = store_mat.begin<uchar>();
                 }
 
-                
+
                 return store_mat;
             }
             cv::Mat CalLane::addMatUsingOR(vec_mat_t add_mat){
@@ -145,7 +145,7 @@ namespace lane_detect_algo{
                 }
             }
             int CalLane::cannyToNSample(cv::Mat canny_img){
-                
+
                 cv::Mat_<uchar>::iterator it = canny_img.begin<uchar>();
                //**영상처리에서 실수처리는 float, 정수 처리는 unsigned char로 한다!!**//
                 int no_sample = 0;
@@ -189,7 +189,7 @@ namespace lane_detect_algo{
                            // std::cout<<"x : "<<samples[sample_index].x<<", y : "<<samples[sample_index].y<<std::endl;
                             ++sample_index;
                             }++it;
-                        
+
                         }
                     }
                     //int a=1;
@@ -221,7 +221,7 @@ namespace lane_detect_algo{
                 cov_xx = (sum_Xi_expo - sum_Xi*sum_Xi/N)/N;
                 cov_xy = (sum_XixYi - sum_Xi*sum_Yi/N)/N;
                 cov_yy = (sum_Yi_expo - sum_Yi*sum_Yi/N)/N;
-                
+
                 double theta = std::atan2(2*cov_xy, cov_xx-cov_yy)/2;
                 model.mx = std::cos(theta);
                 model.my = std::sin(theta);
@@ -237,7 +237,7 @@ namespace lane_detect_algo{
                 /***///******************************//
                 /***///** Xm == sigma(Xi)/N ** (vice versa for Y)
                 /***///** Xm is means of Xi **
-                /***///N*s_dev_x(standard devision for X)^2 == sigma((Xi - Xm)^2) 
+                /***///N*s_dev_x(standard devision for X)^2 == sigma((Xi - Xm)^2)
                 /***///== sigma(Xi^2) - 2*Xm(sigma(Xi)) + sigma(Xm^2)
                 /***///== sigma(Xi^2) - 2*Xm*Xm*N + N*Xm*Xm
                 /***///== sigma(Xi^2) - N*(Xm^2)
@@ -249,7 +249,7 @@ namespace lane_detect_algo{
                 /***///== sigma(Xi*Yi) - N*Xm*Ym
                 /***///== sigma(Xi*Yi) - N*(sgima(Xi)/N)*(sigma(Yi)/N)
                 /***///== sigma(Xi*Yi) - sigma(Xi)*sigma(Yi)/N
-                
+
             }
             //////********http://blog.daum.net/pg365/62*****//////
             /////*********RANSAC algorithm 출처 *************//////
@@ -266,9 +266,9 @@ namespace lane_detect_algo{
                     double &x = samples[i].x;
                     double &y = samples[i].y;
 
-                    sx  += x;	
+                    sx  += x;
                     sy  += y;
-                    sxx += x*x; 
+                    sxx += x*x;
                     sxy += x*y;
                     syy += y*y;
                     sw  += 1;
@@ -278,19 +278,19 @@ namespace lane_detect_algo{
                 double vxx = (sxx - sx*sx/sw)/sw;
                 double vxy = (sxy - sx*sy/sw)/sw;
                 double vyy = (syy - sy*sy/sw)/sw;
-                
+
                 //principal axis
                 double theta = atan2(2*vxy, vxx - vyy)/2;
-                
+
                 model.mx = cos(theta);
                 model.my = sin(theta);
-                
+
                 //center of mass(xc, yc)
                 model.sx = sx/sw;
                 model.sy = sy/sw;
-                
+
                 //직선의 방정식: sin(theta)*(x - sx) = cos(theta)*(y - sy);
-                //////********http://blog.daum.net/pg365/62*****//////  
+                //////********http://blog.daum.net/pg365/62*****//////
                 /////*********RANSAC algorithm 출처 *************//////
             }
             bool CalLane::findDupSamples(CalLane::sPoint *samples, int no_samples, CalLane::sPoint *data){
@@ -311,7 +311,7 @@ namespace lane_detect_algo{
                 // 데이터에서 중복되지 않게 N개의 무작위 셈플을 채취한다.
                 for (int i=0; i<no_samples; ) {
                     int j = rand()%no_data;
-                    
+
                     if (!findDupSamples(samples, i, &data[j])) {
                         samples[i] = data[j];
                         ++i;
@@ -330,14 +330,14 @@ namespace lane_detect_algo{
             }
             double CalLane::modelVerification(CalLane::sPoint *inliers, int *no_inliers, CalLane::sLine &estimated_model, CalLane::sPoint *data, int no_data, double distance_threshold){
                 //////********http://blog.daum.net/pg365/62*****//////
-                /////*********RANSAC algorithm 출처 *************//////            
+                /////*********RANSAC algorithm 출처 *************//////
                 *no_inliers = 0;
                 double cost = 0.;
 
                 for(int i=0; i<no_data; i++){
                     // 직선에 내린 수선의 길이를 계산한다.
                     double distance = computeDistance(estimated_model, data[i]);
-                
+
                     // 예측된 모델에서 유효한 데이터인 경우, 유효한 데이터 집합에 더한다.
                     if (distance < distance_threshold) {
                         cost += 1.;
@@ -355,13 +355,13 @@ namespace lane_detect_algo{
                 //////********http://blog.daum.net/pg365/62*****//////
                 /////*********RANSAC algorithm 출처 *************//////
                 const int no_samples = 2;
-                
+
                 if (no_data < no_samples) {
                     return 0.;
                 }
 
                 CalLane::sPoint *samples = new CalLane::sPoint[no_samples];//edge좌표...
-                    
+
 
                 int no_inliers = 0;
                 CalLane::sPoint *inliers = new CalLane::sPoint[no_data];
@@ -391,7 +391,7 @@ namespace lane_detect_algo{
                         computeModelParameter(inliers, no_inliers, model);
                     }
                 }
-                
+
                 delete [] samples;
                 delete [] inliers;
 
@@ -401,7 +401,7 @@ namespace lane_detect_algo{
             }
             //////********http://blog.daum.net/pg365/62*****//////
             /////*********RANSAC algorithm 출처 *************//////
-            
+
             vec2i_t CalLane::laneLinearEquation(int x_0, int y_0, int x_1, int y_1){
                 vec2i_t lane_coordi;
                 return lane_coordi;
@@ -410,7 +410,7 @@ namespace lane_detect_algo{
                 vec4i_t hough_vec;
                 return hough_vec;
             }
-            cv::Mat CalLane::myCanny(cv::Mat raw_img){ 
+            cv::Mat CalLane::myCanny(cv::Mat raw_img){
                 int min_threshold = 80;
                 int max_threshold = 15;
                 int kernel_size = 3;
@@ -419,11 +419,11 @@ namespace lane_detect_algo{
                 cv::cvtColor(raw_img,gray_img,COLOR_BGR2GRAY);
                 cv::GaussianBlur(gray_img,blur_img,Size(5,5),0,5);
                 cv::Canny(blur_img,canny_img,min_threshold,max_threshold,kernel_size);//파라미터 조절 알고리즘짜기
-                
+
                 return canny_img;
             }
             void CalLane::storeFrameForVideoFile(cv::Mat& frame){
-                
+
             }
             void CalLane::storeFrameForWebCam(cv::Mat& frame){
 
@@ -449,8 +449,8 @@ namespace lane_detect_algo{
 
                 cv::Mat mask1;
                 cv::Mat mask2;
-                
-                
+
+
                 cv::threshold(channels[0], mask1, maxHue, 255, cv::THRESH_BINARY_INV);
                 cv::threshold(channels[0], mask2, minHue, 255, cv::THRESH_BINARY);
                 cv::Mat hueMask;
@@ -485,12 +485,12 @@ namespace lane_detect_algo{
 
                 cv::Mat mask1;
                 cv::Mat mask2;
-                
-                
+
+
                 cv::threshold(channels[0], mask1, maxHue, 255, cv::THRESH_BINARY_INV);
                 cv::threshold(channels[0], mask2, minHue, 255, cv::THRESH_BINARY);
                 cv::Mat hueMask;
-          
+
                 if (minHue < maxHue) {
                 hueMask = mask1 & mask2;//all values are zero
                 }
@@ -511,7 +511,7 @@ namespace lane_detect_algo{
                 valMask = mask1 & mask2;
 
                 dst = hueMask & satMask & valMask;
-               
+
                 }
             void CalLane::detectWhiteLane(cv::Mat src, cv::Mat& dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax, int amin, int amax){
 
@@ -519,8 +519,8 @@ namespace lane_detect_algo{
                 cv::inRange(dst, cv::Scalar(hmin, smin, vmin, amin), cv::Scalar(hmax, smax, vmax, amax), dst);
                 //inrange set 255 at value involving input range and set 0 otherwise
                 //1 channels ->𝚍𝚜𝚝(I)=𝚕𝚘𝚠𝚎𝚛𝚋(I)0≤𝚜𝚛𝚌(I)0≤𝚞𝚙𝚙𝚎𝚛𝚋(I)0
- 
-               
+
+
             }
             void CalLane::birdEyeView(cv::Mat src, cv::Mat& dst) {
                 // Input Quadilateral or Image plane coordinates
@@ -598,13 +598,13 @@ namespace lane_detect_algo{
                         dst.at<uchar>(y,x) = 255;
                     }
                 }
-               
+
                 // // // uchar pixel;
                 // // // unsigned int *H = new unsigned int[src.cols];
                 // // // std::memset(H, 0x00, 4 * src.cols);
                 // // // for (int y = 0; y < src.rows; y++) {
                 // // // uchar* hist_data = src.ptr<uchar>(y+0);
-                // // //     for (int x = 0; x < src.cols; x++) {//1채널이라 (left+width)에 채널값 안곱함    
+                // // //     for (int x = 0; x < src.cols; x++) {//1채널이라 (left+width)에 채널값 안곱함
                 // // //         if (hist_data[x + 0] != (uchar)0) {
                 // // //             H[x]++;
                 // // //             H_result[x]++;
@@ -624,7 +624,7 @@ namespace lane_detect_algo{
                 //     }
                 // }
                 delete[] H;
-                }     
+                }
             void CalLane::makeXProjection(cv::Mat src, cv::Mat dst, unsigned int* H_result){
                 uchar pixel;
                 unsigned int *H = new unsigned int[src.rows];
@@ -654,22 +654,22 @@ namespace lane_detect_algo{
                 std::sort(sorted_H_result, sorted_H_result + H_result_size);
           //      midean = H_result_size / 2;
                 for (int y = 0; y < H_result_size; y++) {
-                    for (uint x = 0; x < sorted_H_result[y]; x++) {
-                    
+                    for (int x = 0; x < sorted_H_result[y]; x++) {
+
                     }std::cout << "H : " << sorted_H_result[y] << std::endl;
                 }std::cout << "___" << std::endl;
                 delete[] sorted_H_result;
-                }     
+                }
             void CalLane::makeWindow(cv::Mat src, cv::Mat dst, int window_width, int window_offset, int per_lane_checked){
                 cv::Mat_<uchar>::iterator it = src.begin<uchar>();
                 unsigned int *lane_check_array = new unsigned int[window_width+window_offset];
                 std::memset(lane_check_array, 0, 4 * (window_width + window_offset));
                 int check_window = 0;
-                
+
                 uint *vote_lane_array = new uint[src.cols*3];//data order is 'value, x, y'
                 std::memset(vote_lane_array, 0, 4 * (src.cols * 3));
-                int temp = 0, vote_index=0;
-                
+                int max_lane = 0, temp = 0, vote_index=0;
+
                 it = it + (src.rows - 1)*src.cols;
                 for (int i = 1; i < src.rows; ++i) {
                     for (int j = 0; j < src.cols*per_lane_checked; ++j) {
@@ -699,21 +699,24 @@ namespace lane_detect_algo{
                             vote_lane_array[vote_index + 2] = i;
                             //vote value
                             vote_index = 0;
-                            check_window = 0;    
+                            check_window = 0;
                         }
-                    
+
                     }
                     it = it + (src.rows - i - 1)*src.cols;
                 }
                 delete[] lane_check_array;
                 delete[] vote_lane_array;
-                }        
-            void CalLane::slideWindow(cv::Mat src, int window_width, int window_height, int per_lane_in_window){  
+                }
+            void CalLane::slideWindow(cv::Mat src, int window_width, int window_height, int per_lane_in_window){
                 std::cout << "window_width : " << src.rows << std::endl << "window_height : " << src.cols;
                 /***/// cv::Rect roi(10, 20, 100, 50);
                 /***/// cv::Mat window = src(roi);
                 cv::Mat window = src(cv::Rect(0, src.rows - window_height, window_width, window_height)).clone();
-                cv::imshow("window", window);
+
+                //modified by Hayean
+                //cv::imshow("window", window);
+
                 cv::MatIterator_<uchar> it;// = window.end<uchar>();
                 //it = it - window.cols - 1;
                 /*
@@ -729,7 +732,7 @@ namespace lane_detect_algo{
                     while (*(it + count) == (uchar)0) {//it+count의 vlaue가 1이 되면 종료
                     *(it + count) = (uchar)255;
                     }
-                    } 
+                    }
                 }
                 ++it;
                 window(cv::Rect(j, 0, window.cols, window.rows));
@@ -754,7 +757,7 @@ namespace lane_detect_algo{
                 else { // count < src.rows*src.cols*per_lane_in_window. this means not enough lane detected in window.
                 return false;
                     }
-                } 
+                }
             void CalLane::makeContoursLeftLane(cv::Mat src, cv::Mat& dst) {
                 std::vector<std::vector<cv::Point>> countours;
                 std::vector<cv::Vec4i> hierachy;
@@ -798,28 +801,31 @@ namespace lane_detect_algo{
 			if(temp_bottom>max_bottom){
 				max_bottom = temp_bottom;
 			}
-		}	
+		}
 
                 for (int row = 1; row < numOfLables; row++) {
-                
-                int* data = stats.ptr<int>(row);   
-          //      int area = data[cv::CC_STAT_AREA];
+
+                int* data = stats.ptr<int>(row);
+                int area = data[cv::CC_STAT_AREA];
                 int left = data[cv::CC_STAT_LEFT];
                 int top = data[cv::CC_STAT_TOP];
                 int width = data[cv::CC_STAT_WIDTH];
-                int height = data[cv::CC_STAT_HEIGHT]; 
-                
-                
+                int height = data[cv::CC_STAT_HEIGHT];
+
+
                 cv::rectangle(draw_lable,cv::Point(left,top),cv::Point(left+width,top+height),cv::Scalar(0,0,255),1);
+
+
                 if(IMSHOW_SW){
-                    imshow("y_lable", draw_lable);
+                  //modified by Hayean
+                  //imshow("y_lable", draw_lable);
                 }
 
               //-for max area and extra-//  if (area == max_area && width<height && left<src.cols / 2 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                 if (abs(max_height - height)<50 && abs(max_bottom-(top+height))<50) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                     for (int delete_row = dst.rows - 1, coordi_index = 0; delete_row >= 0; --delete_row, ++coordi_index) {
                         uchar* delete_data = dst.ptr<uchar>(delete_row);
-                        
+
                         for (int delete_col = dst.cols-1 ; delete_col>=0; --delete_col) {
                         if ((delete_col > left + width || delete_col < left) || (delete_row<top || delete_row>top + height)) {
                         delete_data[delete_col] = (uchar)0;
@@ -847,9 +853,9 @@ namespace lane_detect_algo{
                 else {//delete wrong lable
                     for (int row = top; row < top + height; row++) {
                         uchar* data = dst.ptr<uchar>(row);
-                        for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함    
+                        for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함
                         data[col] = (uchar)0;
-                        
+
                         }
                     }
                 }
@@ -876,7 +882,7 @@ namespace lane_detect_algo{
                 cv::cvtColor(dst, dst, cv::COLOR_BGR2GRAY);  // Convert the image to Gray
                 cv::threshold(dst, dst, 127, 255, cv::THRESH_BINARY);
                 cv::Mat draw_max_lable;
-                
+
                 cv::threshold(dst, draw_max_lable, 127, 255, cv::THRESH_BINARY_INV);
 
                 cv::Mat img_labels, stats, centroids;
@@ -893,9 +899,9 @@ namespace lane_detect_algo{
                     }
                 }
 
-           //     int center_x;
-           //     int center_y;
-                
+                int center_x;
+                int center_y;
+
                 //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
                     for (int row = 1; row < numOfLables; row++) {
@@ -923,7 +929,8 @@ namespace lane_detect_algo{
                     int height = data[cv::CC_STAT_HEIGHT];
                 cv::rectangle(draw_max_lable,cv::Point(left,top),cv::Point(left+width,top+height),cv::Scalar(0,0,255),1);
                 if(IMSHOW_SW){
-                    imshow("w_lable", draw_max_lable);
+                  //modified by Hayean
+                  //imshow("w_lable", draw_max_lable);
                 }
 
                 //--for max area and extra//    if (area == max_area && width<height && left>src.cols / 3 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
@@ -948,14 +955,14 @@ namespace lane_detect_algo{
 
                                 //}///////////////////////////////////////////////////////////////////////////////////
                                 }
-                        
+
                             }
 
                     }
                     else {//delete wrong lable
                         for (int row = top; row < top + height; row++) {
                             uchar* data = dst.ptr<uchar>(row);
-                                for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함    
+                                for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함
                                 data[col] = (uchar)0;
                                 }
                         }
@@ -963,7 +970,7 @@ namespace lane_detect_algo{
                 //    imshow("lane_right", dst);
                     }
               //  imshow("drawing", draw_max_lable);//for visible lane max lable box
-                } 
+                }
 
            void CalLane::makeContoursRightLane(cv::Mat src, cv::Mat& dst, int* crosswalk){
                 std::vector<std::vector<cv::Point>> countours;
@@ -978,7 +985,7 @@ namespace lane_detect_algo{
                 cv::cvtColor(dst, dst, cv::COLOR_BGR2GRAY);  // Convert the image to Gray
                 cv::threshold(dst, dst, 127, 255, cv::THRESH_BINARY);
                 cv::Mat draw_max_lable;
-                
+
                 cv::threshold(dst, draw_max_lable, 127, 255, cv::THRESH_BINARY_INV);
 
                 cv::Mat img_labels, stats, centroids;
@@ -1018,10 +1025,10 @@ namespace lane_detect_algo{
                     }
                 }
                 }
-         //       int center_x;
-         //       int center_y;
-                
-                //USE_MAX_HEIGHT 
+                int center_x;
+                int center_y;
+
+                //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
                     for (int row = 1; row < numOfLables; row++) {
                         int* height_data = stats.ptr<int>(row);
@@ -1030,7 +1037,7 @@ namespace lane_detect_algo{
                             max_height = temp_height;
                         }
                     }
-             
+
                 for (int row = 1; row < numOfLables; row++) {
 
                     int* data = stats.ptr<int>(row);
@@ -1041,7 +1048,8 @@ namespace lane_detect_algo{
                     int height = data[cv::CC_STAT_HEIGHT];
                 cv::rectangle(draw_max_lable,cv::Point(left,top),cv::Point(left+width,top+height),cv::Scalar(0,0,255),1);
                 if(IMSHOW_SW){
-                    imshow("w_lable", draw_max_lable);
+                  //modified by Hayean
+                  //imshow("w_lable", draw_max_lable);
                 }
 
                 //--for max area and extra//    if (area == max_area && width<height && left>src.cols / 3 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
@@ -1066,14 +1074,14 @@ namespace lane_detect_algo{
 
                                 //}///////////////////////////////////////////////////////////////////////////////////
                                 }
-                        
+
                             }
 
                     }
                     else {//delete wrong lable
                         for (int row = top; row < top + height; row++) {
                             uchar* data = dst.ptr<uchar>(row);
-                                for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함    
+                                for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함
                                 data[col] = (uchar)0;
                                 }
                         }
@@ -1081,8 +1089,8 @@ namespace lane_detect_algo{
                 //    imshow("lane_right", dst);
                     }
               //  imshow("drawing", draw_max_lable);//for visible lane max lable box
-                }     
-    
+                }
+
 }
 
 /*
