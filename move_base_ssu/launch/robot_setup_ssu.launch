@@ -1,0 +1,52 @@
+<launch>
+	
+<!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
+    <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
+	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
+	<arg name="map_name" default="ssara.yaml"/>
+
+
+<!-- Robot Frame Setup (static tf)  -->
+    <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.0 0 0 0 0 0 base_link laser 100" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="-0.68 0 0 0 0 0 base_link camera_main 100" />
+
+
+<!-- Sensor Setup  -->
+	<!-- Lidar: Ethernet  -->
+    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node"/>
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>
+
+	<!-- Camera -->
+		<!--
+			*** 여기에 카메라 노드 추가 ***
+		-->
+	
+	<!-- Platform RX/TX: USB0  -->
+    <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test"/>
+    <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0"/>
+[
+
+	<!-- IMU: USB1  -->
+ 	<!--node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10"/>
+	-->
+
+	<!-- GPS: USB2  --> 
+ 	<!--node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
+	<node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
+	<node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
+	-->
+
+	
+<!--  Robot Pose Estimation Node -->	
+	<node pkg="odometry" type="odom_pub" name="odom_wheelbased"/>
+
+	<node pkg="amcl" type="amcl" name="amcl" output="screen"/>
+
+
+<!--   Map Server   -->
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/$(arg map_name)" output="screen"/>
+	
+   
+</launch>
+
