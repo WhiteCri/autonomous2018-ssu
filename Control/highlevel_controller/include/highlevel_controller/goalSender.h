@@ -12,7 +12,8 @@ public:
         STATE_ACTIVE : not reached to the current goal.
         STATE_SUCCEEDED : reached the current goal
     */
-    enum class GoalStates : int {STATE_SUCCEEDED, STATE_PENDING, STATE_ACTIVE, STATE_LOST};
+    enum class GoalStates : int {STATE_SUCCEEDED, STATE_PENDING, STATE_ACTIVE,
+                                STATE_LOST, STATE_PREEMPTED, STATE_ABORTED};
 public:
     
     GoalStates getState();

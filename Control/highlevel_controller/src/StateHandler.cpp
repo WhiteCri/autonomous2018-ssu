@@ -3,6 +3,8 @@
 #include "highlevel_controller/goalSender.h"
 #include <ros/ros.h>
 
+#define ABORT_FLAG TRUE
+
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
 
@@ -67,6 +69,17 @@ void toward_goal(){
     else if (state == GoalStates::STATE_ACTIVE){}
     else if (state == GoalStates::STATE_PENDING) {
         ROS_INFO("PENDING...");
+    }
+    else if (state == GoalStates::STATE_PREEMPTED){
+        ROS_INFO("PREEMPTED...Are you using rviz to set goal?");
+    }
+    else if (state == GoalStates::STATE_ABORTED){
+#ifdef ABORT_FLAG
+        ROS_ERROR("ABORTED... IF YOU WANT TO KILL THE PROGRAM, SET THE ABORT FLAG");
+#elif 
+        ROS_ERROR("ABORTED... exit the program");
+        exit(-1);
+#endif
     }
     else {
         ROS_INFO("why control reaches here...");
