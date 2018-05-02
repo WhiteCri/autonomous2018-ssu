@@ -6,9 +6,12 @@
 #pragma once
 #include <iostream>
 #include <ros/ros.h>
+#include <deque>
 
 #define MAX_STATES 100
 #define MAX_CONDCOUNT 10000
+#define COND_RATE 0.8 //if one condition decide to use timed_contidion, it yeilds true 
+//when the rate of true related to the total_size is larger than COND_RATE
 
 using namespace std;
 
@@ -19,32 +22,36 @@ public:
   virtual bool check(HybridAutomata *HA) = 0;
   virtual ~Condition() {}
   virtual std::string toString() const = 0;
+protected:
 };
 //added by TaeWook
 class TimedCondition : public Condition
 {
 public:
-  TimedCondition(unsigned int condCount) : condCount_(condCount)
+  TimedCondition(unsigned int condCount) : condCount_(condCount), condDeq(condCount)
   { 
     if(condCount_ == 0) condCount_ = 1;
     if(condCount_ >= MAX_CONDCOUNT) throw std::runtime_error("too big condCount!");
   }
   virtual bool check(HybridAutomata *HA)
   {
-    if (timedCheck(HA) == true){
-      cnt++;
-      cnt %= condCount_;
-      if (!cnt) return true;
-    }
-    else
-      cnt = 0;
-    return false;
+    //processing condition
+    condDeq.pop_front();
+    condDeq.push_back(timedCheck(HA));
+
+    //is rate of true is bigger than COND_RATE?
+    size_t trueCnt = 0;
+    for(auto b : condDeq)
+      if(b) trueCnt++;
+    double rate = static_cast<double>(trueCnt) / condDeq.size();
+    if (rate >= COND_RATE) return true;
+    else return false;
   }
   virtual bool timedCheck(HybridAutomata *HA) = 0;
   virtual ~TimedCondition() {}
 private:
   int condCount_;
-  int cnt;
+  std::deque<bool> condDeq;
 };
 //added by TawWook End
 class HybridAutomata
