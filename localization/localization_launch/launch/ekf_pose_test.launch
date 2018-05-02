@@ -1,0 +1,26 @@
+<launch>
+    <rosparam file="$(find sensor_launch)/cfg/sensor_params.yaml" command="load"/>
+   
+   	
+    <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test"/>
+          
+    <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0"/>
+
+    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node"/>
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
+        <rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
+    </node>
+
+ 	<node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10"/>
+   
+    <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
+    <node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
+    <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM"  />
+
+	<include file="$(find odometry)/launch/odometry.launch"/>
+
+	<include file="$(find robot_localization)/launch/ekf_template.launch"/>
+
+</launch>
+

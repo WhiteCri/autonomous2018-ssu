@@ -53,6 +53,21 @@ public:
     std::string toString() const {return "Process_parking_to_toward_goal";}
 };
 
+/* uturn class */
+class Toward_goal_to_process_uturn: public TimedCondition{
+public:
+    Toward_goal_to_process_uturn(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
+    std::string toString() const {return "Toward_goal_to_process_uturn";}
+};
+
+class Process_uturn_to_toward_goal : public TimedCondition{
+public:
+    Process_uturn_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
+    std::string toString() const {return "Process_uturn_to_toward_goal";}
+};
+
 /* recovery */
 class Toward_goal_to_process_recovery: public TimedCondition{
 public:

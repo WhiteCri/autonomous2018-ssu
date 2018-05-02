@@ -21,6 +21,8 @@ static double base_latitude = 37.2323;
 static ros::Publisher odom_pub;
 std::string frame_id, child_frame_id;
 static double rot_cov;
+static bool cov_flag;
+static const double cov_max = 99999;
 //
 static double easting_shift, northing_shift;
 //
@@ -94,24 +96,40 @@ void callback(const sensor_msgs::NavSatFixConstPtr& fix) {
     
     // Use ENU covariance to build XYZRPY covariance
     boost::array<double, 36> covariance = {{
-      fix->position_covariance[0],
-      fix->position_covariance[1],
-      fix->position_covariance[2],
-      0, 0, 0,
-      fix->position_covariance[3],
-      fix->position_covariance[4],
-      fix->position_covariance[5],
-      0, 0, 0,
-      fix->position_covariance[6],
-      fix->position_covariance[7],
-      fix->position_covariance[8],
-      0, 0, 0,
+      fix->position_covariance[0], 0, 0, 0, 0, 0,
+      0, fix->position_covariance[4], 0, 0, 0, 0,
+      0, 0, fix->position_covariance[8], 0, 0, 0,
       0, 0, 0, rot_cov, 0, 0,
       0, 0, 0, 0, rot_cov, 0,
       0, 0, 0, 0, 0, rot_cov
     }};
+     odom.pose.covariance = covariance;
 
-    odom.pose.covariance = covariance;
+    //boost::array<double, 36> covariance = fix->position_covariance;
+//    
+    node.getParam("GPS/cov/flag",cov_flag);
+//
+    /*임의로 covariance 세팅해서 사용하면 됨 */
+    if(cov_flag)
+    {
+      ROS_INFO("hihihihihihi");
+      boost::array<double, 36> covariance2 = {{
+      cov_max, 0, 0, 0, 0, 0,
+      0, cov_max, 0, 0, 0, 0,
+      0, 0, cov_max, 0, 0, 0,
+      0, 0, 0, cov_max, 0, 0,
+      0, 0, 0, 0, cov_max, 0,
+      0, 0, 0, 0, 0, cov_max
+    }};
+    odom.pose.covariance = covariance2;
+    }
+ //
+
+  
+
+  
+        
+
 
     odom_pub.publish(odom);
   }
@@ -125,6 +143,7 @@ int main (int argc, char **argv) {
   priv_node.param<std::string>("frame_id", frame_id, "odom_combined");
   priv_node.param<std::string>("child_frame_id", child_frame_id, "base_footprint");
   priv_node.param<double>("rot_covariance", rot_cov, 99999.0);
+  priv_node.param<bool>("GPS/cov/flag",cov_flag,false);
   odom_pub = node.advertise<nav_msgs::Odometry>("odom/GPS", 10);
 
   ros::Subscriber fix_sub = node.subscribe("fix", 10, callback);

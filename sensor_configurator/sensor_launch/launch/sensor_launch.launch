@@ -1,64 +1,41 @@
 <launch>
-	<node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test">
-        <param name="path" value="/dev/ttyUSB0"/>
-        <param name="serial_frequency" value="20"/>
-        <param name="publish_frequency" value="10"/>
-        <param name="moving_average_element_number" value="5"/>
-    </node>
-	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py"
-	 	name="cmd_vel_to_ackermann_drive"/>
-	<node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0">
-        <param name="angleToSerialValue" value="71.0"/>
-        <param name="maxSteeringAngle" value="24.0"/>
-        <param name="minSteeringAngle" value="-24.0"/>
-        <param name="alignmentBias" value="0"/>
-        <!-- maxSpeed(m/s)-->
-        <param name="maxSpeed" value="3"/>
-        <!-- serial value = kph * 10-->
-        <param name="m_s2serial" value="36"/>
+  <rosparam file="$(find sensor_launch)/cfg/sensor_params.yaml" command="load"/>
 
-        <param name="frequency" value="50"/>
-        <param name="ackermann_topic_name" value="platform_tx_test"/>
-    </node>
-  <!-->
-  <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10">
-      <param name="angle_alignment" value="112"/>
-      <param name="debugingFlag" value="true"/>
-      <param name="imu_yaw_covariance" value="0.5"/>
+  <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test"/>
+
+  <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0"/>
+
+  <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node"/>
+
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
+    <rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
   </node>
 
- <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
- <node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
- <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
+  <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
+  <node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
+  <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM"/>
 
- <param name="GPS_Odometry_initial" value="false"/>
- <-->
- 	<arg name="host" default="192.168.0.204" />
- 	<arg name="publish_min_range_as_inf" default="false" />
- 	<node pkg="lms1xx" name="lms1xx" type="LMS1xx_node">
-    		<param name="host" value="$(arg host)" />
-    		<param name="publish_min_range_as_inf" value="$(arg publish_min_range_as_inf)" />
- 	</node>
- 	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
-    		<rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
- 	</node>
+  <param name="GPS_Odometry_initial" value="false"/>
 
-	<include file="$(find vision_launch)/launch/vision_launch.launch"/>
-	<!-- <arg name="cam_num" default="1"/>
-	<arg name="frequency" default="30"/>
-	<include file="$(find camera_image)/launch/camera_image.launch">
-		<arg name="cam_num" value="$(arg cam_num)"/>
-		<arg name="frequency" value="$(arg frequency)"/>
-	</include>
-	<node name="lane_detection" pkg="lane_detection" type="lane_detection" respawn="true" output="screen">
-		<rosparam file="$(find lane_detection)/cfg/lane_detection.yaml" command="load"/>
-	</node>
-	<node name="cal_distance" pkg="cal_distance" type="cal_distance" respawn="true">
-	</node>
-    <node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" respawn="true">
-	</node>
-	<include file="$(find pointcloud_to_laserscan)/launch/sample_node.launch">
-		<arg name="cam_num" value="$(arg cam_num)"/>
-	</include>  -->
+  <arg name="host" default="192.168.0.204"/>
+  <arg name="publish_min_range_as_inf" default="false"/>
+  <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node">
+    <param name="host" value="$(arg host)"/>
+    <param name="publish_min_range_as_inf" value="$(arg publish_min_range_as_inf)"/>
+  </node>
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
+    <rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
+  </node>
+  <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10"/>
+
+  <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
+  <node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
+  <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM"/>
+
+  <include file="$(find vision_launch)/launch/vision_launch.launch"/>
+  <!-- <arg name="cam_num" default="1"/> <arg name="frequency" default="30"/> <include file="$(find camera_image)/launch/camera_image.launch"> <arg name="cam_num" value="$(arg cam_num)"/> <arg name="frequency" value="$(arg frequency)"/> </include>
+  <node name="lane_detection" pkg="lane_detection" type="lane_detection" respawn="true" output="screen"> <rosparam file="$(find lane_detection)/cfg/lane_detection.yaml" command="load"/> </node> <node name="cal_distance" pkg="cal_distance"
+  type="cal_distance" respawn="true"> </node> <node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" respawn="true"> </node> <include file="$(find pointcloud_to_laserscan)/launch/sample_node.launch"> <arg name="cam_num" value="$(arg
+  cam_num)"/> </include> -->
 
 </launch>

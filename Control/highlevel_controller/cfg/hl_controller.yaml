@@ -11,7 +11,11 @@ hl_controller:
   publish_param: true
 
 #tx
-  tx_stop: false
+##IMPORTANT : THIS VALUES ARE BASED ON SERIAL VALUES
+  tx_control_static: false
+  tx_speed: 0
+  tx_steer: 0
+  tx_brake: 0
 
 #crosswalk
   use_process_crosswalk: true
@@ -42,12 +46,32 @@ hl_controller:
 
   parking_near_arrive_point_x: -200.0
   parking_near_arrive_point_y: -200.0
-  parking_far_arrive_point_x: -200.0
-  parking_far_arrive_point_y: -200.0
+  parking_near_arrive_point_ori_z: 0
+  parking_near_arrive_point_ori_w: 1
   parking_near_back_point_x: -200.0
   parking_near_back_point_y: -200.0
+  parking_near_back_point_ori_z: 0
+  parking_near_back_point_ori_w: 1
+
   parking_far_back_point_x: -200.0
   parking_far_back_point_y: -200.0
+  parking_far_back_point_ori_z: 0
+  parking_far_back_point_ori_w: 1
+  parking_far_arrive_point_x: -200.0
+  parking_far_arrive_point_y: -200.0
+  parking_far_arrive_point_ori_z: 0
+  parking_far_arrive_point_ori_w: 1
+
+#uturn
+  use_process_uturn: true
+  uturn_check_duration: 1.0
+  use_uturn_onetime_flag: true
+
+  uturn_tx_speed: 50
+  uturn_tx_steer: 1999
+  uturn_tx_brake: 0
+  uturn_duration: 2.0
+  
 
 #recovery 
   use_process_recovery: true

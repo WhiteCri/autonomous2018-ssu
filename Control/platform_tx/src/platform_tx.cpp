@@ -23,7 +23,12 @@
 
 static std::string cmd_platform_topic_name;
 static int alignmentBias;
-static bool tx_stop;
+struct TxControlStatic{
+    bool tx_control_static;
+    int tx_speed;
+    int tx_steer;
+    int tx_brake;
+}txControlStatic;
 
 uint8_t packet[TX_PACKET_LENGTH] = {};
 
@@ -68,15 +73,15 @@ void rxMsgCallBack(const platform_rx_msg::platform_rx_msg::ConstPtr& msg){
 void serialWrite(){
     ros::Rate loop_rate(TX_SERIAL_FREQUENCY);
     while(true){
-        lock.lock();
-        if(tx_stop){
-            *(uint16_t*)(packet + 7) = static_cast<uint16_t>(0);//speed
-            *(int8_t*)(packet + 8) = 0;
-            *(int8_t*)(packet + 9) = 0; //steer
-            packet[10] = static_cast<uint8_t>(0); // brake
+        if(txControlStatic.tx_control_static){
+            lock.lock();
+            *(uint16_t*)(packet + 7) = static_cast<uint16_t>(txControlStatic.tx_speed);//speed
+            *(int8_t*)(packet + 8) = *((int8_t*)(&txControlStatic.tx_steer) + 1);
+            *(int8_t*)(packet + 9) = *(int8_t*)(&txControlStatic.tx_steer);
+            packet[10] = txControlStatic.tx_brake; // brake
+            ser->write(packet,TX_PACKET_LENGTH);
+            lock.unlock();
         }
-        ser->write(packet,TX_PACKET_LENGTH);
-        lock.unlock();
         loop_rate.sleep();
     }
 }
@@ -84,7 +89,14 @@ void serialWrite(){
 void processTxStop(ros::NodeHandle& nh){
     ros::Rate loop_rate(TX_STOP_CHECK_PERIOD);
     while(true){ 
-        nh.getParam("hl_controller/tx_stop", tx_stop);
+        nh.getParam("hl_controller/tx_control_static", txControlStatic.tx_control_static);
+        if (txControlStatic.tx_control_static){
+            nh.getParam("hl_controller/tx_speed", txControlStatic.tx_speed);
+            nh.getParam("hl_controller/tx_steer", txControlStatic.tx_steer);
+            nh.getParam("hl_controller/tx_brake", txControlStatic.tx_brake);
+            ROS_INFO("tx_control_static...speed : %d, steer : %hd, brake : %d",
+                        txControlStatic.tx_speed, txControlStatic.tx_steer, txControlStatic.tx_brake);
+        }
         loop_rate.sleep();
     }
 }
@@ -99,7 +111,7 @@ void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
     0x02 : backward
 */
     packet[5] = static_cast<uint8_t>(msg->gear);
-    
+    ROS_INFO("%s",(msg->gear == 0) ? "forward" :"back");
 // SPEED (원래는 accel이 맞는데 혼란을 피하기 위해 변수 이름들은 그냥 speed로 했음)
     int speed = fabs(msg->accel); //   checkSpeedBound(speed);
     uint16_t serialSpeed = speed;

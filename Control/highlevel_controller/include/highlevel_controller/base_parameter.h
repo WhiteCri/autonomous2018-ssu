@@ -8,6 +8,7 @@ enum {
     PROCESS_CROSSWALK,
     PROCESS_MOVINGOBJ,
     PROCESS_PARKING,
+    PROCESS_UTURN,
     PROCESS_RECOVERY,
     DONE
 };
@@ -25,7 +26,10 @@ public:
     std::vector<std::string> goal_type;
 
     /* tx control parameter */
-    bool tx_stop;
+    bool tx_control_static;
+    int tx_speed;
+    int tx_steer;
+    int tx_brake;
 
     /* crosswalk parameter */
     bool crosswalk;
@@ -60,12 +64,35 @@ public:
     //goalpoint members    
     double parking_near_arrive_point_x;
     double parking_near_arrive_point_y;
-    double parking_far_arrive_point_x;
-    double parking_far_arrive_point_y;
+    double parking_near_arrive_point_ori_z;
+    double parking_near_arrive_point_ori_w;
     double parking_near_back_point_x;
     double parking_near_back_point_y;
+    double parking_near_back_point_ori_z;
+    double parking_near_back_point_ori_w;
+    
+    double parking_far_arrive_point_x;
+    double parking_far_arrive_point_y;
+    double parking_far_arrive_point_ori_z;
+    double parking_far_arrive_point_ori_w;
     double parking_far_back_point_x;
     double parking_far_back_point_y;
+    double parking_far_back_point_ori_z;
+    double parking_far_back_point_ori_w;
+
+    /* uturn members */
+    bool uturn;
+    bool use_process_uturn;
+    bool use_uturn_onetime_flag;
+
+    double uturn_check_duration;
+    bool uturn_onetime_flag;
+
+    //tx control members
+    int uturn_tx_speed;
+    int uturn_tx_steer;
+    int uturn_tx_brake;
+    double uturn_duration;
 
     /* recovery members */
     bool recovery;
@@ -87,6 +114,8 @@ public:
         nh.getParam("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag);
         nh.getParam("hl_controller/parking",                parking);
         nh.getParam("hl_controller/parking_onetime_flag",   parking_onetime_flag);
+        nh.getParam("hl_controller/uturn",                  uturn);
+        nh.getParam("hl_controller/uturn_onetime_flag",     uturn_onetime_flag);
         nh.getParam("hl_controller/recovery",               recovery);
         nh.getParam("hl_controller/reached_goal",           reached_goal);
         
@@ -102,6 +131,7 @@ public:
             msg.movingobj = movingobj;
             msg.parking = parking;
             msg.recovery = recovery;
+            msg.uturn = uturn;
 
             param_pub.publish(msg);
         }

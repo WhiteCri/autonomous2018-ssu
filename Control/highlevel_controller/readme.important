@@ -1,0 +1,23 @@
+끄어어ㅓ러거어어러얽얽어얶겅ㄹ꺽ㅇ
+
+# paramter 추가 시 지침 
+    1. base_parameter.h에서 파라미터 변수 추가.
+    2. base_paramter.cpp에서 파라미터 변수 load 코드 추가
+    3. hl_controller cfg 파일에서 파라미터 값 추가
+    기타 파라미터의 용도에 맞게 condition이나 stateHandler 수정
+
+# 상태 추가 시 지침
+    1. 상태 정의(필요한 파라미터, 전/후 상태, 상태 이름)
+    2. paramter 추가 시 지침 수행
+    3. condition.h, conditiono.cpp 수정
+    4. stateHandler.h, stateHandler.cpp 수정
+    5. base_parameter.h에서 상태 enum 변수 추가
+    6. main에서 상태 등록 코드 추가
+    
+# 각 소스코드 역할
+    1. hybridautomata.h/hybridautomata.cpp : stand-alone. 상태머신의 전환 로직
+    2. base_paramter.h/base_paramter.cpp : paramter들의 통신을 담당. 시작 시 로드/주기적으로 로드
+    3. condition.h/ condition.cpp : 상태머신 전환 조건 로직을 담고 있음
+    4. stateHandler.h/ Statehandler.cpp : 상태별 수행 동작을 담고 있음
+    5. GoalSender.h/ GoalSender.cpp : move_base server와의 통신을 담당함.
+    6. highlevel_controller.cpp : main코드. singletone 객체들의 생성 타이밍 주의
