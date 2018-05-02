@@ -219,15 +219,13 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
     std::vector<int>::const_iterator it;
     it = laneData->data.begin();
-    ROS_INFO("11");
-    ROS_INFO("%d",laneData.get_data_size());
-    if(laneData.get_data_size()==0) return;
-    ROS_INFO("22");
+    if(it == laneData->data.end()) {
+      return;
+    }
     size = (*it);
 
     ++it;
     //why try + catch?
-    ROS_INFO("33");
     while(it != laneData->data.end()){
       try{
         Pos targetPixel;
