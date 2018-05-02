@@ -45,6 +45,10 @@ GoalSender::GoalStates GoalSender::getState(){
         ret = GoalStates::STATE_PENDING;    
     else if (state == actionlib::SimpleClientGoalState::LOST)
         ret = GoalStates::STATE_LOST;
+    else if (state == actionlib::SimpleClientGoalState::PREEMPTED)
+        ret = GoalStates::STATE_PREEMPTED;
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+        ret = GoalStates::STATE_ABORTED;
     else {
         ROS_INFO("unhandling move_base server state: %s", state.toString().c_str());
         throw std::runtime_error("unhandling state");
