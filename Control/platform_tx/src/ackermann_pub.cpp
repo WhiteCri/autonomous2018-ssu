@@ -3,7 +3,7 @@
 #include <geometry_msgs/Twist.h>
 
 
-#define FRE 10
+#define FRE 30
 int main(int argc, char *argv[]){
     ros::init(argc, argv, "test_cmd_pub");
     ros::NodeHandle nh;
@@ -16,10 +16,9 @@ int main(int argc, char *argv[]){
     while(ros::ok()){ 
         int test;
         nh.getParam("test", test);
-        msg.linear.x = test;
+        //msg.linear.x = test;
+        msg.angular.z = 19.0/180.0*3.141592;
 
-        //if(flag) msg.drive.speed = -msg.drive.speed;
-        //flag = !flag;
         ackermann_publisher.publish(msg);
         loop_rate.sleep();
     }

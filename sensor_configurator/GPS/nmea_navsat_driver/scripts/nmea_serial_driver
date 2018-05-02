@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     serial_port = sys.argv[1]
     serial_baud = sys.argv[2]
-    frame_id = base_link
+    frame_id = libnmea_navsat_driver.driver.RosNMEADriver.get_frame_id()
     rate=rospy.Rate(10)
 
     try:
