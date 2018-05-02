@@ -11,7 +11,10 @@ hl_controller:
   publish_param: true
 
 #tx
-  tx_stop: false
+  tx_control_static: false
+  tx_speed: 0
+  tx_steer: 0
+  tx_brake: 0
 
 #crosswalk
   use_process_crosswalk: true
@@ -42,12 +45,22 @@ hl_controller:
 
   parking_near_arrive_point_x: -200.0
   parking_near_arrive_point_y: -200.0
-  parking_far_arrive_point_x: -200.0
-  parking_far_arrive_point_y: -200.0
+  parking_near_arrive_point_ori_z: 0
+  parking_near_arrive_point_ori_w: 1
   parking_near_back_point_x: -200.0
   parking_near_back_point_y: -200.0
+  parking_near_back_point_ori_z: 0
+  parking_near_back_point_ori_w: 1
+
   parking_far_back_point_x: -200.0
   parking_far_back_point_y: -200.0
+  parking_far_back_point_ori_z: 0
+  parking_far_back_point_ori_w: 1
+  parking_far_arrive_point_x: -200.0
+  parking_far_arrive_point_y: -200.0
+  parking_far_arrive_point_ori_z: 0
+  parking_far_arrive_point_ori_w: 1
+  
 
 #recovery 
   use_process_recovery: true

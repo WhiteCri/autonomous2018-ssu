@@ -25,7 +25,10 @@ Parameters::Parameters(){
     goal_type = std::vector<std::string>(goal_type.rbegin(), goal_type.rend());
 
     /* tx control parameter */
-    nh.param("hl_controller/tx_stop", tx_stop, false);
+    nh.param("hl_controller/tx_speed", tx_speed, 0);
+    nh.param("hl_controller/tx_steer", tx_steer, 0);
+    nh.param("hl_controller/tx_brake", tx_brake, 0);
+    nh.param("hl_controller/tx_control_static", tx_control_static, false);
 
     /* crosswalk parameter */
     nh.param("hl_controller/crosswalk", crosswalk, false);
@@ -58,14 +61,23 @@ Parameters::Parameters(){
     nh.param("hl_controller/parking_onetime_flag", parking_onetime_flag, true);
 
     //goalpoint members    
-    nh.param("hl_controller/parking_near_arrive_point_x",parking_near_arrive_point_x, -200.0);  
-    nh.param("hl_controller/parking_near_arrive_point_y",parking_near_arrive_point_y, -200.0);
-    nh.param("hl_controller/parking_far_arrive_point_x",parking_far_arrive_point_x, -200.0);  
-    nh.param("hl_controller/parking_far_arrive_point_y",parking_far_arrive_point_y, -200.0);  
-    nh.param("hl_controller/parking_near_back_point_x",parking_near_back_point_x, -200.0);
-    nh.param("hl_controller/parking_near_back_point_y",parking_near_back_point_y, -200.0);
-    nh.param("hl_controller/parking_far_back_point_x",parking_far_back_point_x, -200.0);
-    nh.param("hl_controller/parking_far_back_point_y",parking_far_back_point_y, -200.0);
+    nh.param("hl_controller/parking_near_arrive_point_x",       parking_near_arrive_point_x, -200.0);  
+    nh.param("hl_controller/parking_near_arrive_point_y",       parking_near_arrive_point_y, -200.0);
+    nh.param("hl_controller/parking_near_arrive_point_ori_z",   parking_near_arrive_point_ori_z, 0.0);  
+    nh.param("hl_controller/parking_near_arrive_point_ori_w",   parking_near_arrive_point_ori_w, 0.0);
+    nh.param("hl_controller/parking_near_back_point_x",         parking_near_back_point_x, -200.0);
+    nh.param("hl_controller/parking_near_back_point_y",         parking_near_back_point_y, -200.0);
+    nh.param("hl_controller/parking_near_back_point_ori_z",     parking_near_back_point_ori_z, 0.0);
+    nh.param("hl_controller/parking_near_back_point_ori_w",     parking_near_back_point_ori_w, 0.0);
+
+    nh.param("hl_controller/parking_far_arrive_point_x",       parking_far_arrive_point_x, -200.0);  
+    nh.param("hl_controller/parking_far_arrive_point_y",       parking_far_arrive_point_y, -200.0);
+    nh.param("hl_controller/parking_far_arrive_point_ori_z",   parking_far_arrive_point_ori_z, 0.0);  
+    nh.param("hl_controller/parking_far_arrive_point_ori_w",   parking_far_arrive_point_ori_w, 0.0);
+    nh.param("hl_controller/parking_far_back_point_x",         parking_far_back_point_x, -200.0);
+    nh.param("hl_controller/parking_far_back_point_y",         parking_far_back_point_y, -200.0);
+    nh.param("hl_controller/parking_far_back_point_ori_z",     parking_far_back_point_ori_z, 0.0);
+    nh.param("hl_controller/parking_far_back_point_ori_w",     parking_far_back_point_ori_w, 0.0);
 
     /* recovery members */
     nh.param("hl_controller/recovery", recovery, false);

@@ -25,7 +25,10 @@ public:
     std::vector<std::string> goal_type;
 
     /* tx control parameter */
-    bool tx_stop;
+    bool tx_control_static;
+    int tx_speed;
+    int tx_steer;
+    int tx_brake;
 
     /* crosswalk parameter */
     bool crosswalk;
@@ -60,12 +63,21 @@ public:
     //goalpoint members    
     double parking_near_arrive_point_x;
     double parking_near_arrive_point_y;
-    double parking_far_arrive_point_x;
-    double parking_far_arrive_point_y;
+    double parking_near_arrive_point_ori_z;
+    double parking_near_arrive_point_ori_w;
     double parking_near_back_point_x;
     double parking_near_back_point_y;
+    double parking_near_back_point_ori_z;
+    double parking_near_back_point_ori_w;
+    
+    double parking_far_arrive_point_x;
+    double parking_far_arrive_point_y;
+    double parking_far_arrive_point_ori_z;
+    double parking_far_arrive_point_ori_w;
     double parking_far_back_point_x;
     double parking_far_back_point_y;
+    double parking_far_back_point_ori_z;
+    double parking_far_back_point_ori_w;
 
     /* recovery members */
     bool recovery;
