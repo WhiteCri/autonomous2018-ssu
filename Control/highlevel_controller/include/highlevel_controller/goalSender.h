@@ -12,12 +12,13 @@ public:
         STATE_ACTIVE : not reached to the current goal.
         STATE_SUCCEEDED : reached the current goal
     */
-    enum class GoalStates : int {STATE_SUCCEEDED, STATE_PENDING, STATE_ACTIVE, STATE_LOST};
+    enum class GoalStates : int {STATE_SUCCEEDED, STATE_PENDING, STATE_ACTIVE,
+                                STATE_LOST, STATE_PREEMPTED, STATE_ABORTED};
 public:
     
     GoalStates getState();
     void sendGoal();
-    void setGoal(double x, double y, double yaw);
+    void setGoal(double x, double y, double ori_x, double ori_w);
 
     //teb_local_planner fails to planning when current speed suddenly decrease.
     //then we must set the goal one more, so we decided to use the default thread.

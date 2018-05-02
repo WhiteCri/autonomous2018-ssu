@@ -14,12 +14,14 @@ Parameters::Parameters(){
     /* goal list */
     if (!nh.getParam("hl_controller/x_goal", x_goal)) throw std::runtime_error("no x goal!");
     if (!nh.getParam("hl_controller/y_goal", y_goal)) throw std::runtime_error("no y goal!");
-    if (!nh.getParam("hl_controller/yaw_goal", yaw_goal)) throw std::runtime_error("no yaw goal!");
+    if (!nh.getParam("hl_controller/ori_z_goal", ori_z_goal)) throw std::runtime_error("no ori_z goal!");
+    if (!nh.getParam("hl_controller/ori_w_goal", ori_w_goal)) throw std::runtime_error("no ori_w goal!");
     if (!nh.getParam("hl_controller/goal_type", goal_type)) throw std::runtime_error("no goal_type !");
     //reverse
     x_goal = std::vector<double>(x_goal.rbegin(), x_goal.rend());
     y_goal = std::vector<double>(y_goal.rbegin(), y_goal.rend());
-    yaw_goal = std::vector<double>(yaw_goal.rbegin(), yaw_goal.rend());
+    ori_z_goal = std::vector<double>(ori_z_goal.rbegin(), ori_z_goal.rend());
+    ori_w_goal = std::vector<double>(ori_w_goal.rbegin(), ori_w_goal.rend());
     goal_type = std::vector<std::string>(goal_type.rbegin(), goal_type.rend());
 
     /* tx control parameter */

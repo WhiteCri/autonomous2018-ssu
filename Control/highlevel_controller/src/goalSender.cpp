@@ -23,13 +23,14 @@ void GoalSender::sendGoal(){
     ac.sendGoal(goal);
 }
 
-void GoalSender::setGoal(double x, double y, double yaw){
+void GoalSender::setGoal(double x, double y, double ori_z, double ori_w){
     goal.target_pose.header.frame_id = "map";
     goal.target_pose.header.stamp = ros::Time::now();
 
     goal.target_pose.pose.position.x = x;
     goal.target_pose.pose.position.y = y;
-    goal.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
+    goal.target_pose.pose.orientation.z = ori_z;
+    goal.target_pose.pose.orientation.w = ori_w;
 }
 
 GoalSender::GoalStates GoalSender::getState(){
@@ -44,6 +45,10 @@ GoalSender::GoalStates GoalSender::getState(){
         ret = GoalStates::STATE_PENDING;    
     else if (state == actionlib::SimpleClientGoalState::LOST)
         ret = GoalStates::STATE_LOST;
+    else if (state == actionlib::SimpleClientGoalState::PREEMPTED)
+        ret = GoalStates::STATE_PREEMPTED;
+    else if (state == actionlib::SimpleClientGoalState::ABORTED)
+        ret = GoalStates::STATE_ABORTED;
     else {
         ROS_INFO("unhandling move_base server state: %s", state.toString().c_str());
         throw std::runtime_error("unhandling state");

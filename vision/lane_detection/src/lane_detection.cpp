@@ -22,12 +22,12 @@
 #define CLOCK_PER_SEC 1000
 static const std::string OPENCV_WINDOW_VF = "Image by videofile";
 static const std::string OPENCV_WINDOW_WC = "Image by webcam";
-static const bool DEBUG_SW = true;
-static const bool WEB_CAM = true;
-static const bool IMSHOW_SW = false;
-static const bool TRACK_BAR = true;
-static const bool TIME_CHECK = false;
-static const bool USE_LABEL_COUNT_FOR_CROSSWALK = false;
+static bool DEBUG_SW;
+static bool WEB_CAM;
+static bool IMSHOW_SW;
+static bool TRACK_BAR;
+static bool TIME_CHECK;
+static bool USE_LABEL_COUNT_FOR_CROSSWALK;
 
 lane_detect_algo::vec_mat_t lane_m_vec;
 
@@ -271,7 +271,8 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         check_stop_count = 1;
                         is_stop_checked = true;
                         ROS_INFO("param set crosswalk true!\n");
-                        imshow("stop_lane_before_crosswalk",my_test_hough);
+                        if(IMSHOW_SW)
+                            imshow("stop_lane_before_crosswalk",my_test_hough);
                    // }                       
                     if(is_stop_checked){
 		     //is_stop_checked = false;
@@ -284,7 +285,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                 }
                 coordi_array.data[0] = coordi_count;
 
-                if(!IMSHOW_SW){
+                if(IMSHOW_SW){
                     imshow("colorfulLane",output_origin);
                 }
                 }
@@ -308,10 +309,18 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
 
 int main(int argc, char **argv){
     ros::init(argc, argv, "lane_detection");
-    ros::NodeHandle nh_;
+    ros::NodeHandle nh_("~");
+    nh_.getParam("DEBUG_SW",DEBUG_SW);
+    nh_.getParam("WEB_CAM",WEB_CAM);
+    nh_.getParam("IMSHOW_SW",IMSHOW_SW);
+    nh_.getParam("TRACK_BAR",TRACK_BAR);
+    nh_.getParam("TIME_CHECK",TIME_CHECK);
+    nh_.getParam("USE_LABEL_COUNT_FOR_CROSSWALK",USE_LABEL_COUNT_FOR_CROSSWALK);
+
     InitImgObjectforROS img_obj;
     ros::Rate loop_rate(30);
-    
+
+
     while(img_obj.nh.ok()){
         img_obj.pub.publish(img_obj.coordi_array);
         ros::spinOnce();

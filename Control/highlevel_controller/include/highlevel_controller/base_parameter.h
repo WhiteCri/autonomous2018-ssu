@@ -21,7 +21,7 @@ public:
     bool publish_param;
 
     /* goal list */
-    std::vector<double> x_goal, y_goal, yaw_goal;
+    std::vector<double> x_goal, y_goal, ori_z_goal, ori_w_goal;
     std::vector<std::string> goal_type;
 
     /* tx control parameter */
