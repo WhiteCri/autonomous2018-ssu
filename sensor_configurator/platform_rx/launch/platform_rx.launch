@@ -1,3 +1,0 @@
-<launch>
- <node pkg="platform_rx" type="platform_rx_main_node" name="platform_rx_main_node" args="/dev/ttyUSB0 10"/>
-</launch>
