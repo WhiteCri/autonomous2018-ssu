@@ -28,9 +28,9 @@ public:
         : it_(nh_),cameraMatrix(camMat), distCoeffs(distMat)
     {
         initParam();
-        createTopicName();
-        if(debug) std::cout<<"topic_name : "<<topic_name<<std::endl;
-        camera_image_pub_ = it_.advertise("image_raw",1);
+        //createTopicName();
+        if(debug) std::cout<<"topic_name : "<<"/"+ groupName +"/raw_image"<<std::endl;
+        camera_image_pub_ = it_.advertise("/"+ groupName +"/raw_image",1);
         cap.open(camera_num);
 
         if(calibration){
@@ -61,9 +61,11 @@ int main(int argc, char** argv){
 
     ros::init(argc, argv, "camera_image");
     groupName = argv[1];
-    cv::Mat cameraMatrix = cv::Mat::eye(3, 3, CV_64FC1);
+    cv::Mat cameraMatrix
+     = cv::Mat::eye(3, 3, CV_64FC1);
     cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64FC1);
 
+    ROS_INFO("%s", groupName.c_str());
     CameraImage cimage(cameraMatrix, distCoeffs);
 
     if(debug) ROS_INFO("Start publishing");
@@ -74,10 +76,6 @@ int main(int argc, char** argv){
 
     return 0;
 }
-
-
-
-
 
 // 구현부
 
@@ -105,9 +103,9 @@ void CameraImage::sendImage(){
     }
 }
 
-std::string CameraImage::createTopicName(){
-    topic_name =  "/cam"+ std::to_string(1) +"/raw_image";
-}
+// std::string CameraImage::createTopicName(){
+//     topic_name =  "/"+ groupName +"/raw_image";
+// }
 
 // template < typename T >
 // std::string to_string( const T& n )

@@ -56,13 +56,10 @@ namespace pointcloud_to_laserscan
     private_nh_ = getPrivateNodeHandle();
     private_nh_.param<std::string>("groupName", groupName, "cam9");
 
-    std::cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<groupName<<std::endl;
 
-//    private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
+   // private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
 // modefied by Park
-//private_nh_.param<std::string>("target_frame", target_frame_, groupName+"/camera_main");
-    target_frame_ = groupName+"/camera_main";
-
+    private_nh_.param<std::string>("target_frame", target_frame_, groupName+"/camera_main");
     private_nh_.param<double>("transform_tolerance", tolerance_, 0.01);
     private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min());
     private_nh_.param<double>("max_height", max_height_, std::numeric_limits<double>::max());

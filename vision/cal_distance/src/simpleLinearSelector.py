@@ -2,14 +2,14 @@ import cv2
 import numpy as np
 
 N_LINESAVER_BUFFER = 5
-PATH = './calibration.txt'
-PATH2 = './calibration.png'
-PATH3 = './calibrationLine.txt'
 IMG_PATH = './2.jpg'
+
 mtx_ls = [708.611809, 0, 320.331083, 0, 703.012319, 260.343059, 0, 0, 1] #camera matrix
 dist = np.array([0.09776299999999999, -0.235306, 0.00463, -0.001884, 0]) #distortion matrix
 fx_=1 #resize x 계수
 fy_=1 #resize y 계수
+
+CAMERA_NAME = 'main_'
 
 class LineSaver():
     MAX_SLOPE = 9999
@@ -94,9 +94,43 @@ class LineSaver():
 
         return mat
     def save(self, mat):
-        #sort
+        global CAMERA_NAME
+
+        PATH = '../data/'+CAMERA_NAME+'calibration.txt'
+        PATH2 = '../data/'+CAMERA_NAME+'calibration.png'
+        PATH3 = '../data/'+CAMERA_NAME+'calibrationLine.txt'
+
+        #sort hlines
         self.hlines.sort(key=lambda k:k[1])
-        self.vlines.sort(reverse=True)
+	    #sort vlines
+        self.vlines.sort(key=lambda k:k[0])
+        middle_idx = 0
+        if abs(self.vlines[0][0]) < abs(self.vlines[-1][0]):
+            middle_idx = len(self.vlines) - 1
+        middle = self.vlines[middle_idx]
+        if middle_idx == 0:
+            temp = self.vlines[0]
+            for n in range(0,len(self.vlines)//2):
+                print('n :',n)
+                self.vlines[n] = self.vlines[n + 1]
+        elif middle_idx == len(self.vlines) - 1:
+            temp = self.vlines[-1]
+            n = len(self.vlines) - 1
+            while n > len(self.vlines)//2:
+                print('n :',n)
+                self.vlines[n] = self.vlines[n-1]
+                n = n - 1
+
+            # for n in range(len(self.vlines), len(self.vlines)//2):
+            #     print('n :',n)
+            #     self.vlines[n] = self.vlines[n-1]
+        else :
+            print("why control reaches here...")
+        self.vlines[0], self.vlines[1] = self.vlines[1], self.vlines[0]
+        self.vlines[3], self.vlines[4] = self.vlines[4], self.vlines[3]
+        self.vlines[len(self.vlines)//2] = middle
+
+
         print('hlines : ', self.hlines)
         print('vlines : ', self.vlines)
 

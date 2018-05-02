@@ -21,7 +21,7 @@
 #include <laser_geometry/laser_geometry.h>
 #include <string>
 
-static const bool DEBUG = false;
+static int debug;
 static std::string groupName;
 
 class ConvertCloud{
@@ -32,8 +32,9 @@ class ConvertCloud{
 
 public:
     ConvertCloud(){
+        initParam();
         sub_ = nh_.subscribe("/"+groupName+"/dist",100,&ConvertCloud::distCb,this);
-        sub_scan = nh_.subscribe("/"+groupName+"/scan",100,&ConvertCloud::laserCb,this);
+        sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
         pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/"+groupName+"/point_cloud",100);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
@@ -42,6 +43,7 @@ public:
   void laserCb(const sensor_msgs::LaserScan input);
   void parseVec();
   void convert();
+  void initParam();
   ros::NodeHandle getNh();
   ros::Publisher getPub();
   sensor_msgs::PointCloud2 getPc_out();
@@ -83,7 +85,7 @@ void ConvertCloud::laserCb(const sensor_msgs::LaserScan input){
 }
 void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData){
 
-    if(DEBUG) std::cout<<"start call back"<<std::endl;
+    if(debug) std::cout<<"start call back"<<std::endl;
 
     distXdata.clear();
     distYdata.clear();
@@ -92,7 +94,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
 
     std::vector<float>::const_iterator it;
 
-    if(DEBUG) std::cout<<"before push_back"<<std::endl;
+    if(debug) std::cout<<"before push_back"<<std::endl;
 
     it = distData->data.begin();
 
@@ -112,7 +114,7 @@ void ConvertCloud::distCb(const std_msgs::Float32MultiArray::ConstPtr& distData)
         }
     }
 //    ROS_INFO("size : %u",size);
-    if(DEBUG) {
+    if(debug) {
         std::cout<<"size : "<<distVec.size()<<std::endl;
         for(int i=0; i<distXdata.size(); i++){
             std::cout<<"X : "<<distXdata[i]<<" / Y : "<<distYdata[i]<<std::endl;
@@ -129,14 +131,14 @@ void ConvertCloud::parseVec(){
     std::vector<float>::iterator itX = distXdata.begin();
     std::vector<float>::iterator itY = distYdata.begin();
     while( (itX!=distYdata.end())&&(itY!=distYdata.end()) ){
-        if(DEBUG){
+        if(debug){
            std::cout<<"parse X : "<<(*itX)<<" / parse Y : "<<(*itY)<<std::endl;
         }
         distVec.push_back(cv::Vec3f( (*itX),(*itY),0) );
         ++itX;
         ++itY;
     }
-    if(DEBUG){
+    if(debug){
         std::cout<<"parse done"<<std::endl;
     }
 }
@@ -169,7 +171,7 @@ void ConvertCloud::convert(){
   }
 
   pcl::toROSMsg(*pc, pc_out);
-  if(DEBUG) std::cout<<"make cloud done"<<std::endl;
+  if(debug) std::cout<<"make cloud done"<<std::endl;
 
   pc->clear();
 
@@ -179,3 +181,7 @@ void ConvertCloud::convert(){
 ros::NodeHandle ConvertCloud::getNh(){ return nh_; }
 ros::Publisher ConvertCloud::getPub(){ return pub_; }
 sensor_msgs::PointCloud2 ConvertCloud::getPc_out(){ return pc_out; }
+
+void ConvertCloud::initParam(){
+  nh_.param("/"+groupName+"/convert_cloud/debug", debug, 4);
+}

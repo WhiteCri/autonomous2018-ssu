@@ -20,7 +20,7 @@
     <param name="output_frame_id" value="/cam0/camera_main"/>
     <param name="min_height" value="-0.15"/><!-- Or any other value that suits you etter -->
     <param name="max_height" value="0.15"/><!-- Or any other value that suits you etter -->
-    <remap from="cloud_in" to="/cam0/point_cloud"/>
+    <remap from="cloud_in" to="/main/point_cloud"/>
   </node>
 
   <!-- Fake Laser (narrow one, for localization -->
@@ -28,7 +28,7 @@
     <param name="output_frame_id" value="/cam0/camera_main"/>
     <param name="min_height" value="-0.025"/><!-- Or any other value that suits you etter -->
     <param name="max_height" value="0.025"/><!-- Or any other value that suits you etter -->
-    <remap from="cloud_in" to="/cam0/point_cloud"/>
+    <remap from="cloud_in" to="/main/point_cloud"/>
     <remap from="scan" to="/narrow_scan"/>
   </node>
 </launch>

@@ -41,6 +41,8 @@ lane_detect_algo::vec_mat_t lane_m_vec;
 
  bool is_stop_checked = false;
 using namespace lane_detect_algo;
+using namespace std;
+
 
 class InitImgObjectforROS{
     public:
@@ -50,7 +52,6 @@ class InitImgObjectforROS{
         std_msgs::Int32MultiArray coordi_array;
         cv::Mat pub_img;
         ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("/"+groupName+"/lane",100);//파라미터로 카메라 번호 받도록하기
-
         int y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax;
         int w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax;
         int check_stop_count;
@@ -65,12 +66,11 @@ class InitImgObjectforROS{
 
 InitImgObjectforROS::InitImgObjectforROS():it(nh){
             initParam();
-
             if(!web_cam){//'DEBUG_SW == TURE' means subscribing videofile image
-                sub_img = it.subscribe("/videofile/image_raw",1,&InitImgObjectforROS::imgCb,this);
+                sub_img = it.subscribe("/"+groupName+"videofile/image_raw",1,&InitImgObjectforROS::imgCb,this);
             }
             else{//'DEBUG_SW == FALSE' means subscribing webcam image
-                sub_img = it.subscribe("image_raw",1,&InitImgObjectforROS::imgCb,this);
+                sub_img = it.subscribe("/"+groupName+"/raw_image",1,&InitImgObjectforROS::imgCb,this);
             }
 
             if(track_bar) {
@@ -194,17 +194,19 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                 cv::Mat whiteXProj(cv::Size(frame_width, frame_height), CV_8UC1);
 
                 if(lable){
-                  // int crosswalk_check = 0;
-                  // int *crosswalk = &crosswalk_check;
-                  // callane.makeContoursRightLane(white_hsv, white_labeling, crosswalk);
-                  // nh.setParam("hl_controller/crosswalk",false);
-                  // if(crosswalk_check){
-                  //         ROS_INFO("param set crosswalk true!\n");
-                  //         nh.setParam("hl_controller/crosswalk",true);
-                  //         crosswalk_check = 0;
-                  //       }
+                  int crosswalk_check = 0;
+                  int *crosswalk = &crosswalk_check;
+                  callane.makeContoursRightLane(white_hsv, white_labeling, crosswalk);
+                  nh.setParam("hl_controller/crosswalk",false);
+                  if(crosswalk_check){
+                          ROS_INFO("param set crosswalk true!\n");
+                          nh.setParam("hl_controller/crosswalk",true);
+                          crosswalk_check = 0;
+                        }
                 }
+
                 callane.makeContoursLeftLane(yellow_hsv, yellow_labeling);//for labeling(source channel is 1)
+
                 if(!lable){
                     callane.makeContoursRightLane(white_hsv, white_labeling);//for labeling(source channel is 1)
                 }
@@ -280,8 +282,9 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         nh.setParam("hl_controller/crosswalk",true);
                         check_stop_count = 1;
                         is_stop_checked = true;
-                        //ROS_INFO("param set crosswalk true!\n");
-                        if(imshow)cv::imshow("stop_lane_before_crosswalk",my_test_hough);
+                        ROS_INFO("param set crosswalk true!\n");
+                        if(imshow)
+                            cv::imshow("stop_lane_before_crosswalk",my_test_hough);
                    // }
                     if(is_stop_checked){
 		     //is_stop_checked = false;
@@ -316,10 +319,12 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
 }
 
 
+
 int main(int argc, char **argv){
     ros::init(argc, argv, "lane_detection");
     groupName = argv[1];
-    ros::NodeHandle nh_;
+    ROS_INFO("strat lane detection");
+    // ros::NodeHandle nh_;
     InitImgObjectforROS img_obj;
     ros::Rate loop_rate(30);
 
@@ -332,6 +337,7 @@ int main(int argc, char **argv){
     ROS_INFO("program killed!\n");
     return 0;
 }
+
 
 void InitImgObjectforROS::initParam(){
   nh.param<int>("/"+groupName+"/lane_detection/debug", debug, 0);

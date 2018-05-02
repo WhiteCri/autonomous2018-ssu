@@ -12,7 +12,7 @@ using std::vector;
 
 struct Pos{
   Pos(): x(0), y(0) {}
-  Pos(int x, int y) : x(x), y(x) {}
+  Pos(int x, int y) : x(x), y(y) {}
   Pos(double x, double y): x(x), y(y) {}
   double x;
   double y;
@@ -46,7 +46,6 @@ void parsePixel(std::string filename, vector<vector<Pos> >& posVec, Pos& center)
   in >> str;//flush newline
 
   //initialize pixel
-  in >> str;
   while(!in.eof()){
     posVec.emplace_back(0); // append
 
