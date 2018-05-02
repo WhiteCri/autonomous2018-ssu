@@ -79,6 +79,23 @@ Parameters::Parameters(){
     nh.param("hl_controller/parking_far_back_point_ori_z",     parking_far_back_point_ori_z, 0.0);
     nh.param("hl_controller/parking_far_back_point_ori_w",     parking_far_back_point_ori_w, 0.0);
 
+    /* uturn members */
+    bool use_process_uturn;
+    bool use_uturn_onetime_flag;
+
+    int uturn_tx_speed;
+    int uturn_tx_steer;
+    int uturn_tx_brake;
+    double uturn_duration;
+    nh.param("hl_controller/use_process_uturn", use_process_uturn, true);
+    nh.param("hl_controller/uturn_check_duration", uturn_check_duration, 1.0);
+    nh.param("hl_controller/use_uturn_onetime_flag", use_uturn_onetime_flag, true);
+
+    nh.param("hl_controller/uturn_tx_speed", uturn_tx_speed, 50);
+    nh.param("hl_controller/uturn_tx_steer", uturn_tx_steer, 1999);
+    nh.param("hl_controller/uturn_tx_brake", uturn_tx_brake, 0);
+    nh.param("hl_controller/uturn_duration", uturn_duration, 1.0);
+
     /* recovery members */
     nh.param("hl_controller/recovery", recovery, false);
     nh.param("hl_controller/use_process_recovery", use_process_recovery, true);

@@ -228,6 +228,31 @@ void process_parking(){
     param_ptr->nh.setParam("hl_controller/parking_onetime_flag",true);
 }
 
+void process_uturn(){
+    ROS_INFO("uturn start");
+
+    double uturn_duration = param_ptr->uturn_duration;
+
+    //set tx_control_static
+    ROS_INFO("set tx_control value - speed : %d, steer : %d, brake : %d", 
+        param_ptr->uturn_tx_speed, param_ptr->uturn_tx_steer, param_ptr->uturn_tx_brake);
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", param_ptr->uturn_tx_speed);
+    param_ptr->nh.setParam("hl_controller/tx_steer", param_ptr->uturn_tx_steer);
+    param_ptr->nh.setParam("hl_controller/tx_brake", param_ptr->uturn_tx_brake);
+
+    //wait until duration ends
+    ros::Rate(param_ptr->uturn_duration).sleep();
+
+    //erase tx_control_static flag
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+
+    //check that process_movingobj had been done.
+    param_ptr->nh.setParam("hl_controller/uturn_onetime_flag",true);
+
+    ROS_INFO("uturn done");
+}
+
 void process_recovery(){
     param_ptr->nh.setParam("hl_controller/recovery",false);
 }

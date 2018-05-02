@@ -82,6 +82,24 @@ int main(int argc, char *argv[]){
             );
         }
 
+        //register uturn
+        if (param_ptr->use_process_uturn){
+            ha.setState(PROCESS_UTURN, process_uturn);
+
+            int uturn_check_frequency = ha_frequency * param_ptr->uturn_check_duration;
+            
+            ha.setCondition(
+                TOWARD_GOAL,
+                new Toward_goal_to_process_uturn(uturn_check_frequency),
+                PROCESS_UTURN
+            );
+            ha.setCondition(
+                PROCESS_UTURN,
+                new Process_uturn_to_toward_goal(0),
+                TOWARD_GOAL
+            );
+        }
+
         //register recovery
         if (param_ptr->use_process_recovery){
             ha.setState(PROCESS_RECOVERY, process_recovery);

@@ -51,6 +51,20 @@ bool Process_parking_to_toward_goal::timedCheck(HybridAutomata *HA){
     return true;
 }
 
+/* uturn */
+bool Toward_goal_to_process_uturn::timedCheck(HybridAutomata* HA){
+    bool ret = true;
+    ret &= param_ptr->uturn;
+    if (param_ptr->use_uturn_onetime_flag)
+        ret &= !param_ptr->uturn_onetime_flag;
+
+    return ret;
+}
+
+bool Process_uturn_to_toward_goal::timedCheck(HybridAutomata *HA){
+    return true;
+}
+
 /* recovery */
 bool Toward_goal_to_process_recovery::timedCheck(HybridAutomata* HA){
     bool ret = true;
