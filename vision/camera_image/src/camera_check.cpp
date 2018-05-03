@@ -6,7 +6,11 @@
 
 // Complile : g++ camera_check.cpp -o camera_check `pkg-config --cflags --libs opencv` -std=c++11
 // ESC : 종료
+<<<<<<< HEAD
 // a(소문자) : 다음 카메라
+=======
+// ENTER : 다음 카메라
+>>>>>>> origin/master
 // SPACE : 사진 촬영. ../sample_image에 저장
 
 
@@ -17,8 +21,11 @@ using namespace cv;
 
 void mouseEvent( int event, int x, int y, int flags, void* userdata );
 
+<<<<<<< HEAD
 std::string name;
 
+=======
+>>>>>>> origin/master
 int main(int argc, char** argv){
   VideoCapture cam[MAX_CAM];
   char status[MAX_CAM];
@@ -29,8 +36,11 @@ int main(int argc, char** argv){
   int imgNum = 0;
   memset(status, 0, sizeof(status));
 
+<<<<<<< HEAD
   name = argv[1];
 
+=======
+>>>>>>> origin/master
   for(int i=0; i<MAX_CAM; i++){
     cam[i].open(i);
     if(!cam[i].isOpened()){
@@ -63,8 +73,12 @@ int main(int argc, char** argv){
       if(key == 27) {
           break;
       }
+<<<<<<< HEAD
       else if (key == 97) {
         cout<<"a\n"<<endl;
+=======
+      else if (key == 13) {
+>>>>>>> origin/master
         cam[showNum].release();
         destroyAllWindows();
         for(int i = showNum+1; i<MAX_CAM; i++){
@@ -82,10 +96,17 @@ int main(int argc, char** argv){
         cam[showNum].open(showNum);
       }
       else if(key == 32){
+<<<<<<< HEAD
         cout<<"Save vision/camera_image/sample_image/"+name+"_origin_"<<imgNum<<".jpg"<<endl;
         cout<<"Save vision/camera_image/sample_image/"+name+"_sizeX2_"<<imgNum<<".jpg"<<endl;
         imwrite("../sample_image/"+name+"_origin_"+to_string(imgNum)+".jpg", frame[showNum]);
         imwrite("../sample_image/"+name+"_sizeX2_"+to_string(imgNum)+".jpg", frameX2[showNum]);
+=======
+        cout<<"Save vision/camera_image/sample_image/origin_"<<imgNum<<".jpg"<<endl;
+        cout<<"Save vision/camera_image/sample_image/sizeX2_"<<imgNum<<".jpg"<<endl;
+        imwrite("../sample_image/origin_"+to_string(imgNum)+".jpg", frame[showNum]);
+        imwrite("../sample_image/sizeX2_"+to_string(imgNum)+".jpg", frameX2[showNum]);
+>>>>>>> origin/master
         imgNum++;
 
       }

@@ -43,19 +43,23 @@
 #include <pluginlib/class_list_macros.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <tf2_sensor_msgs/tf2_sensor_msgs.h>
+#include <string>
+#include <iostream>
 
 namespace pointcloud_to_laserscan
 {
-
   PointCloudToLaserScanNodelet::PointCloudToLaserScanNodelet() {}
 
   void PointCloudToLaserScanNodelet::onInit()
   {
     boost::mutex::scoped_lock lock(connect_mutex_);
     private_nh_ = getPrivateNodeHandle();
+    private_nh_.param<std::string>("groupName", groupName, "cam9");
 
-//    private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
-private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
+
+   // private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
+// modefied by Park
+    private_nh_.param<std::string>("target_frame", target_frame_, groupName+"/camera_main");
     private_nh_.param<double>("transform_tolerance", tolerance_, 0.01);
     private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min());
     private_nh_.param<double>("max_height", max_height_, std::numeric_limits<double>::max());
@@ -67,7 +71,7 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
     private_nh_.param<double>("range_min", range_min_, 0.0);
     private_nh_.param<double>("range_max", range_max_, std::numeric_limits<double>::max());
     private_nh_.param<double>("inf_epsilon", inf_epsilon_, 1.0);
-    
+
     int concurrency_level;
     private_nh_.param<int>("concurrency_level", concurrency_level,1);
     private_nh_.param<bool>("use_inf", use_inf_, true);
@@ -104,7 +108,7 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
     else // otherwise setup direct subscription
     {
 
-    
+
       sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
     }
 
@@ -116,10 +120,12 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
   void PointCloudToLaserScanNodelet::connectCb()
   {
     boost::mutex::scoped_lock lock(connect_mutex_);
-    
+
     if (pub_.getNumSubscribers() > 0 && sub_.getSubscriber().getNumPublishers() == 0)
     {
       NODELET_INFO("Got a subscriber to scan, starting subscriber to pointcloud");
+      // modefied by Park
+      std::cout<<"in connect"<<std::endl;
       sub_.subscribe(nh_, "cloud_in", input_queue_size_);
     }
     else{
@@ -148,11 +154,11 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
   void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
   {
 
-   
+
     //build laserscan output
     sensor_msgs::LaserScan output;
     output.header = cloud_msg->header;
-    
+
     if (!target_frame_.empty())
     {
       output.header.frame_id = target_frame_;
@@ -190,7 +196,7 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
         cloud.reset(new sensor_msgs::PointCloud2);
         tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_));
         cloud_out = cloud;
-        
+
       }
       catch (tf2::TransformException &ex)
       {
@@ -201,7 +207,7 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
     else
     {
       cloud_out = cloud_msg;
-     
+
     }
 
     // Iterate through pointcloud
@@ -241,12 +247,12 @@ private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
 
       //overwrite range at laserscan ray if new range is smaller
       int index = (angle - output.angle_min) / output.angle_increment;
-      
+
       if (range < output.ranges[index])
       {
         output.ranges[index] = range;
       }
-        
+
     }
 //    ROS_INFO("cloud count : %d",count);
     output.header.stamp = ros::Time::now();
