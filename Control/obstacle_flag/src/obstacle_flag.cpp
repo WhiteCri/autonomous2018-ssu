@@ -13,11 +13,10 @@
 #include <thread>
 #include <vector>
 
-
 /* U_turn check */
 #define Laser_Filter_start 200
 #define Laser_Filter_end 300
-#define frequency 10
+#define frequency 30
 
 #define test_uturn
 #define test_dynamic
@@ -168,7 +167,7 @@ void uturncall(const sensor_msgs::LaserScan::ConstPtr& scan)
             u_turn = false;
         }
     }
-    Node.setParam("hl_controller/Uturn",u_turn);
+    Node.setParam("hl_controller/uturn",u_turn);
 
 
 }
@@ -220,7 +219,7 @@ void parkcall(const obstacle_detector::Obstacles::ConstPtr &object)
          }
 
     #endif
-    Node.setParam("h1_controller/park",is_park);
+    Node.setParam("h1_controller/parking",is_park);
 
 }
 
@@ -269,8 +268,8 @@ int main(int argc, char *argv[])
     ros::NodeHandle n("~");
 
     n.param<bool>("hl_controller/movingobj",dynamic_obstacle,false);
-    n.param<bool>("hl_controller/Uturn",u_turn,false);
-    n.param<bool>("h1_controoller/park",is_park,false);
+    n.param<bool>("hl_controller/uturn",u_turn,false);
+    n.param<bool>("h1_controoller/parking",is_park,false);
 
 
     n.getParam("dynamic/size_N",dynamic_param.size_N);
