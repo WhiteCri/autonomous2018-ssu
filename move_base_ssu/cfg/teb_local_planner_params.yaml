@@ -31,9 +31,9 @@ TebLocalPlannerROS:
   #[[0.40,-0.55],[-1.25,-0.55],[-1.25,0.55],[0.40,0.55]] # 0.05m 줄인 값(feasibile warning 잡기 위해)
   #[[0.45,-0.60],[-1.3,-0.60],[-1.3,0.60],[0.45,0.60]] # 정확한 값 
 
-  acc_lim_x: 1.5
+  acc_lim_x: 1.3
   max_vel_x: 8.0
-  max_vel_x_backwards: 0.8
+  max_vel_x_backwards: 0.5
  
   acc_lim_y: 0.01
   max_vel_y: 0.0

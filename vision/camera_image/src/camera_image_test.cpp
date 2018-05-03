@@ -37,33 +37,33 @@ int main(int argc, char** argv){
         // cout<<"src x : "<<src.cols << " / src y : "<<src.rows<<endl;
 
         resize(src, src2, Size(src.cols * 2, src.rows * 2), 0, 0, CV_INTER_NN);
-        imshow("Size up",src2);
+        //imshow("Size up",src2);
         // cout<<"src2 x : "<<src2.cols << " / src_up y : "<<src2.rows<<endl;
 
-        undistort(src, calib1, cameraMatrix, distCoeffs);
+        //undistort(src, calib1, cameraMatrix, distCoeffs);
 
         //undistort(src2, calib2, cameraMatrix, distCoeffs);
-        resize(calib1, calib2, Size(calib1.cols * 2, calib1.rows * 2), 0, 0, CV_INTER_NN);
+        //resize(calib1, calib2, Size(calib1.cols * 2, calib1.rows * 2), 0, 0, CV_INTER_NN);
 
-        imshow("Calibration 1",calib1);
+        //imshow("Calibration 1",calib1);
 
-        imshow("Calibration 2",calib2);
+        //imshow("Calibration 2",calib2);
 
         key = waitKey(30);
         if(key == 27) {
             break;
         }
-        // else if (key == 32) {
-        //
-        //     cout<<"Image write "<<to_string(num)<<endl;
-        //     imwrite("../sample_image/src_"+to_string(num)+".jpg", src);
-        //     imwrite("../sample_image/src2_"+to_string(num)+".jpg", src2);
+        else if (key == 32) {
+        
+             cout<<"Image write "<<to_string(num)<<endl;
+             imwrite("../sample_image/src_"+to_string(num)+".jpg", src);
+         //    imwrite("../sample_image/src2_"+to_string(num)+".jpg", src2);
         //     imwrite("../sample_image/calib1_"+to_string(num)+".jpg", calib1);
         //     imwrite("../sample_image/calib2_"+to_string(num)+".jpg", calib2);
-        //
-        //     num++;
-        //
-        // }
+        
+        
+             num++;
+        }
     }
 
     return 0;

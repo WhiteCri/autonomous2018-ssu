@@ -22,16 +22,16 @@ public:
   virtual bool check(HybridAutomata *HA) = 0;
   virtual ~Condition() {}
   virtual std::string toString() const = 0;
-protected:
 };
 //added by TaeWook
 class TimedCondition : public Condition
 {
 public:
-  TimedCondition(unsigned int condCount) : condCount_(condCount), condDeq(condCount)
+  TimedCondition(unsigned int condCount) : condCount_(condCount)
   { 
-    if(condCount_ == 0) condCount_ = 1;
+    if(condCount_ <= 0) condCount_ = 1;
     if(condCount_ >= MAX_CONDCOUNT) throw std::runtime_error("too big condCount!");
+    condDeq = std::deque<bool>(condCount_);
   }
   virtual bool check(HybridAutomata *HA)
   {

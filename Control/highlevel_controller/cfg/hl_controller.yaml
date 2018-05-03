@@ -1,10 +1,10 @@
 hl_controller:
 #goal
-  x_goal: [330,331,333]
-  y_goal: [0.125,7.5,16]
-  ori_z_goal: [3,0,3,3,3,3]
-  ori_w_goal: [0.5,0.5,0.5,0.5]
-  goal_type: ["before crosswalk","g"]
+  x_goal: [3.979,0.8854,-11.4371]
+  y_goal: [6.894,15.6163,15.0483]
+  ori_z_goal: [0.685,0.9881,-0.7187]
+  ori_w_goal: [0.727,0.1533,0.6952]
+  goal_type: ["normal","normal","n"]
 
 #config controller
   frequency: 5
@@ -82,4 +82,4 @@ hl_controller:
 
 #goal_sender params
   use_auto_goal_sender: false
-  auto_goal_sender_frequency: 3
+  auto_goal_sender_frequency: 0.2

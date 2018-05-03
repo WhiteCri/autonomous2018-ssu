@@ -14,6 +14,7 @@ inline void showGoal(double x, double y, double ori_z, double ori_w, const std::
 }
 
 void init(){
+    ROS_INFO("State Init...");
     double x = param_ptr->x_goal.back();
     double y = param_ptr->y_goal.back();
     double ori_z = param_ptr->ori_z_goal.back();

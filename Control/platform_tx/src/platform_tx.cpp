@@ -79,9 +79,9 @@ void serialWrite(){
             *(int8_t*)(packet + 8) = *((int8_t*)(&txControlStatic.tx_steer) + 1);
             *(int8_t*)(packet + 9) = *(int8_t*)(&txControlStatic.tx_steer);
             packet[10] = txControlStatic.tx_brake; // brake
-            ser->write(packet,TX_PACKET_LENGTH);
             lock.unlock();
         }
+        ser->write(packet,TX_PACKET_LENGTH);
         loop_rate.sleep();
     }
 }
