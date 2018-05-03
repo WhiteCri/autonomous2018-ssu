@@ -28,7 +28,7 @@ void init(){
 
 void toward_goal(){
     typedef GoalSender::GoalStates GoalStates;
-    param_ptr->nh.setParam("hl_controller/tx_stop", false);
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
 
     auto state = goalSender_ptr->getState();
     if (state == GoalStates::STATE_SUCCEEDED){
@@ -98,7 +98,10 @@ void process_crosswalk(){
 
     //take car to stop
     ROS_INFO("stop...");
-    param_ptr->nh.setParam("hl_controller/tx_stop", true);
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", 150);
 
     //take car to wait
     ros::Rate(1 / param_ptr->crosswalk_stop_duration).sleep();
@@ -120,7 +123,10 @@ void process_movingobj(){
     }
     //take car to stop
     ROS_INFO("stop...");
-    param_ptr->nh.setParam("hl_controller/tx_stop", true);
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", 150);
 
     //take car to wait
     ros::Rate(1 / param_ptr->movingobj_stop_duration).sleep();
@@ -135,20 +141,39 @@ void process_parking(){
     ROS_INFO("process parking start");
 
     ROS_INFO("finding parking point...");
+    double parking_point_x;
+    double parking_point_y;
+    double parking_point_ori_z;
+    double parking_point_ori_w;
+    double backing_point_x;
+    double backing_point_y;
+    double backing_point_ori_z;
+    double backing_point_ori_w;
     /* 
         I haven't find the solution to select the goal. So temporarily, just select the near goal.
         this code should be modified until the contest
     */
-    double parking_point_x   = param_ptr->parking_near_arrive_point_x;
-    double parking_point_y   = param_ptr->parking_near_arrive_point_y;
-    double parking_point_ori_z = 0;
-    double parking_point_ori_w = 0;
-    double backing_point_x   = param_ptr->parking_near_back_point_x;
-    double backing_point_y   = param_ptr->parking_near_back_point_y;
-    double backing_point_ori_z = 0;
-    double backing_point_ori_w = 0;
-    ROS_INFO("set near point as a goal...");
-    
+    if (true){
+        parking_point_x      = param_ptr->parking_near_arrive_point_x;
+        parking_point_y      = param_ptr->parking_near_arrive_point_y;
+        parking_point_ori_z  = param_ptr->parking_near_arrive_point_ori_z;
+        parking_point_ori_w  = param_ptr->parking_near_arrive_point_ori_w;
+        backing_point_x      = param_ptr->parking_near_back_point_x;
+        backing_point_y      = param_ptr->parking_near_back_point_y;
+        backing_point_ori_z  = param_ptr->parking_near_back_point_ori_z;
+        backing_point_ori_w  = param_ptr->parking_near_back_point_ori_w;
+        ROS_INFO("set near point as a goal...");
+    } else{
+        parking_point_x      = param_ptr->parking_far_arrive_point_x;
+        parking_point_y      = param_ptr->parking_far_arrive_point_y;
+        parking_point_ori_z  = param_ptr->parking_far_back_point_ori_z;
+        parking_point_ori_w  = param_ptr->parking_far_back_point_ori_w;
+        backing_point_x      = param_ptr->parking_far_back_point_x;
+        backing_point_y      = param_ptr->parking_far_back_point_y;
+        backing_point_ori_z  = param_ptr->parking_far_back_point_ori_z;
+        backing_point_ori_w  = param_ptr->parking_far_back_point_ori_w;
+        ROS_INFO("set far point as a goal...");
+    }
     //set goal to parking point
     ROS_INFO("to the parking point...");
     goalSender_ptr->setGoal(
@@ -170,14 +195,17 @@ void process_parking(){
 
     //take car to stop
     ROS_INFO("stop...");
-    param_ptr->nh.setParam("hl_controller/tx_stop", true);
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", 100);
 
     //take car to wait
     ros::Rate(1 / param_ptr->parking_stop_duration).sleep();
 
     //set goal to backing point
     ROS_INFO("set tx_stop false");
-    param_ptr->nh.setParam("hl_controller/tx_stop", false);
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
 
     ROS_INFO("to the backing point...");
     goalSender_ptr->setGoal(
@@ -198,6 +226,31 @@ void process_parking(){
     ROS_INFO("Arrived backing point...");
 
     param_ptr->nh.setParam("hl_controller/parking_onetime_flag",true);
+}
+
+void process_uturn(){
+    ROS_INFO("uturn start");
+
+    double uturn_duration = param_ptr->uturn_duration;
+
+    //set tx_control_static
+    ROS_INFO("set tx_control value - speed : %d, steer : %d, brake : %d", 
+        param_ptr->uturn_tx_speed, param_ptr->uturn_tx_steer, param_ptr->uturn_tx_brake);
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", param_ptr->uturn_tx_speed);
+    param_ptr->nh.setParam("hl_controller/tx_steer", param_ptr->uturn_tx_steer);
+    param_ptr->nh.setParam("hl_controller/tx_brake", param_ptr->uturn_tx_brake);
+
+    //wait until duration ends
+    ros::Rate(param_ptr->uturn_duration).sleep();
+
+    //erase tx_control_static flag
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+
+    //check that process_movingobj had been done.
+    param_ptr->nh.setParam("hl_controller/uturn_onetime_flag",true);
+
+    ROS_INFO("uturn done");
 }
 
 void process_recovery(){

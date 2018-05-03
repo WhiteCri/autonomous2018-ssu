@@ -1,0 +1,44 @@
+## Platform RX/TX: USB0
+rx_thread_test:
+  path: "/dev/ttyUSB0"
+  serial_frequency: 20
+  publish_frequency: 10
+  moving_average_element_number: 5
+
+platform_tx:
+  alignmentBias: 0
+  frequency: 50
+  cmd_platform_topic_name: "/control/cmd_platform"
+  
+
+## IMU: USB1
+imu:
+  shift: 0.0
+  debugingFlag: true
+  covariance: 0.009
+
+
+## GPS: USB2
+GPS_Odometry_initial: false
+
+
+## LIDAR: Ethernet
+LMS1xx_node:
+  host: "192.168.0.204"
+  publish_min_range_as_inf: false
+
+scan_to_scan_filter_chain:
+  scan_filter_chain:
+  - name: angle
+    type: LaserScanAngularBoundsFilter
+    params:
+      lower_angle: 1.4
+      upper_angle: 2.4
+  - name: angle2
+    type: LaserScanAngularBoundsFilter
+    params:
+      lower_angle: -2.4
+      upper_angle: -1.4
+
+## Webcam
+

@@ -10,6 +10,8 @@ void process_movingobj();
 
 void process_parking();
 
+void process_uturn();
+
 void process_recovery();
 
 void done();

@@ -1,6 +1,10 @@
 #include <vector>
 #include <iostream>
-
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <cmath>
+#include "coordinate.h"
 #include "ros/ros.h"
 
 #include "std_msgs/MultiArrayLayout.h"
@@ -8,64 +12,191 @@
 #include "std_msgs/Int32MultiArray.h"
 #include "std_msgs/Float32MultiArray.h"
 
-#define X_CENTER 460.0
-#define Y_CENTER 277.0
+#include <stdio.h>
+#include <unistd.h>
 
-// xGap = xCenter - xTarget, yGap = yTarget - yCenter
+static int debug;
+static std::string groupName;
+static std::string calPath;
 
-static const bool DEBUG = false;
+/*
+  1. 픽셀 파일 읽기 => 2차원 백터
+  1'. 변환 함수(pixel -> 실좌표)
+  struct pos
+  2. 무한루프
+*/
+
+using std::vector;
+
+class Transformer{
+public:
+    Transformer(){}
+    Transformer(std::string pixelName, std::string lineName){
+      //save Center
+      parsePixel(pixelName, fileVec, center);
+      parseLine(lineName, hlines, vlines);
+
+      this->realVec.resize(fileVec.size());
+      realVec[0].emplace_back(center.x, center.y); // set top-left realcoordinate
+      for (size_t i = 1 ; i < fileVec[0].size(); ++i)
+        realVec[0].emplace_back(
+          realVec[0][i-1].x ,
+          realVec[0][i-1].y - 0.5
+        );
+      for(size_t i = 1 ; i < fileVec.size(); ++i){
+        for( size_t j = 0 ; j < fileVec[0].size(); ++j){
+          realVec[i].emplace_back(
+            realVec[i-1][j].x - 0.5,
+            realVec[i-1][j].y
+          );
+        }
+      }
+
+      //debuging code
+    //   {
+    //     //make string from fileVec, realVec, linevec
+    //
+    //     //filevec
+    //     std::stringstream ss;
+    //     for (auto& posVec: fileVec){
+    //       for (auto& pos : posVec){
+    //         ss << "(" << pos.x << ',' << pos.y << ")";
+    //       }
+    //       ss << std::endl;
+    //     }
+    //     ROS_INFO("filevec... %s",ss.str().c_str());
+    //
+    //     //realvec
+    //     ss.str("");
+    //     for(auto& posVec : realVec){
+    //       for(auto& pos : posVec){
+    //         ss << "(" << pos.x << ',' << pos.y << ")";
+    //       }
+    //       ss << std::endl;
+    //     }
+    //     ROS_INFO("realvec... %s",ss.str().c_str());
+    //
+    //     //hlines, vlines
+    //     ss.str("");
+    //     for(auto& line : hlines)
+    //       ss << "(" << line.slope << ',' << line.intercept << ")";
+    //     ROS_INFO("hlines... %s",ss.str().c_str());
+    //   }
+    //   //debuging code end
+    //
+    }
+
+    Pos pixel_to_real(const Pos& pos){
+      int idx_x = -1, idx_y = -1;
+      //find upper y (in pixel coordinate)
+      for(size_t i = 0 ; i < fileVec.size(); ++i){
+        if (fileVec[i][0].y > pos.y) {
+          idx_y = i;
+          break;
+        }
+
+      }
+      // exception handling
+      if (idx_y <= 0) return Pos(0,0);
+
+
+      //find upper x (in pixel coordinate)
+     for(size_t i = 0 ; i < fileVec[0].size(); ++i){
+        if (fileVec[idx_y][i].x > pos.x) {
+          idx_x = i;
+          break;
+        }
+      }
+
+      if (idx_x <= 0) return Pos(0,0);
+
+      // //to avoid divide by zero, throw away when hlines.slope == 0
+      if ((hlines[idx_y].slope == 0) || (hlines[idx_y-1].slope == 0)) return Pos(0,0);
+
+      // calc top-left coordinate
+      Pos real_dr = realVec[idx_y][idx_x];
+
+      // 타겟 지점부터 상하좌우 직선 좌표차
+      double up, down, right, left;
+      up   = abs( pos.y - ( hlines[idx_y - 1].slope * pos.x + hlines[idx_y-1].intercept ) );
+      down = abs( pos.y - ( hlines[idx_y].slope  * pos.x + hlines[idx_y].intercept ) );
+
+      right = abs( pos.x - ( pos.y - vlines[idx_x].intercept) / vlines[idx_x].slope ); // 1
+
+      // px - ( py - b) / a
+      left = abs( pos.x -  ( pos.y - vlines[idx_x - 1].intercept ) / vlines[idx_x - 1].slope); // 0
+
+      Pos distance( real_dr.x+  0.5 * down / ( up + down ), real_dr.y + 0.5 * right / ( left + right ) );
+      return distance;
+    }
+private:
+  Pos center;
+  vector<vector<Pos> > fileVec;
+  vector<vector<Pos> > realVec;
+  vector<Line> hlines; // 수직방향 직선
+  vector<Line> vlines; //수평방향 직선
+};
 
 class CalDistance{
     ros::NodeHandle nh_;
     ros::Subscriber sub_;
     ros::Publisher pub_;
 public:
-    CalDistance()
-        : xCenter(X_CENTER), yCenter(Y_CENTER), yGap(0.0), yGap50(0.0), yDist(0.0), xGap(0.0), xDist(0.0)
+    CalDistance(std::string _filename, std::string _linename)
+      //filename(_filename), linename(_linename)//transformer(filename, linename)
     {
-        sub_ = nh_.subscribe("/cam1/lane",100,&CalDistance::laneCb,this);
-        pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/cam1/dist", 100);
+      // 싱글카메라
+      initParam();
+      transformer = Transformer(filename, linename);
+
+
+      sub_ = nh_.subscribe("/"+ groupName +"/lane",100,&CalDistance::laneCb,this);
+      pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/"+ groupName +"/dist", 100);
+
     }
-    void calXdist();
-    void calYgap50();
-    void calYdist();
     void laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData);
     void sendDist();
+    void initParam();
     ros::NodeHandle getNh();
+    void setName(){
 
-
+    }
 private:
     std::vector<float> laneXData;
     std::vector<float> laneYData;
     std_msgs::Float32MultiArray distData;
-    float xCenter;
-    float yCenter;
-    float yGap;
-    float yGap50;
     float yDist;
-    float xGap;
     float xDist;
     int size;
+    Transformer transformer;
+    std::string filename;
+    std::string linename;
 };
 
 
 int main(int argc, char** argv){
-    ros::init(argc, argv, "cal_distance");
 
-    CalDistance calDist;
+    /*char buf[1024];
+    int bufsize;
+    getcwd(buf,bufsize);
+    printf("buf :: %s , size :: %d \n",buf,bufsize);*/
+
+    sleep(2); // 런치 파일 실행시 lane_detection이 구동되지 않아 생기는 오류 방지
+    groupName = argv[1];
+
+    ros::init(argc, argv, "cal_dirstance");
+
+    CalDistance calDist( calPath +"/calibration.txt", calPath + "/calibrationLine.txt");
     while(calDist.getNh().ok()){
         calDist.sendDist();
         ros::spinOnce();
     }
-    
-
     return 0;
 }
 
 void CalDistance::sendDist(){
-
     distData.data.clear();
-
+    distData.data.resize(0);
     std::vector<float>::iterator itX = laneXData.begin();
     std::vector<float>::iterator itY = laneYData.begin();
 
@@ -81,73 +212,51 @@ void CalDistance::sendDist(){
 
 }
 
-
-void CalDistance::calXdist(){
-    xDist = 2.8162*std::exp(0.0054*xGap);
-}
-
-void CalDistance::calYgap50(){
-    yGap50 = ( 0.0843*std::pow(xDist, 6) - 2.5819*std::pow(xDist, 5) + 32.429*std::pow(xDist, 4)
-        - 214.4*std::pow(xDist, 3) + 792.81*std::pow(xDist, 2) - 1588.6*xDist + 1473.1 ) * -1;
-}
-
-void CalDistance::calYdist(){
-    yDist = 0.5*yGap / yGap50;
-}
-
-
 void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
-
-
-    if(DEBUG) std::cout<<"start call back"<<std::endl;
-
     laneXData.clear();
+
     laneYData.clear();
 
     std::vector<int>::const_iterator it;
-
-    if(DEBUG) std::cout<<"before push_back"<<std::endl;
-
     it = laneData->data.begin();
-
+    if(it == laneData->data.end()) {
+      return;
+    }
     size = (*it);
+
     ++it;
-
+    //why try + catch?
     while(it != laneData->data.end()){
-        try{
-            yGap = (*it)-yCenter;
-            if(DEBUG){
-              std::cout<<"vec y : "<<(*it)<<std::endl;
-            }
+      try{
+        Pos targetPixel;
+          Pos targetDist;
+            targetPixel.x = (*it);
             ++it;
-
-            xGap = xCenter - (*it);            
-            if(DEBUG){
-              std::cout<<"vec x : "<<(*it)<<std::endl;
-            }
+            targetPixel.y = (*it);
             ++it;
+            targetDist = transformer.pixel_to_real(targetPixel);
 
-            calXdist();
-            laneXData.push_back(xDist);
 
-            calYdist();
-            calYgap50();
-            laneYData.push_back(yDist);
+            if ((targetDist.x == 0) && (targetDist.y == 0)) continue; //when transformer() failed, continue;
 
-        }
-        catch(std::exception& e){
-            break;
-        }
+            if(debug){
+              ROS_INFO("target dist %f %f", targetDist.x, targetDist.y);
+            }
+            laneXData.push_back(targetDist.x);
+            laneYData.push_back(targetDist.y);
+      } catch(std::exception& e){
+        break;
+      }
+
     }
 
-    if(DEBUG) {
-        std::cout<<"size : "<<size<<std::endl;
-        for(int i=0; i<size/2; i++){
-            std::cout<<"X : "<<laneXData[i]<<" / Y : "<<laneYData[i]<<std::endl;
-        }
-    }
-
-    
 }
 
 ros::NodeHandle CalDistance::getNh(){ return nh_; }
+
+void CalDistance::initParam(){
+  nh_.param("/"+groupName+"/cal_distance/debug", debug, 4);
+  nh_.param<std::string>("/"+groupName+"/cal_distance/cal_path", calPath, "/");
+  filename = calPath + "/calibration.txt";
+  linename = calPath + "/calibrationLine.txt";
+}

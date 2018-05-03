@@ -1,43 +1,21 @@
 <launch>
-	<node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test">
-        <param name="path" value="/dev/ttyUSB0"/>
-        <param name="serial_frequency" value="20"/>
-        <param name="publish_frequency" value="10"/>
-        <param name="moving_average_element_number" value="5"/>
-    </node>
-	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py"
-	 	name="cmd_vel_to_ackermann_drive"/>
+    <rosparam file="$(find sensor_launch)/cfg/sensor_params.yaml" command="load"/>
+   
+   	
+    <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test"/>
+          
+    <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0"/>
 
-	<node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0">
-        <param name="frequency" value="50"/>
-        <param name="ackermann_topic_name" value="control/cmd_platform"/>
-        <param name="alignmentBias" value="0"/>
+    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node"/>
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
+        <rosparam file="$(find laser_filters)/vail_obstacles.yaml" command="load"/>
     </node>
 
-    <node pkg="platform_controller" type="PlatformController_node" name="control" >
-        <param name="/accel/settling_time" value="0.5"/>
-        
-        <param name="/brake/kp" value="30.0"/>
-        <param name="/brake/ki" value="0.2"/>
-        <param name="/brake/kd" value="0.0"/>
 
-        <!--
-            Steering Angle 제어 parameter: "/steer/*"
-                - kp: 비례계수, ki: 적분계수, kd: 미분계수
-                - 튜닝필요
-        -->
-        <param name="/steer/kp" value="1.0"/>    0.8  / 0.7  / 0.5
-        <param name="/steer/ki" value="0.0"/>    10.0 / 1.0  / 1.0
-        <param name="/steer/kd" value="0.0"/>    0.01 / 0.01 / 0.008
-    </node>
 
-  <!-->
-  <node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10">
-      <param name="angle_alignment" value="112"/>
-      <param name="debugingFlag" value="true"/>
-      <param name="imu_yaw_covariance" value="0.5"/>
-  </node>
 
+<<<<<<< HEAD
  <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="GPS_Sensor" args="/dev/ttyUSB2 38400"/>
  <node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
  <node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
@@ -62,6 +40,12 @@
 		<remap from="/scan"  to="/dynamic_scan"/>
 	</node>
   <include file="$(find obstacle_detector)/launch/nodes.launch" />
+=======
+<!--
+    	<node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10"/>
+ -->
+
+>>>>>>> origin/master
 		
 	<!--arg name="cam_num" default="1"/>	
 	<arg name="frequency" default="30"/>
@@ -78,5 +62,6 @@
 	<include file="$(find pointcloud_to_laserscan)/launch/sample_node.launch">
 		<arg name="cam_num" value="$(arg cam_num)"/>
 	</include>
-	<-->
+	-->
 </launch>
+

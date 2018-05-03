@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(lane_detection)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -29,9 +29,9 @@ set(CMAKE_CXX_FLAGS "-fPIE -fPIC -std=c++11 -O2 -D_FORTIFY_SOURCE=2 -fstack-prot
 catkin_package(
 INCLUDE_DIRS include
 LIBRARIES preprocessing
-CATKIN_DEPENDS cv_bridge image_transport message_runtime sensor_msgs std_msgs roscpp 
+CATKIN_DEPENDS cv_bridge image_transport message_runtime sensor_msgs std_msgs roscpp
 DEPENDS system_lib
-) 
+)
 
 find_package(OpenCV)
 
@@ -70,7 +70,7 @@ find_package(OpenCV)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- 
+
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -128,7 +128,7 @@ find_package(OpenCV)
 ## Your package locations should be listed before other locations
 include_directories(
   include ${catkin_INCLUDE_DIRS}
-  include 
+  include
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
