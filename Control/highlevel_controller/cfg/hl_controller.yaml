@@ -65,10 +65,10 @@ hl_controller:
 #uturn
   use_process_uturn: true
   uturn_check_duration: 1.0
-  use_uturn_onetime_flag: true
+  use_uturn_onetime_flag: false
 
-  uturn_tx_speed: 50
-  uturn_tx_steer: 1999
+  uturn_tx_speed: 70
+  uturn_tx_steer: -1999
   uturn_tx_brake: 0
   uturn_duration: 10.0
   

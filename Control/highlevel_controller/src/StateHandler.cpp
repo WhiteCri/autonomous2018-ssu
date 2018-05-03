@@ -74,6 +74,15 @@ void toward_goal(){
     }
     else if (state == GoalStates::STATE_PREEMPTED){
         ROS_INFO("PREEMPTED...Are you using rviz to set goal?");
+        double x = param_ptr->x_goal.back();
+        double y = param_ptr->y_goal.back();
+        double ori_z = param_ptr->ori_z_goal.back();
+        double ori_w = param_ptr->ori_w_goal.back();
+        std::string goal_type = param_ptr->goal_type.back();
+       
+        goalSender_ptr->setGoal(x, y, ori_z, ori_w);
+        showGoal(x, y, ori_z, ori_w, goal_type);
+        goalSender_ptr->sendGoal();
     }
     else if (state == GoalStates::STATE_ABORTED){
 #ifdef ABORT_FLAG
