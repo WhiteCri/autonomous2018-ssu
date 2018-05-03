@@ -258,7 +258,8 @@ void process_uturn(){
     param_ptr->nh.setParam("hl_controller/tx_brake", param_ptr->uturn_tx_brake);
 
     //wait until duration ends
-    ros::Rate(param_ptr->uturn_duration).sleep();
+    ROS_INFO("maintaing for %lf seconds...", param_ptr->uturn_duration);
+    ros::Rate(1/param_ptr->uturn_duration).sleep();
 
     //erase tx_control_static flag
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);

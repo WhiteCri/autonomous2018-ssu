@@ -70,7 +70,7 @@ hl_controller:
   uturn_tx_speed: 50
   uturn_tx_steer: 1999
   uturn_tx_brake: 0
-  uturn_duration: 2.0
+  uturn_duration: 10.0
   
 
 #recovery 

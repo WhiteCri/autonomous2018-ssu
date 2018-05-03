@@ -55,7 +55,7 @@ bool Toward_goal_to_process_uturn::timedCheck(HybridAutomata* HA){
     ret &= param_ptr->uturn;
     if (param_ptr->use_uturn_onetime_flag)
         ret &= !param_ptr->uturn_onetime_flag;
-
+        
     return ret;
 }
 
