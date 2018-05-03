@@ -51,7 +51,6 @@ int main(int argc, char *argv[]){
             ha.setState(PROCESS_MOVINGOBJ, process_movingobj);
 
             int movingobj_check_frequency = ha_frequency * param_ptr->movingobj_check_duration;
-            int movingobj_escape_frequency = ha_frequency * param_ptr->movingobj_escape_duration;
             ha.setCondition(
                 TOWARD_GOAL,
                 new Toward_goal_to_process_movingobj(movingobj_check_frequency),
@@ -59,7 +58,7 @@ int main(int argc, char *argv[]){
             );
             ha.setCondition(
                 PROCESS_MOVINGOBJ,
-                new Process_movingobj_to_toward_goal(movingobj_escape_frequency),
+                new Process_movingobj_to_toward_goal(0),
                 TOWARD_GOAL
             );
         }

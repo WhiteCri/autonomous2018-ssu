@@ -27,14 +27,12 @@ bool Toward_goal_to_process_movingobj::timedCheck(HybridAutomata* HA){
     ret &= param_ptr->movingobj;
     if (param_ptr->use_movingobj_onetime_flag)
         ret &= !param_ptr->movingobj_onetime_flag;
-
+    
     return ret;
 }
 
 bool Process_movingobj_to_toward_goal::timedCheck(HybridAutomata *HA){
-    bool ret = !param_ptr->movingobj;
-
-    return ret;
+    return true;
 }
 
 /* parking */

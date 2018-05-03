@@ -44,7 +44,10 @@ public:
     for(auto b : condDeq)
       if(b) trueCnt++;
     double rate = static_cast<double>(trueCnt) / condDeq.size();
-    if (rate >= COND_RATE) return true;
+    if (rate >= COND_RATE) {
+      for (auto& i : condDeq) i = false;//flush
+      return true;
+    }
     else return false;
   }
   virtual bool timedCheck(HybridAutomata *HA) = 0;

@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 
 #define ABORT_FLAG TRUE
+#define TX_STOP_BRAKE 75
 
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
@@ -98,22 +99,27 @@ void process_crosswalk(){
     }
 
     //take car to stop
-    ROS_INFO("stop...");
+    ROS_INFO("stop for %lf seconds...", param_ptr->crosswalk_stop_duration);
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
     param_ptr->nh.setParam("hl_controller/tx_speed", 0);
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", 150);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     //take car to wait
     ros::Rate(1 / param_ptr->crosswalk_stop_duration).sleep();
 
+    //unlock tx_control_static
+    param_ptr->nh.setParam("hl_controller/tx_control_static",false);
+    
     //check that process_crosswalk had been done.
     param_ptr->nh.setParam("hl_controller/crosswalk_onetime_flag",true);
 
     ROS_INFO("crosswalk done");    
+    param_ptr->load_param();
 }
 
 void process_movingobj(){
+    ROS_INFO("movingobj , movingobj_onetime_flag : %d %d",param_ptr->movingobj, param_ptr->movingobj_onetime_flag);
     ROS_INFO("movingobj start");
 
     //maintaining car's status
@@ -127,15 +133,24 @@ void process_movingobj(){
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
     param_ptr->nh.setParam("hl_controller/tx_speed", 0);
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", 150);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     //take car to wait
     ros::Rate(1 / param_ptr->movingobj_stop_duration).sleep();
-    
+
+    //unlock tx_control_static
+    param_ptr->nh.setParam("hl_controller/tx_control_static",false);
+
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/movingobj_onetime_flag",true);
 
+    while(param_ptr->movingobj){
+        param_ptr->nh.getParam("hl_controller/movingobj", param_ptr->movingobj);
+        ROS_INFO("wait for hl_controller/movingobj to be false...");
+        ros::Rate(1).sleep();
+    }
     ROS_INFO("movingobj done");
+    param_ptr->load_param();
 }
 
 void process_parking(){
@@ -199,7 +214,7 @@ void process_parking(){
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
     param_ptr->nh.setParam("hl_controller/tx_speed", 0);
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", 100);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     //take car to wait
     ros::Rate(1 / param_ptr->parking_stop_duration).sleep();
