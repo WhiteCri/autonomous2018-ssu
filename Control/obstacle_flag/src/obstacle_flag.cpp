@@ -61,7 +61,6 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
             priv.priv_data_first_y.push_back(object->segments.at(i).first_point.y);
         }
     }
-
     /* 이전 data와 비교해서 delta_y 추출 */
     if( priv.priv_data_first_y.size() == dynamic_param.sample_size )
     {
@@ -73,11 +72,11 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
         priv.priv_data_first_y.resize(0);
     }
     /* delta y에 대한 샘플링 시작 */
-    if(priv.delta_y.size() == (dynamic_param.size_N - 1)) 
+    if(priv.delta_y.size() == dynamic_param.size_N) 
     {
         for(std::vector<double>::size_type i = 0; i < priv.delta_y.size(); i++)
         {
-            ROS_INFO("delta[%ld] y : %lf",i,priv.delta_y[i]);
+            ROS_INFO("delta[%ld] y : %lf",i,priv.delta_y.at(i));
             if(priv.delta_y[i] > dynamic_param.min_delta_y && priv.delta_y[i] < dynamic_param.max_delta_y)
                 dynamic_obstacle = true;
             else
@@ -89,8 +88,7 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
         priv.delta_y.clear();
         priv.delta_y.resize(0);
     }
-    else
-        priv.delta_y.clear();
+
 
     Node.setParam("hl_controller/movingobj",dynamic_obstacle);
 

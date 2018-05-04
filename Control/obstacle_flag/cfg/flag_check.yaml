@@ -1,14 +1,15 @@
 active:
   # active check
-  dynamic: false
+  dynamic: true
   u_turn: false
-  park: true
+  park: false
 
 
 dynamic :
   # sampling delta y
-  size_N : 4
-  sample_size: 15
+  size_N : 3
+  # sampling pose_y
+  sample_size: 10
   # min y size
   min_y_distance : 0.4
   max_y_distance : 2
