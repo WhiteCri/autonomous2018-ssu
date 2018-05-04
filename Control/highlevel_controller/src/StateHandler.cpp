@@ -6,8 +6,20 @@
 #define ABORT_FLAG TRUE
 #define TX_STOP_BRAKE 75
 
+std::string MOVING_STATUES[] = {
+    "normal",
+    "crosswalk",
+    "movingobj",
+    "parking",
+    "b"
+};
+
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
+
+void setCarStatus(const std::string& a_goal_type){
+
+}
 
 inline void showGoal(double x, double y, double ori_z, double ori_w, const std::string& str){
     ROS_INFO("set new goal : %lf, %lf, %lf, %lf, %s",
@@ -16,6 +28,16 @@ inline void showGoal(double x, double y, double ori_z, double ori_w, const std::
 
 void init(){
     ROS_INFO("State Init...");
+    for(auto& a_goal_type : param_ptr->goal_type){
+        bool in = false;
+        for(auto& type : MOVING_STATUES){
+            if (a_goal_type == type) in = true;
+        }
+        if(!in){
+            ROS_ERROR("undefined MOVING STATUS");
+            exit(-1);
+        } // if false
+    }
     double x = param_ptr->x_goal.back();
     double y = param_ptr->y_goal.back();
     double ori_z = param_ptr->ori_z_goal.back();

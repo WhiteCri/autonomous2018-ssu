@@ -44,6 +44,7 @@ int main(int argc, char *argv[]){
                 new Process_crosswalk_to_toward_goal(0),
                 TOWARD_GOAL
             );
+            ROS_INFO("set process crosswalk!");
         }
 
         //register movingobj
@@ -61,6 +62,7 @@ int main(int argc, char *argv[]){
                 new Process_movingobj_to_toward_goal(0),
                 TOWARD_GOAL
             );
+            ROS_INFO("set process movingobj!");
         }
 
         //register parking
@@ -79,6 +81,7 @@ int main(int argc, char *argv[]){
                 new Process_parking_to_toward_goal(0),
                 TOWARD_GOAL
             );
+            ROS_INFO("set process parking!");
         }
 
         //register uturn
@@ -97,6 +100,7 @@ int main(int argc, char *argv[]){
                 new Process_uturn_to_toward_goal(0),
                 TOWARD_GOAL
             );
+            ROS_INFO("set process uturn!");
         }
 
         //register recovery
@@ -114,10 +118,11 @@ int main(int argc, char *argv[]){
                 new Process_recovery_to_toward_goal(0),
                 TOWARD_GOAL
             );
+            ROS_INFO("set process recovery!");
         }
     }
 
-    ros::Rate loop_rate(param_ptr->frequency);
+    ros::Rate loop_rate(ha_frequency);
     while(ros::ok()){
         param_ptr->load_param();
         ha.operate();

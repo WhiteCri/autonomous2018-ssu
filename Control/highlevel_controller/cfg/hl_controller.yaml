@@ -1,13 +1,13 @@
 hl_controller:
 #goal
-  x_goal: [4.1276,9.004]
-  y_goal: [-6.9626,-6.7436]
-  ori_z_goal: [0.01825,-0.0217,-0.7187]
-  ori_w_goal: [0.9998,0.9997,0.6952]
-  goal_type: ["normal","normal"]
+  x_goal:     [4.1276,  9.004 ,0.5626]
+  y_goal:     [-6.962,  -6.74, 2.2604]
+  ori_z_goal: [0.01825,-0.0217,-0.7187, 0.9987]
+  ori_w_goal: [0.9998,0.9997,0.6952,0.05053]
+  goal_type:  ["normal","normal","normal"]
 
 #config controller
-  frequency: 5
+  frequency: 10
   publish_param: true
 
 #tx
@@ -18,28 +18,25 @@ hl_controller:
   tx_brake: 0
 
 #crosswalk
-  use_process_crosswalk: true
+  use_process_crosswalk: false
   crosswalk_check_duration: 0.2
   use_crosswalk_onetime_flag: true
-  crosswalk_onetime_flag: false
 
   crosswalk_driving_duration: 1.0
   crosswalk_stop_duration: 3.0
 
 #movingobj
   use_process_movingobj: true
-  movingobj_check_duration: 1.0
+  movingobj_check_duration: 0.5
   use_movingobj_onetime_flag: true
-  movingobj_onetime_flag: false
 
   movingobj_driving_duration: 1.0
   movingobj_stop_duration: 5.0
 
 #parking
-  use_process_parking: true
-  parking_check_duration: 1.0
+  use_process_parking: false
+  parking_check_duration: 2.0
   use_parking_onetime_flag: true
-  parking_onetime_flag: false
 
   parking_stop_duration: 10.0
 
@@ -62,7 +59,7 @@ hl_controller:
   parking_far_arrive_point_ori_w: 1
 
 #uturn
-  use_process_uturn: true
+  use_process_uturn: false
   uturn_check_duration: 1.0
   use_uturn_onetime_flag: false
 
