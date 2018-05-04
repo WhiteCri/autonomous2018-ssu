@@ -8,7 +8,7 @@ Parameters* Parameters::getInstancePtr(){
 Parameters::Parameters(){
         
     /* global parameter */
-    nh.param("hl_contoller/frequency", frequency, 5);
+    nh.param("hl_controller/frequency", frequency, 5);
     nh.param("hl_controller/publish_param", publish_param, true);
 
     /* goal list */
@@ -38,7 +38,7 @@ Parameters::Parameters(){
 
     nh.param("hl_controller/crosswalk_driving_duration", crosswalk_driving_duration, 1.0);
     nh.param("hl_controller/crosswalk_stop_duration", crosswalk_stop_duration, 3.0);
-    nh.param("hl_controller/crosswalk_onetime_flag", crosswalk_onetime_flag, true);
+    nh.param("hl_controller/crosswalk_onetime_flag", crosswalk_onetime_flag, false);
 
     /* movingobj paramter */
     nh.param("hl_controller/movingobj", movingobj, false);
@@ -48,7 +48,7 @@ Parameters::Parameters(){
 
     nh.param("hl_controller/movingobj_driving_duration", movingobj_driving_duration, 1.0);
     nh.param("hl_controller/movingobj_stop_duration", movingobj_stop_duration, 5.0);
-    nh.param("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag, true);
+    nh.param("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag, false);
 
     /* uturn members */
     nh.param("hl_controller/use_process_uturn", use_process_uturn, true);
@@ -68,7 +68,7 @@ Parameters::Parameters(){
     nh.param("hl_controller/use_parking_onetime_flag", use_parking_onetime_flag, true);
 
     nh.param("hl_controller/parking_stop_duration", parking_stop_duration, 10.0);
-    nh.param("hl_controller/parking_onetime_flag", parking_onetime_flag, true);
+    nh.param("hl_controller/parking_onetime_flag", parking_onetime_flag, false);
 
     //goalpoint members    
     nh.param("hl_controller/parking_near_arrive_point_x",       parking_near_arrive_point_x, -200.0);  

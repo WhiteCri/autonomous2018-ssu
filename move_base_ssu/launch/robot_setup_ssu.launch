@@ -36,6 +36,7 @@
 	<node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
 	<node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
 	-->
+
 	<!--obstacle Flag-->
 	<!--<node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
         <rosparam file="$(find obstacle_flag)/cfg/flag_check.yaml" command="load"/>

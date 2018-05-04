@@ -1,35 +1,36 @@
 active:
   # active check
-  dynamic: true
-  u_turn: true
+  dynamic: false
+  u_turn: false
   park: true
+
 
 dynamic :
   # sampling delta y
   size_N : 4
+  sample_size: 6
   # min y size
-  min_y_distance : 0.5
+  min_y_distance : 0.4
   max_y_distance : 2
   # 최소 x와의 거리
-  min_x_obstacle : 5
+  min_x_obstacle : 2
   # 최소 x size
   max_x_width : 0.015
 
   # delta y size 조정 
-  min_delta_y : 0.002
-  max_delta_y : 0.09
+  min_delta_y : 0.015
+  max_delta_y : 0.2
 
 u_turn:
   # detect size 크기 조정
-  check_UTurn : 3
-  # point 간 최소 range 범위
-  UTurn_distance_point : 0.05
+  check_UTurn : 2
+  # point 간 최대 range 범위
+  UTurn_distance_point : 0.1
+  # 최소 탐지 횟수
+  number_of_uturn: 5
 
 park:
-  # detect 할 size 결정
-  min_x: 2.0
-  max_x: 4.0
-  min_y: -2.0
-  max_y: 0
-  # 물체간 최소 거리
-  obj_2_distance: 0.015
+  min_sample_cnt: 4
+  # 주차 box 좌표. x,y 4개 적을 것.
+  near_box: [-2, -3, -4, 5, 9, 6, 7, 5]
+  far_box: [-2, -3, -4, 5, 9, 6, 7, 5]
