@@ -1,11 +1,11 @@
 <launch>
 	
-	<arg name="global_planner"		 default="global_planner/GlobalPlanner"/>
-	<arg name="local_planner" 		 default="dwa_local_planner"/> 	<!--teb_local_planner-->
-	<arg name="LocalROS" 			 default="DWAPlannerROS"/> 		<!--TebLocalPlannerROS-->
+	<arg name="global_planner"		default="global_planner/GlobalPlanner"/>
+	<arg name="local_planner" 		default="dwa_local_planner"/> 	<!--teb_local_planner-->
+	<arg name="LocalROS" 			default="DWAPlannerROS"/> 		<!--TebLocalPlannerROS-->
 	
-	<arg name="planner_frequency"	 default="1.0"/>	<arg name="controller_frequency" 	default="15.0"/>
-	<arg name="planner_patience"	 default="5.0"/>	<arg name="controller_patience"	 	default="15.0"/>
+	<arg name="planner_frequency"	default="1.0"/>	<arg name="controller_frequency"   default="15.0"/>
+	<arg name="planner_patience"	default="5.0"/>	<arg name="controller_patience"	   default="15.0"/>
 	
 		
 	<!--  ****** Move_Base ******  -->
