@@ -4,9 +4,10 @@
 	<arg name="local_planner" 		 default="dwa_local_planner"/> 	<!--teb_local_planner-->
 	<arg name="LocalROS" 			 default="DWAPlannerROS"/> 		<!--TebLocalPlannerROS-->
 	
-	<arg name="planner_frequency"	 default="1.0"/>
-	<arg name="controller_frequency" default="15.0"/>
-
+	<arg name="planner_frequency"	 default="1.0"/>	<arg name="controller_frequency" 	default="15.0"/>
+	<arg name="planner_patience"	 default="5.0"/>	<arg name="controller_patience"	 	default="15.0"/>
+	
+		
 	<!--  ****** Move_Base ******  -->
 	
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
@@ -18,26 +19,23 @@
 
 		<param name="base_global_planner" value="$(arg global_planner)" />
 		<param name="planner_frequency" value="$(arg planner_frequency)" />
-		<param name="planner_patience" value="5.0" />
+		<param name="planner_patience" value="$(arg planner_patience)" />
 
 		<!--<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />-->
 		<param name="base_local_planner" value="$(arg local_planner)/$(arg LocalROS)" />
 		<param name="controller_frequency" value="$(arg controller_frequency)" />
-		<param name="controller_patience" value="15.0" />
+		<param name="controller_patience" value="$(arg controller_patience)" />
 
     	<param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
 	</node>
 
-	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py" name="cmd_vel_to_ackermann"/>
-
-
 	<!--  ****** Controller (High / Low  Level) ******  -->
-	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
-        <rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load" />
-    </node>
+	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen"/>
+	<rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load"/>
+        
 
-	<!--<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>
-	<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>-->
+	<!--<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>
+	<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>-->
 	
 
 	<!--  **************** Visualisation ****************  -->
