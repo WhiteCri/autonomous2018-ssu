@@ -74,13 +74,12 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     }
 
     /* 이전 data와 비교해서 delta_y 추출 */
-    if( priv.priv_data_first_y.size() == dynamic_param.size_N )
+    if( priv.priv_data_first_y.size() == dynamic_param.sample_size )
     {
-        for(std::vector<double>::size_type i = 0; i < priv.priv_data_first_y.size()-1; i++)
-        {
-            delta_y = fabs(priv.priv_data_first_y[i] - priv.priv_data_first_y[i+1]);
-            priv.delta_y.push_back(delta_y);
-        }   
+        
+        delta_y = fabs(priv.priv_data_first_y[0] - priv.priv_data_first_y[dynamic_param.sample_size]);
+        priv.delta_y.push_back(delta_y);
+           
         priv.priv_data_first_y.clear();
     }
     /* delta y에 대한 샘플링 시작 */
@@ -98,6 +97,7 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
             }
         }
         priv.delta_y.clear();
+        priv.delta_y.resize(0);
     }
 
     Node.setParam("hl_controller/movingobj",dynamic_obstacle);
@@ -203,7 +203,7 @@ void parkcall(const obstacle_detector::Obstacles::ConstPtr &object)
               index.push_back(i);
     }
     /* no data detect then return */
-    if(index.size() == 0)
+    if(index.empty())
         return;
 
     /* park track checking */
@@ -218,6 +218,8 @@ void parkcall(const obstacle_detector::Obstacles::ConstPtr &object)
            }
 
     }
+    index.clear();
+    index.resize(0);
     #ifdef test_park
         if(is_park)
          {
@@ -287,6 +289,7 @@ int main(int argc, char *argv[])
     n.getParam("dynamic/max_x_width",dynamic_param.max_x_width);
     n.getParam("dynamic/min_delta_y",dynamic_param.min_delta_y);
     n.getParam("dynamic/max_delta_y",dynamic_param.max_delta_y);
+    n.getParam("dynamic/sample_size",dynamic_param.sample_size);
 
     
     ros::Subscriber sub = Node.subscribe("dynamic_obstacle",100,obstaclecheck);

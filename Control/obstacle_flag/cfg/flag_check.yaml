@@ -1,14 +1,15 @@
 active:
   # active check
-  dynamic: false
-  u_turn: true
+  dynamic: true
+  u_turn: false
   park: false
 
 dynamic :
   # sampling delta y
   size_N : 4
+  sample_size: 5
   # min y size
-  min_y_distance : 0.5
+  min_y_distance : 0.4
   max_y_distance : 2
   # 최소 x와의 거리
   min_x_obstacle : 5

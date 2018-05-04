@@ -10,6 +10,7 @@ struct priv{
 };
 struct dynamic{
     int size_N;
+    int sample_size;
     double min_y_distance;
     double max_y_distance;
     double min_x_obstacle;
