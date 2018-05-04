@@ -14,8 +14,8 @@
 #include <vector>
 
 /* U_turn check */
-#define Laser_Filter_start 200
-#define Laser_Filter_end 300
+#define Laser_Filter_start 195
+#define Laser_Filter_end 330
 #define frequency 30
 
 #define test_uturn
@@ -114,16 +114,15 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
 bool checkUTurn(std::vector<float>ranges, int number)
 {
     int offset;
-    int max_range = u_turn_param.check_UTurn + 1;
-    int min_number = number - 1;
-    /* detect size 크기 조절 */
-    if( (ranges[number+max_range] == inf || ranges[number+max_range] == -inf) &&
-        (ranges[min_number] == inf || ranges[min_number] == -inf) )
-        {}
+    int min_number = number - u_turn_param.check_UTurn;
+   /*  detect size 크기 조절 */
+    if( /*ranges[number+max_range] == inf || ranges[number-max_range] == inf &&*/
+        (ranges[min_number] == inf) )
+        {}  
     else
-        return false;
+        return false; 
     /* detection */
-    for(offset=1; offset<=u_turn_param.check_UTurn; offset++)
+    for(offset=0; offset<=u_turn_param.check_UTurn; offset++)
     {
         if( (ranges[number+offset] != inf) && 
             (fabs(ranges[number]-ranges[number+offset]) < u_turn_param.UTurn_distance_point) )
@@ -135,7 +134,7 @@ bool checkUTurn(std::vector<float>ranges, int number)
     /* 이전 상태와 range값 비교해서 최대한 붙어 있게 설정 */
     if(u_turn_param.before_detect == 0)
         u_turn_param.before_detect = number;
-    if((fabs(ranges[number]-ranges[u_turn_param.before_detect]) > 0.2))
+    if((fabs(ranges[number]-ranges[u_turn_param.before_detect]) > 0.1))
         return false;
     u_turn_param.before_detect = number;
     return true;
@@ -147,13 +146,14 @@ void uturncall(const sensor_msgs::LaserScan::ConstPtr& scan)
     Node.getParam("obstacle_flag/active/u_turn",active.active_uturn);
     if(!active.active_uturn)
         return;
+    int count=0;
 
     for(int i=Laser_Filter_start; i<=Laser_Filter_end;i++)
     {
         if(checkUTurn(scan->ranges,i))
         {      
             u_turn = true;   
-
+            count++;
             #ifdef test_uturn
             if(u_turn)
             {
@@ -167,9 +167,16 @@ void uturncall(const sensor_msgs::LaserScan::ConstPtr& scan)
             u_turn = false;
         }
     }
+    if(count>=u_turn_param.number_of_uturn)
+        u_turn = true;
+    else
+        u_turn = false;
+
+    #ifdef test_uturn
+        ROS_INFO("count : %d",count);
+    #endif
+
     Node.setParam("hl_controller/uturn",u_turn);
-
-
 }
 
 void parkcall(const obstacle_detector::Obstacles::ConstPtr &object)
@@ -251,6 +258,7 @@ void subscribeuturn()
 
     n.getParam("u_turn/UTurn_distance_point",u_turn_param.UTurn_distance_point);
     n.getParam("u_turn/check_UTurn",u_turn_param.check_UTurn);
+    n.getParam("u_turn/number_of_uturn",u_turn_param.number_of_uturn);
     ros::Subscriber scan_sub = Node.subscribe("uturn_scan",100,uturncall);
     ros::Rate loop_rate(frequency);
 
