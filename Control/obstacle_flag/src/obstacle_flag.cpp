@@ -135,7 +135,7 @@ bool checkUTurn(std::vector<float>ranges, int number)
     /* 이전 상태와 range값 비교해서 최대한 붙어 있게 설정 */
     if(u_turn_param.before_detect == 0)
         u_turn_param.before_detect = number;
-    if((fabs(ranges[number]-ranges[u_turn_param.before_detect]) > 0.2))
+    if((fabs(ranges[number]-ranges[u_turn_param.before_detect]) > 0.1))
         return false;
     u_turn_param.before_detect = number;
     return true;
@@ -147,7 +147,7 @@ void uturncall(const sensor_msgs::LaserScan::ConstPtr& scan)
     Node.getParam("obstacle_flag/active/u_turn",active.active_uturn);
     if(!active.active_uturn)
         return;
-
+    int count=0;
     for(int i=Laser_Filter_start; i<=Laser_Filter_end;i++)
     {
         if(checkUTurn(scan->ranges,i))
@@ -157,6 +157,7 @@ void uturncall(const sensor_msgs::LaserScan::ConstPtr& scan)
             #ifdef test_uturn
             if(u_turn)
             {
+                count++;
                 ROS_INFO("range[%d] : %lf",i, scan->ranges[i]);
                 ROS_INFO("Detected u_turn");
             }   
@@ -167,6 +168,11 @@ void uturncall(const sensor_msgs::LaserScan::ConstPtr& scan)
             u_turn = false;
         }
     }
+    ROS_INFO("count : %d",count);
+    if(count>=3)
+        u_turn = true;
+    else
+        u_turn = false;
     Node.setParam("hl_controller/uturn",u_turn);
 
 

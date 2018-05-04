@@ -23,7 +23,7 @@ u_turn:
   # detect size 크기 조정
   check_UTurn : 3
   # point 간 최소 range 범위
-  UTurn_distance_point : 0.05
+  UTurn_distance_point : 0.06
 
 park:
   # detect 할 size 결정
