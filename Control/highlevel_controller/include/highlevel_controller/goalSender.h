@@ -2,6 +2,8 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <tf/transform_broadcaster.h>
+#include <string>
+#include "HybridAutomata.h"
 
 class GoalSender{
 private:
@@ -18,20 +20,25 @@ public:
     
     GoalStates getState();
     void sendGoal();
-    void setGoal(double x, double y, double ori_x, double ori_w);
+    void setGoal(double x, double y, double ori_x, double ori_w, std::string goal_type);
 
     //teb_local_planner fails to planning when current speed suddenly decrease.
     //then we must set the goal one more, so we decided to use the default thread.
     //it sends the goal to the server periodically
     void auto_goal_sender();
 
+    void setHA(HybridAutomata* HA_ptr);
     //singletone
 public:
     static GoalSender* getInstancePtr();
 private:
     GoalSender();
     static GoalSender* objptr;
+
+    //members
 private:
     MoveBaseClient ac;
     move_base_msgs::MoveBaseGoal goal;
+    std::string goal_type;
+    HybridAutomata *HA;
 };

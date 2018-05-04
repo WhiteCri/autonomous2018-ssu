@@ -100,4 +100,8 @@ Parameters::Parameters(){
     nh.param("hl_controller/reached_goal", reached_goal, false);
 }
 
+void Parameters::setHA(HybridAutomata* HA_ptr){
+    this->HA = HA_ptr;
+}
+
 Parameters* Parameters::obj_ptr = nullptr;
