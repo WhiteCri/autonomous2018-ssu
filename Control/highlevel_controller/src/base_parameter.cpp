@@ -62,7 +62,8 @@ Parameters::Parameters(){
 
 
     /* parking parameter */
-    nh.param("hl_controller/parking", parking, false);
+    nh.param("hl_controller/parking_near", parking_near, false);
+    nh.param("hl_controller/parking_far", parking_far, false);  
     nh.param("hl_controller/parking_check_duration", parking_check_duration, 1.0);
     nh.param("hl_controller/use_process_parking", use_process_parking, true);
     nh.param("hl_controller/use_parking_onetime_flag", use_parking_onetime_flag, true);
@@ -97,6 +98,10 @@ Parameters::Parameters(){
 
     /* Done members */
     nh.param("hl_controller/reached_goal", reached_goal, false);
+}
+
+void Parameters::setHA(HybridAutomata* HA_ptr){
+    this->HA = HA_ptr;
 }
 
 Parameters* Parameters::obj_ptr = nullptr;

@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
     int ha_frequency = param_ptr->frequency;
 
     //init hybridautomata
-    HybridAutomata ha;
+    HybridAutomata ha; param_ptr->setHA(&ha);
     {
         //init
         ha.setState(INIT, init);

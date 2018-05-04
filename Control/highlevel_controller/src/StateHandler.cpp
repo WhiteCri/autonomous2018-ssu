@@ -6,20 +6,8 @@
 #define ABORT_FLAG TRUE
 #define TX_STOP_BRAKE 75
 
-std::string MOVING_STATUES[] = {
-    "normal",
-    "crosswalk",
-    "movingobj",
-    "parking",
-    "b"
-};
-
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
-
-void setCarStatus(const std::string& a_goal_type){
-
-}
 
 inline void showGoal(double x, double y, double ori_z, double ori_w, const std::string& str){
     ROS_INFO("set new goal : %lf, %lf, %lf, %lf, %s",
@@ -44,7 +32,7 @@ void init(){
     double ori_w = param_ptr->ori_w_goal.back();
     std::string goal_type = param_ptr->goal_type.back();
 
-    goalSender_ptr->setGoal(x, y, ori_z, ori_w);
+    goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
     goalSender_ptr->sendGoal();
     goalSender_ptr->sendGoal();
     showGoal(x, y, ori_z, ori_w, goal_type);
@@ -57,26 +45,27 @@ void toward_goal(){
     auto state = goalSender_ptr->getState();
     if (state == GoalStates::STATE_SUCCEEDED){
         ROS_INFO("SUCCEEDED...");
-       param_ptr->x_goal.pop_back();
-       param_ptr->y_goal.pop_back();
-       param_ptr->ori_z_goal.pop_back();
-       param_ptr->ori_w_goal.pop_back();
-       param_ptr->goal_type.pop_back();
-
-       if(param_ptr->goal_type.size() == 0){
-           param_ptr->nh.setParam("hl_controller/reached_goal", true);
-           return;
-       }
+        param_ptr->x_goal.pop_back();
+        param_ptr->y_goal.pop_back();
+        param_ptr->ori_z_goal.pop_back();
+        param_ptr->ori_w_goal.pop_back();
+        param_ptr->goal_type.pop_back();
        
-       double x = param_ptr->x_goal.back();
-       double y = param_ptr->y_goal.back();
-       double ori_z = param_ptr->ori_z_goal.back();
-       double ori_w = param_ptr->ori_w_goal.back();
-       std::string goal_type = param_ptr->goal_type.back();
-       
-       goalSender_ptr->setGoal(x, y, ori_z, ori_w);
-       goalSender_ptr->sendGoal();
-       showGoal(x, y, ori_z, ori_w, goal_type);
+        if(param_ptr->goal_type.size() == 0){
+            param_ptr->nh.setParam("hl_controller/reached_goal", true);
+            return;
+        }
+        
+        double x = param_ptr->x_goal.back();
+        double y = param_ptr->y_goal.back();
+        double ori_z = param_ptr->ori_z_goal.back();
+        double ori_w = param_ptr->ori_w_goal.back();
+        std::string goal_type = param_ptr->goal_type.back();
+        
+        goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
+        goalSender_ptr->sendGoal();
+        showGoal(x, y, ori_z, ori_w, goal_type);
+        ROS_INFO("success end!");
     }
     else if (state == GoalStates::STATE_LOST){
         ROS_INFO("LOST...");
@@ -86,7 +75,7 @@ void toward_goal(){
         double ori_w = param_ptr->ori_w_goal.back();
         std::string goal_type = param_ptr->goal_type.back();
        
-        goalSender_ptr->setGoal(x, y, ori_z, ori_w);
+        goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
         showGoal(x, y, ori_z, ori_w, goal_type);
         goalSender_ptr->sendGoal();
     }
@@ -102,7 +91,7 @@ void toward_goal(){
         double ori_w = param_ptr->ori_w_goal.back();
         std::string goal_type = param_ptr->goal_type.back();
        
-        goalSender_ptr->setGoal(x, y, ori_z, ori_w);
+        goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
         showGoal(x, y, ori_z, ori_w, goal_type);
         goalSender_ptr->sendGoal();
     }
@@ -199,7 +188,7 @@ void process_parking(){
         I haven't find the solution to select the goal. So temporarily, just select the near goal.
         this code should be modified until the contest
     */
-    if (true){
+    if (param_ptr->parking_near){
         parking_point_x      = param_ptr->parking_near_arrive_point_x;
         parking_point_y      = param_ptr->parking_near_arrive_point_y;
         parking_point_ori_z  = param_ptr->parking_near_arrive_point_ori_z;
@@ -226,7 +215,8 @@ void process_parking(){
         parking_point_x,
         parking_point_y,
         parking_point_ori_z,
-        parking_point_ori_w
+        parking_point_ori_w,
+        "parking"
     );
     goalSender_ptr->sendGoal();
 
@@ -258,7 +248,8 @@ void process_parking(){
         backing_point_x,
         backing_point_y,
         backing_point_ori_z,
-        backing_point_ori_w
+        backing_point_ori_w,
+        "parking"
     );
     goalSender_ptr->sendGoal();
 
