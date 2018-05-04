@@ -13,6 +13,7 @@ enum {
     DONE
 };
 
+
 // when you add new param, you should config base_parameter.h, base_parameter.cpp, hl_controller.yaml
 class Parameters{
 public:
