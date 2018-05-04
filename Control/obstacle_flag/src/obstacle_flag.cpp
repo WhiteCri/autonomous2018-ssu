@@ -52,6 +52,7 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     /* find arry num */
     for(int i=0; i<object->segments.size(); i++)
     {
+
         if( (fabs(object->segments.at(i).first_point.y - object->segments.at(i).last_point.y) > dynamic_param.min_y_distance)  && 
             (fabs(object->segments.at(i).first_point.y - object->segments.at(i).last_point.y) < dynamic_param.max_y_distance) &&
             (fabs(object->segments.at(i).first_point.x - object->segments.at(i).last_point.x) < dynamic_param.max_x_width) && (fabs(object->segments.at(i).first_point.x) > dynamic_param.min_x_obstacle) 
@@ -64,6 +65,7 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     /* 이전 data와 비교해서 delta_y 추출 */
     if( priv.priv_data_first_y.size() == dynamic_param.sample_size )
     {
+
         delta_y =  fabs( priv.priv_data_first_y.front() - priv.priv_data_first_y.back());
         priv.delta_y.push_back(delta_y);
            
@@ -270,11 +272,11 @@ void parkcall(const obstacle_detector::Obstacles::ConstPtr &object)
     }
 
     bool near = false, far = false;
-    if (in_nearbox_cnt >= min_sample_cnt) {near = true; ROS_INFO("near parking point detected!");} 
-    if (in_farbox_cnt >= min_sample_cnt) {far = true; ROS_INFO("far parking point detected!");}
+    if (in_nearbox_cnt >= min_sample_cnt) {near = true; ROS_INFO("near parking point detected! %ld", in_nearbox_cnt);} 
+    if (in_farbox_cnt >= min_sample_cnt) {far = true; ROS_INFO("far parking point detected! %ld", in_farbox_cnt);}
     Node.setParam("hl_controller/parking_near", near);
     Node.setParam("hl_controller/parking_far", far);
-    if ((!near) && (!far)) ROS_INFO("no parking point...");
+    if ((!near) && (!far)) ROS_INFO("no parking point...%ld %ld", in_nearbox_cnt, in_farbox_cnt);
 }
 
 void subscribepark()

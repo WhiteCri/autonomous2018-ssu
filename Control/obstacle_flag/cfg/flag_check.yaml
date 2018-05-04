@@ -8,14 +8,14 @@ active:
 dynamic :
   # sampling delta y
   size_N : 4
-  sample_size: 6
+  sample_size: 15
   # min y size
   min_y_distance : 0.4
   max_y_distance : 2
   # 최소 x와의 거리
-  min_x_obstacle : 2
+  min_x_obstacle : 0.2
   # 최소 x size
-  max_x_width : 0.015
+  max_x_width : 0.2
 
   # delta y size 조정 
   min_delta_y : 0.015
@@ -32,5 +32,5 @@ u_turn:
 park:
   min_sample_cnt: 4
   # 주차 box 좌표. x,y 4개 적을 것.
-  near_box: [-2, -3, -4, 5, 9, 6, 7, 5]
+  near_box: [0.07, -0.2, -0.7, -10.2, 2.7, 0.15, 2.01, -9.89]
   far_box: [-2, -3, -4, 5, 9, 6, 7, 5]
