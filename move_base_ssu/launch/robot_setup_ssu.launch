@@ -3,7 +3,7 @@
 <!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
     <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
 	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
-	<arg name="map_name" default="front_of_three.yaml"/>
+	<arg name="map_name" default="jinry_final.yaml"/>
 
 
 <!-- Robot Frame Setup (static tf)  -->
@@ -25,7 +25,7 @@
 	<!-- Platform RX/TX: USB0  -->
     <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test" respawn="true"/>
     <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0" respawn="true"/>
-[
+
 
 	<!-- IMU: USB1  -->
  	<!--node pkg="imu" type="imu_main" name="imu" args="/dev/ttyUSB1 10"/>
