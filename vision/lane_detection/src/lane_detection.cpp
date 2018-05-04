@@ -50,6 +50,7 @@ ros::NodeHandle nh;
 image_transport::ImageTransport it;
 image_transport::Subscriber sub_img;
 std_msgs::Int32MultiArray coordi_array;
+std::vector<int> lane_width_array;
 cv::Mat pub_img;
 ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("/"+groupName+"/lane",100);        //파라미터로 카메라 번호 받도록하기
 
@@ -179,8 +180,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         lane_detect_algo::CalLane callane;
                         cv::Mat bev =frame.clone();
                         callane.birdEyeView(frame,bev);
-                        cv::Mat test_ts = origin.clone();
-                        cv::imshow("test_ts",test_ts);
+                        cv::imshow("mybev",bev);
 
                         if (track_bar) {
                                 callane.detectYHSVcolor(bev, yellow_hsv, y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax);
@@ -198,7 +198,11 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         cv::Mat whiteYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat yellowXProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat whiteXProj(cv::Size(frame_width, frame_height), CV_8UC1);
-
+                        cv::Mat myhistsrc = bev.clone();
+                        cv::Mat myhistdst = cv::Mat::zeros(bev.rows,bev.cols,CV_8UC1); 
+                      //  callane.makeYProjection(myhistsrc,myhistdst,H_yResultWhite);
+                       // callane.myProjection(myhistsrc,myhistdst,H_yResultWhite);
+                       
                         if(lable) {
 
                                 int crosswalk_check = 0;
@@ -212,9 +216,9 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 }
                         }
                         callane.makeContoursLeftLane(yellow_hsv, yellow_labeling); //for labeling(source channel is 1)
-                        if(!lable) {
+                     //   if(!lable) {
                                 callane.makeContoursRightLane(white_hsv, white_labeling); //for labeling(source channel is 1)
-                        }
+                       // }
 
 
                         if(time_check) {
@@ -240,8 +244,11 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         int coordi_count = 0;
                         coordi_array.data.clear();
                         coordi_array.data.push_back(10);
-
-                        for(int y = output_origin.rows-1; y>=220; y--) {
+                        //cv::imshow("ssss",laneColor);
+                        //coordi_x_array.data.clear();
+                        int line_check = 0, lane_width_check = 0;
+                        int first_x, first_y, second_x, second_y, lane_width;
+                        for(int y = output_origin.rows-1; y>=0; y--) {
                                 uchar* origin_data = output_origin.ptr<uchar>(y);
                                 uchar* pub_img_data = pub_img.ptr<uchar>(y*0.5); //resize 복구(0.5 -> 1))
                                 for(int x = 0; x<output_origin.cols; x++) {
@@ -250,10 +257,39 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                                 coordi_count++;
                                                 coordi_array.data.push_back(x);
                                                 coordi_array.data.push_back(y);
+                                                
+                                                if(!line_check && y > 230 && y<280){
+                                                        first_x = x;
+                                                        first_y = y;
+                                                        line_check = 1;        
+                                                }
+                                                if(line_check && y > 230 && y<280){
+                                                        second_x = x;
+                                                        second_y = y;
+                                                        lane_width = abs(second_x - first_x);
+                                                        
+                                                         
+                                                }
                                                 origin_data[x*output_origin.channels()] = 255;
                                         }
                                 }
+                                if(abs(first_y-second_y)<5){
+                                        if(abs(first_x-second_x)<400){//m/pixel 알아내서 정확한 차선폭을 60대신 쓰기
+                                                second_x = first_x + 400;
+                                                cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);       
+                                        }
+                                        else{
+                                                cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
+                                        }
+                                        }
+                                lane_width_array.push_back(lane_width);
+                                if(lane_width_array.size()>4){
+                                        ROS_INFO("data: %d\n",lane_width);
+                                        
+                                }
+                             //   cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
                         }
+                        
                         std::vector<cv::Vec4i> lines;
                         std::vector<cv::Vec4i>::iterator it;
 

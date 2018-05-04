@@ -580,25 +580,78 @@ namespace lane_detect_algo{
                 // Apply the Perspective Transform just found to the src image
                 warpPerspective(src, dst, lambda, dst.size());
                 }
+            void CalLane::myProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result) {
+                uchar pixel;
+                int project=0;
+                for(int y = 0; y<src.cols; y++){
+                	project=0;
+                    for(int x = 0; x<src.rows; x++){
+                         pixel = src.at<uchar>(y,x);
+                         if(pixel != (uchar)0){
+                            project++;
+                            
+                        }
+                    }
+	                if(project > 0) {
+                        ROS_INFO("project : %d\n ",project);
+	                    for(int k =0; k < project; k++) {
+                            
+          	              // dst.at<uchar>(y,dst.rows-k-1) = (uchar)255;
+                            
+                    	}	
+                    }
+                }
+                cv::imshow("hist",dst);
+
+               
+                // uchar pixel;
+
+                // unsigned int *H = new unsigned int [src.cols];
+                // std::memset(H,0x00,4*src.cols);
+                // for(int y = 0; y<src.cols; y++){
+                //     for(int x = 0; x<src.rows; x++){
+                //          pixel = src.at<uchar>(y,x);
+                //          if(pixel != (uchar)0){
+                //             H[y]++;
+                //             H_result[y]++;
+                            
+                //         }
+                //     }
+                // }
+                // ROS_INFO("dd : %d\n",H[0]);
+                // ROS_INFO(" dd : %d\n",H[1]);
+                 
+                // for(int y = 0; y<src.cols; y++){
+                //     for(unsigned int x = 0; x<H[y]; x++){
+                //         dst.at<uchar>(y,x) = (uchar)255;
+                      
+                //     }
+                // }
+                // cv::imshow("hist",dst);
+                // delete[] H;
+                }    
             void CalLane::makeYProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result) {
                 uchar pixel;
-                unsigned int *H = new unsigned int [src.rows];
-                std::memset(H,0x00,4*src.rows);
-                for(int x = 0; x<src.cols; x++){
-                    for(int y = 0; y<src.rows; y++){
-                         pixel = src.at<uchar>(y,x);
+                cv::Mat gray;
+                cv::cvtColor(src,gray,CV_BGR2GRAY);
+                cv::imshow("mysrc",src);
+                unsigned int *H = new unsigned int [gray.rows];
+                std::memset(H,0x00,4*gray.rows);
+                for(int x = 0; x<gray.cols; x++){
+                    for(int y = 0; y<gray.rows; y++){
+                         pixel = gray.at<uchar>(y,x);
                          if(pixel != 0){
                             H[y]++;
                             H_result[y]++;
                         }
                     }
                 }
-                for(int y = 0; y<src.rows; y++){
+                for(int y = 0; y<gray.rows; y++){
                     for(unsigned int x = 0; x<H[y]; x++){
                         dst.at<uchar>(y,x) = 255;
                     }
                 }
-
+                cv::imshow("hist",dst);
                 // // // uchar pixel;
                 // // // unsigned int *H = new unsigned int[src.cols];
                 // // // std::memset(H, 0x00, 4 * src.cols);
@@ -758,7 +811,11 @@ namespace lane_detect_algo{
                 return false;
                     }
                 }
-            void CalLane::makeContoursLeftLane(cv::Mat src, cv::Mat& dst) {
+            void CalLane::laneHist(cv::Mat src, cv::Mat& dst){
+                
+
+            }
+            void CalLane::voteLabel(cv::Mat src, cv::Mat& dst){
                 std::vector<std::vector<cv::Point>> countours;
                 std::vector<cv::Vec4i> hierachy;
 
@@ -775,33 +832,7 @@ namespace lane_detect_algo{
                 cv::Mat img_labels, stats, centroids;
                 int numOfLables = cv::connectedComponentsWithStats(dst, img_labels, stats, centroids, 8, CV_32S);
 
-                if(COUNT_MAX_AREA){//쓸때는 if문 빼고
-                    int temp_area = 0, max_area = 0;
-                    for (int row = 1; row < numOfLables; row++) {
-                        int* area_data = stats.ptr<int>(row);
-                        temp_area = area_data[cv::CC_STAT_AREA];
-                        if (temp_area > max_area) {
-                        max_area = temp_area;
-                        }
-                    }
-                }
 
-                int temp_height= 0, max_height = 0;
-                    for (int row = 1; row < numOfLables; row++) {
-                        int* height_data = stats.ptr<int>(row);
-                        temp_height = height_data[cv::CC_STAT_HEIGHT];
-                        if (temp_height > max_height) {
-                        max_height = temp_height;
-                        }
-                    }
-		int temp_bottom = 0, max_bottom = 0;
-	    	for(int row = 1; row < numOfLables; row++){
-			int* bottom_data = stats.ptr<int>(row);
-			temp_bottom = bottom_data[cv::CC_STAT_TOP]+bottom_data[cv::CC_STAT_HEIGHT];
-			if(temp_bottom>max_bottom){
-				max_bottom = temp_bottom;
-			}
-		}
 
                 for (int row = 1; row < numOfLables; row++) {
 
@@ -821,15 +852,101 @@ namespace lane_detect_algo{
                   //imshow("y_lable", draw_lable);
                 }
 
-              //-for max area and extra-//  if (area == max_area && width<height && left<src.cols / 2 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
-                if (abs(max_height - height)<50 && abs(max_bottom-(top+height))<50) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
+                if (1) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                     for (int delete_row = dst.rows - 1, coordi_index = 0; delete_row >= 0; --delete_row, ++coordi_index) {
                         uchar* delete_data = dst.ptr<uchar>(delete_row);
 
                         for (int delete_col = dst.cols-1 ; delete_col>=0; --delete_col) {
                         if ((delete_col > left + width || delete_col < left) || (delete_row<top || delete_row>top + height)) {
-                        delete_data[delete_col] = (uchar)0;
+                            delete_data[delete_col] = (uchar)0;
+                            }
                         }
+                    }
+                }
+                else {//delete wrong lable
+                    for (int row = top; row < top + height; row++) {
+                        uchar* data = dst.ptr<uchar>(row);
+                        for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함
+                            data[col] = (uchar)0;
+                            }   
+                        }
+                    }
+                }
+                
+            }
+                
+            void CalLane::makeContoursLeftLane(cv::Mat src, cv::Mat& dst) {
+                std::vector<std::vector<cv::Point>> countours;
+                std::vector<cv::Vec4i> hierachy;
+
+                cv::findContours(src, countours, hierachy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+                dst = cv::Mat::zeros(src.size(), CV_8UC3);
+
+                for (std::vector<std::vector<cv::Point>>::size_type i = 0; i < countours.size(); ++i) {
+                    cv::drawContours(dst, countours, i, CV_RGB(255, 255, 255), -1, 8, hierachy, 0, cv::Point());
+                }
+                cv::cvtColor(dst, dst, cv::COLOR_BGR2GRAY);  // Convert the image to Gray
+                cv::threshold(dst, dst, 127, 255, cv::THRESH_BINARY);
+                cv::Mat draw_lable;//레이블확인용
+                cv::threshold(dst, draw_lable, 127, 255, cv::THRESH_BINARY_INV);//레이블 확인용
+                cv::Mat img_labels, stats, centroids;
+                int numOfLables = cv::connectedComponentsWithStats(dst, img_labels, stats, centroids, 8, CV_32S);
+
+               // if(COUNT_MAX_AREA){//쓸때는 if문 빼고
+                    int temp_area = 0, max_area = 0;
+                    for (int row = 1; row < numOfLables; row++) {
+                        int* area_data = stats.ptr<int>(row);
+                        temp_area = area_data[cv::CC_STAT_AREA];
+                        if (temp_area > max_area) {
+                        max_area = temp_area;
+                        }
+                    }
+              //  }
+
+                int temp_height= 0, max_height = 0;
+                    for (int row = 1; row < numOfLables; row++) {
+                        int* height_data = stats.ptr<int>(row);
+                        temp_height = height_data[cv::CC_STAT_HEIGHT];
+                        if (temp_height > max_height) {
+                        max_height = temp_height;
+                        }
+                    }
+                int temp_bottom = 0, max_bottom = 0;
+                    for(int row = 1; row < numOfLables; row++){
+                    int* bottom_data = stats.ptr<int>(row);
+                    temp_bottom = bottom_data[cv::CC_STAT_TOP]+bottom_data[cv::CC_STAT_HEIGHT];
+                    if(temp_bottom>max_bottom){
+                        max_bottom = temp_bottom;
+                    }
+                }
+
+                for (int row = 1; row < numOfLables; row++) {
+
+                int* data = stats.ptr<int>(row);
+                int area = data[cv::CC_STAT_AREA];
+                int left = data[cv::CC_STAT_LEFT];
+                int top = data[cv::CC_STAT_TOP];
+                int width = data[cv::CC_STAT_WIDTH];
+                int height = data[cv::CC_STAT_HEIGHT];
+
+
+                cv::rectangle(draw_lable,cv::Point(left,top),cv::Point(left+width,top+height),cv::Scalar(0,0,255),1);
+
+              //  imshow("y_lable", draw_lable);
+                if(IMSHOW_SW){
+                  //modified by Hayean
+               //   imshow("y_lable", draw_lable);
+                }
+
+              //-for max area and extra-//  if (area == max_area && width<height && left<src.cols / 2 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
+                if(area == max_area){
+              //  if (abs(max_height - height)<100 && abs(max_bottom-(top+height))<50) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
+                    for (int delete_row = dst.rows - 1; delete_row >= 0; --delete_row) {
+                        uchar* delete_data = dst.ptr<uchar>(delete_row);
+                        for (int delete_col = dst.cols-1; delete_col>=0; --delete_col) {
+                            if ((delete_col > left + width || delete_col < left) ) {
+                                delete_data[delete_col] = (uchar)0;
+                            }
                         //else {//range of max lable box///////////////////////for visible center line////////////////////////////////////////////
                         // if (delete_data[delete_col] != 0 && !lane_checked && coordi_index<dst.cols/2*3) {
                         //  lane_checked = true;
@@ -899,8 +1016,7 @@ namespace lane_detect_algo{
                     }
                 }
 
-                int center_x;
-                int center_y;
+              
 
                 //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
@@ -1025,8 +1141,7 @@ namespace lane_detect_algo{
                     }
                 }
                 }
-                int center_x;
-                int center_y;
+          
 
                 //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
