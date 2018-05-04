@@ -1,12 +1,12 @@
 accel:
-  settling_time: 1.2
+  settling_time: 1.1
   
 speed:
   weight: 1.1
   shift: 20.0
   
 brake:
-  max: 80
+  max: 77
   kp: 125
   ki: 0.0
   kd: 0.0

@@ -5,7 +5,7 @@
 	<arg name="LocalROS" 			 default="DWAPlannerROS"/> 		<!--TebLocalPlannerROS-->
 	
 	<arg name="planner_frequency"	 default="1.0"/>
-	<arg name="controller_frequency" default="20.0"/>
+	<arg name="controller_frequency" default="15.0"/>
 
 	<!--  ****** Move_Base ******  -->
 	

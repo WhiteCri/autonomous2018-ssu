@@ -25,7 +25,7 @@
 #define C1 0.0184 // acceleration [m/s^2] = 0.108*exp(0.0184*platform) -> C1 = 0.0184
 #define C2 0.0598 // steady-state speed [m/s] = 0.0598*platform        -> C2 = 0.0598
 
-#define FILTER_SIZE 2 // Reference Steering Angle 진동 잡기 위한 이동평균필터 크기
+#define FILTER_SIZE 4 // Reference Steering Angle 진동 잡기 위한 이동평균필터 크기
 #define EPSILON 0.05   // log(negative) 방지
 
 /* Debug */
