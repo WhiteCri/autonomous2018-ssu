@@ -8,7 +8,7 @@
 
 <!-- Robot Frame Setup (static tf)  -->
     <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.0 0 0 0 0 0 base_link laser 100" />
+    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0 0 0 0 base_link laser 100" />
     <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="-0.68 0 0 0 0 0 base_link camera_main 100" />
 
 
@@ -38,7 +38,7 @@
 	-->
 
 	<!--obstacle Flag-->
-	<node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
+	<!--<node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
         <rosparam file="$(find obstacle_flag)/cfg/flag_check.yaml" command="load"/>
     </node>
 
@@ -60,7 +60,7 @@
     <node pkg="obstacle_detector" type="obstacle_extractor_node" name="parking_obstacle_extractor">
     <remap from="/raw_obstacles" to="/park_obstacle"/>
         <rosparam file="$(find obstacle_flag)/cfg/park_obstacle.yaml" command="load"/>      
-  </node>
+  </node>-->
 	
 <!--  Robot Pose Estimation Node -->	
 	<node pkg="odometry" type="odom_pub" name="odom_wheelbased"/>

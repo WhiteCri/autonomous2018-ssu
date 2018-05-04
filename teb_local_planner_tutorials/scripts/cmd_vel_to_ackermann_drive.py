@@ -24,11 +24,11 @@ def cmd_callback(data):
   v = data.linear.x
   steering = convert_trans_rot_vel_to_steering_angle(v, data.angular.z, wheelbase)
   
-  msg = AckermannDriveStamped()
-  msg.header.stamp = rospy.Time.now()
-  msg.header.frame_id = frame_id
-  msg.drive.steering_angle = steering
-  msg.drive.speed = v
+  msg = Twist()
+  #msg.header.stamp = rospy.Time.now()
+  #msg.header.frame_id = frame_id
+  msg.linear.x = v
+  msg.angular.z = steering
   
   pub.publish(msg)
   
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     frame_id = rospy.get_param('~frame_id', 'odom')
     
     rospy.Subscriber(twist_cmd_topic, Twist, cmd_callback, queue_size=1)
-    pub = rospy.Publisher(ackermann_cmd_topic, AckermannDriveStamped, queue_size=1)
+    pub = rospy.Publisher(ackermann_cmd_topic, Twist, queue_size=1)
     
     rospy.loginfo("Node 'cmd_vel_to_ackermann_drive' started.\nListening to %s, publishing to %s. Frame id: %s, wheelbase: %f", "/cmd_vel", ackermann_cmd_topic, frame_id, wheelbase)
     
