@@ -7,7 +7,7 @@ hl_controller:
   goal_type:  ["normal","normal","normal"]
 
 #config controller
-  frequency: 10
+  frequency: 20
   publish_param: true
 
 #tx
@@ -26,15 +26,15 @@ hl_controller:
   crosswalk_stop_duration: 3.0
 
 #movingobj
-  use_process_movingobj: true
-  movingobj_check_duration: 0.5
-  use_movingobj_onetime_flag: true
+  use_process_movingobj: false
+  movingobj_check_duration: 0
+  use_movingobj_onetime_flag: false
 
   movingobj_driving_duration: 1.0
   movingobj_stop_duration: 5.0
 
 #parking
-  use_process_parking: false
+  use_process_parking: true
   parking_check_duration: 2.0
   use_parking_onetime_flag: true
 
