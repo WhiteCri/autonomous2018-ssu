@@ -1,10 +1,10 @@
 hl_controller:
 #goal
-  x_goal: [330,331,333]
-  y_goal: [0.125,7.5,16]
-  ori_z_goal: [3,0,3,3,3,3]
-  ori_w_goal: [0.5,0.5,0.5,0.5]
-  goal_type: ["before crosswalk","g"]
+  x_goal: [3.979,0.8854,-11.4371]
+  y_goal: [6.894,15.6163,15.0483]
+  ori_z_goal: [0.685,0.9881,-0.7187]
+  ori_w_goal: [0.727,0.1533,0.6952]
+  goal_type: ["normal","normal","n"]
 
 #config controller
   frequency: 5
@@ -28,8 +28,13 @@ hl_controller:
 
 #movingobj
   use_process_movingobj: true
+<<<<<<< HEAD
   movingobj_check_duration: 0.2
   movingobj_escape_duration: 1.0
+=======
+  movingobj_check_duration: 1.0
+  movingobj_escape_duration: 0.0
+>>>>>>> origin/master
   use_movingobj_onetime_flag: true
   movingobj_onetime_flag: false
 
@@ -65,12 +70,12 @@ hl_controller:
 #uturn
   use_process_uturn: true
   uturn_check_duration: 1.0
-  use_uturn_onetime_flag: true
+  use_uturn_onetime_flag: false
 
-  uturn_tx_speed: 50
-  uturn_tx_steer: 1999
+  uturn_tx_speed: 70
+  uturn_tx_steer: -1999
   uturn_tx_brake: 0
-  uturn_duration: 2.0
+  uturn_duration: 10.0
   
 
 #recovery 
@@ -82,4 +87,4 @@ hl_controller:
 
 #goal_sender params
   use_auto_goal_sender: false
-  auto_goal_sender_frequency: 3
+  auto_goal_sender_frequency: 0.2
