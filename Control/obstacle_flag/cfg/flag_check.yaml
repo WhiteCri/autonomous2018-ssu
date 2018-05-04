@@ -8,7 +8,7 @@ active:
 dynamic :
   # sampling delta y
   size_N : 4
-  sample_size: 5
+  sample_size: 6
   # min y size
   min_y_distance : 0.4
   max_y_distance : 2
@@ -18,8 +18,8 @@ dynamic :
   max_x_width : 0.015
 
   # delta y size 조정 
-  min_delta_y : 0.002
-  max_delta_y : 0.09
+  min_delta_y : 0.015
+  max_delta_y : 0.2
 
 u_turn:
   # detect size 크기 조정

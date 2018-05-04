@@ -1,3 +1,5 @@
+#include <deque>
+#include <vector>
 
 struct active{
     bool active_dynamic;
@@ -5,7 +7,7 @@ struct active{
     bool active_uturn;
 };
 struct priv{
-    std::vector<double> priv_data_first_y;
+    std::deque<double> priv_data_first_y;
     std::vector<double> delta_y;
 };
 struct dynamic{

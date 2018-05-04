@@ -11,7 +11,7 @@
 #include "obstacle_flag/data.h"
 #include <cmath>
 #include <thread>
-#include <vector>
+
 
 /* U_turn check */
 #define Laser_Filter_start 195
@@ -44,43 +44,29 @@ void obstaclecheck(const obstacle_detector::Obstacles::ConstPtr &object)
     if(object->segments.empty())
         return;
     
-    std::vector<std::vector<double>> dataarry;
     double delta_y;
     bool dynamic_obstacle = false;
 
-    for(int i=0; i<object->segments.size(); i++)
-    {
-        std::vector<double> element;
-        element.resize(4);
-        dataarry.push_back(element);
-    }
-    /* 내 vector로 모든 data추출 */
-    for(int i=0; i<object->segments.size(); i++)
-    {
-        dataarry[i][0] = object->segments.at(i).first_point.x;
-        dataarry[i][1] = object->segments.at(i).first_point.y;
-        dataarry[i][2] = object->segments.at(i).last_point.x;
-        dataarry[i][3] = object->segments.at(i).last_point.y;
-    }
     /* find arry num */
     for(int i=0; i<object->segments.size(); i++)
     {
-        if( (fabs(dataarry[i][1] - dataarry[i][3]) > dynamic_param.min_y_distance)  && (fabs(dataarry[i][1] - dataarry[i][3]) < dynamic_param.max_y_distance) &&
-            (fabs(dataarry[i][0] - dataarry[i][2]) < dynamic_param.max_x_width) && (fabs(dataarry[i][0]) > dynamic_param.min_x_obstacle) 
-            && (fabs(dataarry[i][2]) > dynamic_param.min_x_obstacle) )
+        if( (fabs(object->segments.at(i).first_point.y - object->segments.at(i).last_point.y) > dynamic_param.min_y_distance)  && 
+            (fabs(object->segments.at(i).first_point.y - object->segments.at(i).last_point.y) < dynamic_param.max_y_distance) &&
+            (fabs(object->segments.at(i).first_point.x - object->segments.at(i).last_point.x) < dynamic_param.max_x_width) && (fabs(object->segments.at(i).first_point.x) > dynamic_param.min_x_obstacle) 
+            && (fabs(object->segments.at(i).last_point.x) > dynamic_param.min_x_obstacle) )
         {
-            priv.priv_data_first_y.push_back(dataarry[i][1]);
+            priv.priv_data_first_y.push_back(object->segments.at(i).first_point.y);
         }
     }
 
     /* 이전 data와 비교해서 delta_y 추출 */
     if( priv.priv_data_first_y.size() == dynamic_param.sample_size )
     {
-        
-        delta_y = fabs(priv.priv_data_first_y[0] - priv.priv_data_first_y[dynamic_param.sample_size]);
+        delta_y =  fabs( priv.priv_data_first_y.front() - priv.priv_data_first_y.back());
         priv.delta_y.push_back(delta_y);
            
         priv.priv_data_first_y.clear();
+        priv.priv_data_first_y.resize(0);
     }
     /* delta y에 대한 샘플링 시작 */
     if(priv.delta_y.size() == (dynamic_param.size_N - 1)) 
