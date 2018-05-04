@@ -19,6 +19,7 @@ const std::string MOVING_STATUES[] = {
     "crosswalk",
     "movingobj",
     "parking",
+    "uturn"
     "b"
 };
 

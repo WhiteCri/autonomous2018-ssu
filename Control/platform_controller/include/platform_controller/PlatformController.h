@@ -31,7 +31,7 @@
 /* Debug */
 //#define MY_DEBUG
 //#define MY_TEST
-#define PRINT_CMD
+//#define PRINT_CMD
 
 class PlatformController {
 public:
