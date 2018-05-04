@@ -1,8 +1,8 @@
 active:
   # active check
-  dynamic: true
+  dynamic: false
   u_turn: true
-  park: true
+  park: false
 
 dynamic :
   # sampling delta y
@@ -21,9 +21,11 @@ dynamic :
 
 u_turn:
   # detect size 크기 조정
-  check_UTurn : 3
-  # point 간 최소 range 범위
-  UTurn_distance_point : 0.06
+  check_UTurn : 2
+  # point 간 최대 range 범위
+  UTurn_distance_point : 0.1
+  # 최소 탐지 횟수
+  number_of_uturn: 5
 
 park:
   # detect 할 size 결정

@@ -36,8 +36,9 @@
 	<node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
 	<node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
 	-->
-	<!-- Obstacle Flag-->
-    <node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
+
+	<!--obstacle Flag-->
+	<node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
         <rosparam file="$(find obstacle_flag)/cfg/flag_check.yaml" command="load"/>
     </node>
 
@@ -59,7 +60,7 @@
     <node pkg="obstacle_detector" type="obstacle_extractor_node" name="parking_obstacle_extractor">
     <remap from="/raw_obstacles" to="/park_obstacle"/>
         <rosparam file="$(find obstacle_flag)/cfg/park_obstacle.yaml" command="load"/>      
-  </node>	
+  </node>
 	
 <!--  Robot Pose Estimation Node -->	
 	<node pkg="odometry" type="odom_pub" name="odom_wheelbased"/>
