@@ -1,6 +1,6 @@
 active:
   # active check
-  dynamic: true
+  dynamic: false
   u_turn: false
   park: true
 
@@ -30,10 +30,7 @@ u_turn:
   number_of_uturn: 5
 
 park:
-  # detect 할 size 결정
-  min_x: 2.0
-  max_x: 4.0
-  min_y: -2.0
-  max_y: 0
-  # 물체간 최소 거리
-  obj_2_distance: 0.015
+  min_sample_cnt: 4
+  # 주차 box 좌표. x,y 4개 적을 것.
+  near_box: [-2, -3, -4, 5, 9, 6, 7, 5]
+  far_box: [-2, -3, -4, 5, 9, 6, 7, 5]

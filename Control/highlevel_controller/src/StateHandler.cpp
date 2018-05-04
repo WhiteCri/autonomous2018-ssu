@@ -150,7 +150,6 @@ void process_crosswalk(){
 }
 
 void process_movingobj(){
-    ROS_INFO("movingobj , movingobj_onetime_flag : %d %d",param_ptr->movingobj, param_ptr->movingobj_onetime_flag);
     ROS_INFO("movingobj start");
 
     //maintaining car's status
