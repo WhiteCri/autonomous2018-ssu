@@ -88,16 +88,16 @@ void Calc_PID(void){ // read_state, read_reference로 읽은 후에 Platform_TX(
 void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data){
     current_speed_ = rx_data->speed;
     current_steer_ = rx_data->steer;
-    Calc_PID();
-    publish();
+    //Calc_PID();
+    //publish();
 }
 
 void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist){
     ref_speed_ = twist->linear.x;
     ref_steer_ = mv_avg_filter( BoundaryCheck_Steer(RAD2SERIAL*(twist->angular.z)) );
 
-    //Calc_PID();
-    //publish();
+    Calc_PID();
+    publish();
 }
 
 void publish(){
