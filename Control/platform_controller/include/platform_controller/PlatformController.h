@@ -102,13 +102,13 @@ void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist){
     if(cmd_steering_angle_){
         ref_steer_ = twist->angular.z;
             #ifdef PRINT_CMD
-                ROS_INFO("원래 조향각");
+                ROS_INFO("NOT Converted!");
             #endif
     }
     else{
         ref_steer_ = convert_rotvel_to_steering_angle(twist->linear.x, twist->angular.z);
             #ifdef PRINT_CMD
-                ROS_INFO("변환된 조향각");
+                ROS_INFO("Converted!");
             #endif
     }
 
@@ -237,7 +237,7 @@ inline int BoundaryCheck_Steer(const int steer){
 }
 
 void Calc_lateral(void){
-    cmd_.steer = BoundaryCheck_Steer(ref_steer_);
+    cmd_.steer = BoundaryCheck_Steer(RAD2SERIAL * ref_steer_);
 }
 
 bool Calc_longitudinal(void){
