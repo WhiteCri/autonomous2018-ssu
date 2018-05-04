@@ -53,7 +53,8 @@ public:
     bool movingobj_onetime_flag;
 
     /* parking parameter */
-    bool parking;
+    bool parking_near;
+    bool parking_far;
     bool use_process_parking;
     bool use_parking_onetime_flag;
 
@@ -112,7 +113,8 @@ public:
         nh.getParam("hl_controller/crosswalk_onetime_flag", crosswalk_onetime_flag);
         nh.getParam("hl_controller/movingobj",              movingobj);
         nh.getParam("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag);
-        nh.getParam("hl_controller/parking",                parking);
+        nh.getParam("hl_controller/parking_near",           parking_near);
+        nh.getParam("hl_controller/parking_far",            parking_far);
         nh.getParam("hl_controller/parking_onetime_flag",   parking_onetime_flag);
         nh.getParam("hl_controller/uturn",                  uturn);
         nh.getParam("hl_controller/uturn_onetime_flag",     uturn_onetime_flag);
@@ -129,7 +131,8 @@ public:
             msg.seq = seq++;
             msg.crosswalk = crosswalk;
             msg.movingobj = movingobj;
-            msg.parking = parking;
+            msg.parking_near = parking_near;
+            msg.parking_far = parking_far;
             msg.recovery = recovery;
             msg.uturn = uturn;
 
