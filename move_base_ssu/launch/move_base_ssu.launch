@@ -1,36 +1,45 @@
 <launch>
-
+	
+	<arg name="global_planner"		default="global_planner/GlobalPlanner"/>
+	<arg name="local_planner" 		default="dwa_local_planner"/> 	<!--teb_local_planner-->
+	<arg name="LocalROS" 			default="DWAPlannerROS"/> 		<!--TebLocalPlannerROS-->
+	
+	<arg name="planner_frequency"	default="1.0"/>	<arg name="controller_frequency"   default="15.0"/>
+	<arg name="planner_patience"	default="5.0"/>	<arg name="controller_patience"	   default="15.0"/>
+	
+		
 	<!--  ****** Move_Base ******  -->
+	
 	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
   	  	<rosparam file="$(find move_base_ssu)/cfg/costmap_common_params.yaml" command="load" ns="global_costmap" />
   	 	<rosparam file="$(find move_base_ssu)/cfg/costmap_common_params.yaml" command="load" ns="local_costmap" />
   		<rosparam file="$(find move_base_ssu)/cfg/local_costmap_params.yaml" command="load" />
   		<rosparam file="$(find move_base_ssu)/cfg/global_costmap_params.yaml" command="load" />
-  		<rosparam file="$(find move_base_ssu)/cfg/teb_local_planner_params.yaml" command="load" />
+		<rosparam file="$(find move_base_ssu)/cfg/$(arg local_planner)_params.yaml" command="load" />
 
-		<param name="base_global_planner" value="global_planner/GlobalPlanner" />
-		<param name="planner_frequency" value="1.0" />
-		<param name="planner_patience" value="5.0" />
+		<param name="base_global_planner" value="$(arg global_planner)" />
+		<param name="planner_frequency" value="$(arg planner_frequency)" />
+		<param name="planner_patience" value="$(arg planner_patience)" />
 
-		<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
-		<param name="controller_frequency" value="5.0" />
-		<param name="controller_patience" value="15.0" />
+		<!--<param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />-->
+		<param name="base_local_planner" value="$(arg local_planner)/$(arg LocalROS)" />
+		<param name="controller_frequency" value="$(arg controller_frequency)" />
+		<param name="controller_patience" value="$(arg controller_patience)" />
 
     	<param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
 	</node>
 
-
 	<!--  ****** Controller (High / Low  Level) ******  -->
-	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
-        <rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load" />
-    </node>
+	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen"/>
+	<rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load"/>
+        
 
-	<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>
-	<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>
+	<!--<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>
+	<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>-->
 	
 
-	 <!--  **************** Visualisation ****************  -->
-	  <node name="rviz" pkg="rviz" type="rviz"/>
-	  <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+	<!--  **************** Visualisation ****************  -->
+	<node name="rviz" pkg="rviz" type="rviz"/>
+	<node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
 
 </launch>
