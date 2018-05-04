@@ -49,3 +49,10 @@ target_link_libraries(highlevel_controller
   ${catkin_LIBRARIES}
 )
 
+add_executable(fake_param_setter
+  src/fake_param_setter.cpp
+)
+add_dependencies(fake_param_setter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(fake_param_setter
+  ${catkin_LIBRARIES}
+)

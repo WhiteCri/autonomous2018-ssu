@@ -43,13 +43,23 @@ Parameters::Parameters(){
     /* movingobj paramter */
     nh.param("hl_controller/movingobj", movingobj, false);
     nh.param("hl_controller/movingobj_check_duration", movingobj_check_duration, 1.0);
-    nh.param("hl_controller/movingobj_escape_duration", movingobj_escape_duration, 1.0);
     nh.param("hl_controller/use_process_movingobj", use_process_movingobj, true);
     nh.param("hl_controller/use_movingobj_onetime_flag", use_movingobj_onetime_flag, true);
 
     nh.param("hl_controller/movingobj_driving_duration", movingobj_driving_duration, 1.0);
     nh.param("hl_controller/movingobj_stop_duration", movingobj_stop_duration, 5.0);
     nh.param("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag, true);
+
+    /* uturn members */
+    nh.param("hl_controller/use_process_uturn", use_process_uturn, true);
+    nh.param("hl_controller/uturn_check_duration", uturn_check_duration, 1.0);
+    nh.param("hl_controller/use_uturn_onetime_flag", use_uturn_onetime_flag, true);
+
+    nh.param("hl_controller/uturn_tx_speed", uturn_tx_speed, 50);
+    nh.param("hl_controller/uturn_tx_steer", uturn_tx_steer, 1999);
+    nh.param("hl_controller/uturn_tx_brake", uturn_tx_brake, 0);
+    nh.param("hl_controller/uturn_duration", uturn_duration, 1.0);
+
 
     /* parking parameter */
     nh.param("hl_controller/parking", parking, false);
@@ -78,23 +88,6 @@ Parameters::Parameters(){
     nh.param("hl_controller/parking_far_back_point_y",         parking_far_back_point_y, -200.0);
     nh.param("hl_controller/parking_far_back_point_ori_z",     parking_far_back_point_ori_z, 0.0);
     nh.param("hl_controller/parking_far_back_point_ori_w",     parking_far_back_point_ori_w, 0.0);
-
-    /* uturn members */
-    bool use_process_uturn;
-    bool use_uturn_onetime_flag;
-
-    int uturn_tx_speed;
-    int uturn_tx_steer;
-    int uturn_tx_brake;
-    double uturn_duration;
-    nh.param("hl_controller/use_process_uturn", use_process_uturn, true);
-    nh.param("hl_controller/uturn_check_duration", uturn_check_duration, 1.0);
-    nh.param("hl_controller/use_uturn_onetime_flag", use_uturn_onetime_flag, true);
-
-    nh.param("hl_controller/uturn_tx_speed", uturn_tx_speed, 50);
-    nh.param("hl_controller/uturn_tx_steer", uturn_tx_steer, 1999);
-    nh.param("hl_controller/uturn_tx_brake", uturn_tx_brake, 0);
-    nh.param("hl_controller/uturn_duration", uturn_duration, 1.0);
 
     /* recovery members */
     nh.param("hl_controller/recovery", recovery, false);

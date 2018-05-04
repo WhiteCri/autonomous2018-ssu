@@ -75,13 +75,14 @@ void serialWrite(){
     while(true){
         if(txControlStatic.tx_control_static){
             lock.lock();
+            packet[5] = static_cast<uint8_t>(0);
             *(uint16_t*)(packet + 7) = static_cast<uint16_t>(txControlStatic.tx_speed);//speed
             *(int8_t*)(packet + 8) = *((int8_t*)(&txControlStatic.tx_steer) + 1);
             *(int8_t*)(packet + 9) = *(int8_t*)(&txControlStatic.tx_steer);
             packet[10] = txControlStatic.tx_brake; // brake
-            ser->write(packet,TX_PACKET_LENGTH);
             lock.unlock();
         }
+        ser->write(packet,TX_PACKET_LENGTH);
         loop_rate.sleep();
     }
 }

@@ -3,7 +3,7 @@
 <!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
     <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
 	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
-	<arg name="map_name" default="ssara.yaml"/>
+	<arg name="map_name" default="jinry_final.yaml"/>
 
 
 <!-- Robot Frame Setup (static tf)  -->
@@ -14,7 +14,7 @@
 
 <!-- Sensor Setup  -->
 	<!-- Lidar: Ethernet  -->
-    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node"/>
+    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" respawn="true"/>
     <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>
 
 	<!-- Camera -->
@@ -23,8 +23,8 @@
 		-->
 	
 	<!-- Platform RX/TX: USB0  -->
-    <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test"/>
-    <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0"/>
+    <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test" respawn="true"/>
+    <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0" respawn="true"/>
 [
 
 	<!-- IMU: USB1  -->
@@ -36,7 +36,30 @@
 	<node pkg="nmea_navsat_driver" type="GPS_Subscriber" name="GPS_Subscriber"/>
 	<node pkg="gps_common" type="utm_odometry_node" name="Degree_To_UTM" />
 	-->
+	<!--obstacle Flag-->
+	<node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
+        <rosparam file="$(find obstacle_flag)/cfg/flag_check.yaml" command="load"/>
+    </node>
 
+ 	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="uturn_filter">
+        <rosparam file="$(find laser_filters)/cfg/uturn_cut.yaml" command="load"/>  
+		<remap from="/scan"  to="/uturn_scan"/>
+	</node>
+
+ 	<node pkg="laser_filters" type="scan_to_scan_filter_chain" name="dynamic_filter">
+        <rosparam file="$(find laser_filters)/cfg/dynamic_cut.yaml" command="load"/>  
+		<remap from="/scan"  to="/dynamic_scan"/>
+	</node>
+
+    <node pkg="obstacle_detector" type="obstacle_extractor_node" name="dynamic_obstacle_extractor">
+  	    <remap from="/scan"  to="/dynamic_scan"/>
+        <remap from="/raw_obstacles" to="/dynamic_obstacle"/>
+        <rosparam file="$(find obstacle_flag)/cfg/dynamic_obstacle.yaml" command="load"/>  
+    </node>
+    <node pkg="obstacle_detector" type="obstacle_extractor_node" name="parking_obstacle_extractor">
+    <remap from="/raw_obstacles" to="/park_obstacle"/>
+        <rosparam file="$(find obstacle_flag)/cfg/park_obstacle.yaml" command="load"/>      
+  </node>
 	
 <!--  Robot Pose Estimation Node -->	
 	<node pkg="odometry" type="odom_pub" name="odom_wheelbased"/>

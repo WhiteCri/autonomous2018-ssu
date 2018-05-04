@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 
 #define ABORT_FLAG TRUE
+#define TX_STOP_BRAKE 75
 
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
@@ -14,6 +15,7 @@ inline void showGoal(double x, double y, double ori_z, double ori_w, const std::
 }
 
 void init(){
+    ROS_INFO("State Init...");
     double x = param_ptr->x_goal.back();
     double y = param_ptr->y_goal.back();
     double ori_z = param_ptr->ori_z_goal.back();
@@ -72,6 +74,15 @@ void toward_goal(){
     }
     else if (state == GoalStates::STATE_PREEMPTED){
         ROS_INFO("PREEMPTED...Are you using rviz to set goal?");
+        double x = param_ptr->x_goal.back();
+        double y = param_ptr->y_goal.back();
+        double ori_z = param_ptr->ori_z_goal.back();
+        double ori_w = param_ptr->ori_w_goal.back();
+        std::string goal_type = param_ptr->goal_type.back();
+       
+        goalSender_ptr->setGoal(x, y, ori_z, ori_w);
+        showGoal(x, y, ori_z, ori_w, goal_type);
+        goalSender_ptr->sendGoal();
     }
     else if (state == GoalStates::STATE_ABORTED){
 #ifdef ABORT_FLAG
@@ -97,22 +108,27 @@ void process_crosswalk(){
     }
 
     //take car to stop
-    ROS_INFO("stop...");
+    ROS_INFO("stop for %lf seconds...", param_ptr->crosswalk_stop_duration);
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
     param_ptr->nh.setParam("hl_controller/tx_speed", 0);
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", 150);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     //take car to wait
     ros::Rate(1 / param_ptr->crosswalk_stop_duration).sleep();
 
+    //unlock tx_control_static
+    param_ptr->nh.setParam("hl_controller/tx_control_static",false);
+    
     //check that process_crosswalk had been done.
     param_ptr->nh.setParam("hl_controller/crosswalk_onetime_flag",true);
 
     ROS_INFO("crosswalk done");    
+    param_ptr->load_param();
 }
 
 void process_movingobj(){
+    ROS_INFO("movingobj , movingobj_onetime_flag : %d %d",param_ptr->movingobj, param_ptr->movingobj_onetime_flag);
     ROS_INFO("movingobj start");
 
     //maintaining car's status
@@ -126,15 +142,24 @@ void process_movingobj(){
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
     param_ptr->nh.setParam("hl_controller/tx_speed", 0);
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", 150);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     //take car to wait
     ros::Rate(1 / param_ptr->movingobj_stop_duration).sleep();
-    
+
+    //unlock tx_control_static
+    param_ptr->nh.setParam("hl_controller/tx_control_static",false);
+
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/movingobj_onetime_flag",true);
 
+    while(param_ptr->movingobj){
+        param_ptr->nh.getParam("hl_controller/movingobj", param_ptr->movingobj);
+        ROS_INFO("wait for hl_controller/movingobj to be false...");
+        ros::Rate(1).sleep();
+    }
     ROS_INFO("movingobj done");
+    param_ptr->load_param();
 }
 
 void process_parking(){
@@ -198,7 +223,7 @@ void process_parking(){
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
     param_ptr->nh.setParam("hl_controller/tx_speed", 0);
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", 100);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     //take car to wait
     ros::Rate(1 / param_ptr->parking_stop_duration).sleep();
@@ -242,7 +267,8 @@ void process_uturn(){
     param_ptr->nh.setParam("hl_controller/tx_brake", param_ptr->uturn_tx_brake);
 
     //wait until duration ends
-    ros::Rate(param_ptr->uturn_duration).sleep();
+    ROS_INFO("maintaing for %lf seconds...", param_ptr->uturn_duration);
+    ros::Rate(1/param_ptr->uturn_duration).sleep();
 
     //erase tx_control_static flag
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
