@@ -1,17 +1,21 @@
-accel:
-  settling_time: 1.2
+platform_controller:
+  cmd_is_steering_angle: false
+  wheelbase: 1.0
   
-speed:
-  weight: 1.1
-  shift: 20.0
-  
-brake:
-  max: 80
-  kp: 125
-  ki: 0.0
-  kd: 0.0
-  
-steer:
-  kp: 1.0
-  ki: 0.0
-  kd: 0.0
+  accel:
+    settling_time: 1.2
+    
+  speed:
+    weight: 1.1
+    shift: 20.0
+    
+  brake:
+    max: 80
+    kp: 125
+    ki: 0.0
+    kd: 0.0
+    
+  steer:
+    kp: 1.0
+    ki: 0.0
+    kd: 0.0

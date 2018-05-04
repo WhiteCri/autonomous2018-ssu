@@ -28,13 +28,10 @@
     	<param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
 	</node>
 
-	<node pkg="teb_local_planner_tutorials" type="cmd_vel_to_ackermann_drive.py" name="cmd_vel_to_ackermann"/>
-
-
 	<!--  ****** Controller (High / Low  Level) ******  -->
-	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen">
-        <rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load" />
-    </node>
+	<node pkg="platform_controller" type="PlatformController_node" name="control" output="screen"/>
+	<rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load"/>
+        
 
 	<!--<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>
 	<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>-->

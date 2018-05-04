@@ -31,6 +31,7 @@
 /* Debug */
 //#define MY_DEBUG
 //#define MY_TEST
+#define PRINT_CMD
 
 class PlatformController {
 public:
@@ -44,8 +45,9 @@ PlatformController()
     , dt_(0.0), index_(0)
     , ss_speed_(0), ss_speed_weight_(1.35), ss_speed_shift_(20.0)
     , target_accel_(0.0), current_gear_(GEAR_FORWARD), target_gear_(GEAR_FORWARD) 
+    , cmd_steering_angle_(false), wheelbase_(1.0), curvature_(0.0)
 {
-     
+
 }
 
 
@@ -53,6 +55,9 @@ void Init(int argc, char **argv){ // Controller 돌리기 전에 initialize (dt 
     ros::init(argc, argv, "Platform_Controller");
     ros::NodeHandle priv_nh_("~");
     ros::NodeHandle nh_;
+
+    priv_nh_.param<bool>("/control/cmd_is_steering_angle", cmd_steering_angle_, false);
+    priv_nh_.param<double>("/control/wheelbase", wheelbase_, 1.0);
 
     priv_nh_.param<double>("/control/accel/settling_time", settling_time_, 0.8);
     priv_nh_.param<double>("/control/speed/weight", ss_speed_weight_, 1.1);
@@ -79,7 +84,6 @@ void Calc_PID(void){ // read_state, read_reference로 읽은 후에 Platform_TX(
 
     UpdateParameters(); // PID Gain Parameter Update
 
-
     Calc_longitudinal(); // SPEED CONTROL
 
     Calc_lateral(); // STEER CONTROL
@@ -95,30 +99,29 @@ void RX_Callback(const platform_rx_msg::platform_rx_msg::ConstPtr& rx_data){
 void Cmd_Callback(const geometry_msgs::TwistConstPtr& twist){
     ref_speed_ = twist->linear.x;
     
-    if(cmd_steering_angle_)
+    if(cmd_steering_angle_){
         ref_steer_ = twist->angular.z;
-    else
+            #ifdef PRINT_CMD
+                ROS_INFO("원래 조향각");
+            #endif
+    }
+    else{
         ref_steer_ = convert_rotvel_to_steering_angle(twist->linear.x, twist->angular.z);
-    
-    #ifdef PRINT_CMD
-        ROS_INFO("ref_speed: %lf", ref_speed_);
-        ROS_INFO("ref_steer: %lf", ref_steer_ * (180.0 / PI));
-    #endif
+            #ifdef PRINT_CMD
+                ROS_INFO("변환된 조향각");
+            #endif
+    }
+
+            #ifdef PRINT_CMD
+                ROS_INFO("ref_speed: %lf", ref_speed_);
+                ROS_INFO("ref_steer: %lf", ref_steer_ * (180.0 / PI));
+            #endif
 
     //ref_steer_ = mv_avg_filter( BoundaryCheck_Steer(RAD2SERIAL*(ref_steer_) );
 
     Calc_PID();
     publish();
 }
-
-inline double convert_rotvel_to_steering_angle(double linear_vel, double rot_vel){
-    if(linear_vel == 0 || rot_vel == 0)
-        return 0;
-
-    curvature_ = linear_vel / rot_vel;
-        return atan(wheelbase_ / curvature_);
-}
-
 
 void publish(){
     pub_.publish(cmd_);
@@ -147,7 +150,7 @@ platform_controller::cmd_platform cmd_;
 
 double filter_[FILTER_SIZE];
 int index_;
-
+bool cmd_steering_angle_;
 double wheelbase_, curvature_;
 
 double dt_;
@@ -175,6 +178,9 @@ double mv_avg_filter(double data){
 
 inline void UpdateParameters(void){
     ros::NodeHandle priv_nh_("~");
+
+    priv_nh_.getParam("/control/cmd_is_steering_angle", cmd_steering_angle_);
+    priv_nh_.getParam("/control/wheelbase", wheelbase_);
     
     priv_nh_.getParam("/control/accel/settling_time", settling_time_);
     priv_nh_.getParam("/control/speed/weight", ss_speed_weight_);
@@ -188,6 +194,14 @@ inline void UpdateParameters(void){
     priv_nh_.getParam("/control/brake/kp", kp_brake_);
     priv_nh_.getParam("/control/brake/ki", ki_brake_);
     priv_nh_.getParam("/control/brake/kd", kd_brake_);
+}
+
+inline double convert_rotvel_to_steering_angle(double linear_vel, double rot_vel){
+    if(linear_vel == 0 || rot_vel == 0)
+        return 0;
+
+    curvature_ = linear_vel / rot_vel;
+        return atan(wheelbase_ / curvature_);
 }
 
 inline int BoundaryCheck_Accel(const int accel){
