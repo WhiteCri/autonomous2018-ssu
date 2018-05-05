@@ -540,13 +540,13 @@ namespace lane_detect_algo{
                 // These four pts are the sides of the rect box used as input
                 inputQuad[0] = cv::Point2f(120, 44);//point 예외처리 추가
                 inputQuad[1] = cv::Point2f(220, 44);//point 예외처리 추가
-                inputQuad[2] = cv::Point2f(4, 220);
-                inputQuad[3] = cv::Point2f(320, 220);   
+                inputQuad[2] = cv::Point2f(4, 200);
+                inputQuad[3] = cv::Point2f(320, 200);   
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
                 outputQuad[0] = cv::Point2f(0, 24);
                 outputQuad[1] = cv::Point2f(320-1, 24);
-                outputQuad[2] = cv::Point2f(4+100, 220);
-                outputQuad[3] = cv::Point2f(320-100, 220);
+                outputQuad[2] = cv::Point2f(4+100, 200);
+                outputQuad[3] = cv::Point2f(320-100, 200);
                 /*left*/
                 // inputQuad[0] = cv::Point2f(195, 84);//point 예외처리 추가
                 // inputQuad[1] = cv::Point2f(245, 84);//point 예외처리 추가
@@ -600,13 +600,13 @@ namespace lane_detect_algo{
                 lambda = cv::Mat::zeros(src.rows, src.cols, src.type());
                 inputQuad[0] = cv::Point2f(120, 44);//point 예외처리 추가
                 inputQuad[1] = cv::Point2f(220, 44);//point 예외처리 추가
-                inputQuad[2] = cv::Point2f(4, 220);
-                inputQuad[3] = cv::Point2f(320, 220);   
+                inputQuad[2] = cv::Point2f(4, 200);
+                inputQuad[3] = cv::Point2f(320, 200);   
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
                 outputQuad[0] = cv::Point2f(0, 24);
                 outputQuad[1] = cv::Point2f(320-1, 24);
-                outputQuad[2] = cv::Point2f(4+100, 220);
-                outputQuad[3] = cv::Point2f(320-100, 220);
+                outputQuad[2] = cv::Point2f(4+100, 200);
+                outputQuad[3] = cv::Point2f(320-100, 200);
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
                 
                 /*left*/

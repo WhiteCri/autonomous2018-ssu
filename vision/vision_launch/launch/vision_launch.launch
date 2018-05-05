@@ -1,6 +1,6 @@
 <launch>
 	<arg name="main_camera_name" default="main"/>
-	<arg name="main_camera_num" default="0"/>
+	<arg name="main_camera_num" default="1"/>
 
 	<group ns="$(arg main_camera_name)">
 		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg main_camera_name)">
@@ -15,7 +15,7 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="0"/>
+			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 		</node>-->

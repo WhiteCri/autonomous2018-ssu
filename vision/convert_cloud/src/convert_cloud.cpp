@@ -73,7 +73,7 @@ int main(int argc, char** argv){
     if(ros::param::get("hl_controller/crosswalk",is_cross_walk)){
       //차량정지 및 파라미터값 복구 작성 예정
     }
-
+    cvtCloud.getPc_out().header.stamp = ros::Time::now();
     pub.publish(cvtCloud.getPc_out());
     ros::spinOnce();
   }

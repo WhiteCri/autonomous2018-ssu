@@ -45,6 +45,7 @@
 #include <tf2_sensor_msgs/tf2_sensor_msgs.h>
 #include <string>
 #include <iostream>
+#include <ros/ros.h>
 
 namespace pointcloud_to_laserscan
 {
@@ -162,6 +163,7 @@ namespace pointcloud_to_laserscan
     if (!target_frame_.empty())
     {
       output.header.frame_id = target_frame_;
+      output.header.stamp = ros::Time::now();
     }
 
     output.angle_min = angle_min_;

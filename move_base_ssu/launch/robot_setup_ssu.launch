@@ -19,7 +19,7 @@
 
 	<!-- Camera -->
 	<arg name="main_camera_name" default="main"/>
-	<arg name="main_camera_num" default="0"/>
+	<arg name="main_camera_num" default="1"/>
 
 	<group ns="$(arg main_camera_name)">
 		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg main_camera_name)">
