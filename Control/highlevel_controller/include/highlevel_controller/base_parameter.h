@@ -20,7 +20,8 @@ const std::string MOVING_STATUES[] = {
     "movingobj",
     "parking",
     "uturn"
-    "b"
+    "b",
+    "skip"
 };
 
 

@@ -10,7 +10,7 @@ hl_controller:
   y_goal:     [91.01,    116.459,111.33,93.66  ]
   ori_z_goal: [0.1814, 0.992  ,-0.376,93.66  ]
   ori_w_goal: [0.9833,  -0.1227,0.9263,-0.0118]
-  goal_type:  ["b","uturn","parking","b"]
+  goal_type:  ["skip","skip","parking","b"]
 
 #config controller
   frequency: 20
