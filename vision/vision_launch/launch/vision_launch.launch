@@ -1,6 +1,6 @@
 <launch>
 	<arg name="main_camera_name" default="main"/>
-	<arg name="main_camera_num" default="1"/>
+	<arg name="main_camera_num" default="0"/>
 
 	<group ns="$(arg main_camera_name)">
 		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg main_camera_name)">
@@ -18,13 +18,13 @@
 			<param name="track_bar" value="0"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
-		</node>
+		</node>-->
 		<!-- <node name="send_vec" pkg="send_vec" type="send_vec"></node> -->
 
 
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg main_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
-			<param name="cal_path" value="/home/seuleee/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
 		</node>
 
 		<node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" args="$(arg main_camera_name)" respawn="true" output="screen">

@@ -129,6 +129,27 @@ public:
       Pos distance( real_dr.x+  0.5 * down / ( up + down ), real_dr.y + 0.5 * right / ( left + right ) );
       return distance;
     }
+
+    Pos find_idx(const Pos& pos){
+
+      for(int i = 1 ; i < fileVec.size(); ++i){
+        for(int j = 1; j < fileVec[0].size(); ++j){
+          // bigger than UP_Y
+          if( ( ( hlines[i-1].slope * pos.x + hlines[i-1].intercept ) <= pos.y )
+          // smaller than DOWN_Y
+          &&( ( hlines[i].slope * pos.x + hlines[i].intercept ) > pos.y )
+          // bigger than LEFT_X
+          &&( ( ( pos.y - vlines[j-1].intercept ) / vlines[j-1].slope ) <= pos.x )
+          // smaller than RIGHT_X
+          &&( ( (pos.y - vlines[j].intercept ) / vlines[j].slope ) > pos.x ) ){
+              return Pos((int)j,(int)i);
+          }
+        }
+      }
+
+      return Pos(-1,-1);
+    }
+
 private:
   Pos center;
   vector<vector<Pos> > fileVec;
@@ -185,8 +206,9 @@ int main(int argc, char** argv){
     groupName = argv[1];
 
     ros::init(argc, argv, "cal_dirstance");
-
-    CalDistance calDist( calPath +"/calibration.txt", calPath + "/calibrationLine.txt");
+    std::string filename = "/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data/main_calibration.txt";
+    std::string linename = "/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data/main_calibrationLine.txt";
+    CalDistance calDist( filename, linename);
     while(calDist.getNh().ok()){
         calDist.sendDist();
         ros::spinOnce();
@@ -224,9 +246,18 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
     }
     size = (*it);
 
+    // count
+    int count = 0;
+    //
+
     ++it;
     //why try + catch?
     while(it != laneData->data.end()){
+
+      // count
+      count++;
+      //
+
       try{
         Pos targetPixel;
           Pos targetDist;
@@ -235,7 +266,6 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
             targetPixel.y = (*it);
             ++it;
             targetDist = transformer.pixel_to_real(targetPixel);
-
 
             if ((targetDist.x == 0) && (targetDist.y == 0)) continue; //when transformer() failed, continue;
 
@@ -247,8 +277,11 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
       } catch(std::exception& e){
         break;
       }
-
     }
+
+    // COUNT
+
+    //
 
 }
 
@@ -257,6 +290,6 @@ ros::NodeHandle CalDistance::getNh(){ return nh_; }
 void CalDistance::initParam(){
   nh_.param("/"+groupName+"/cal_distance/debug", debug, 4);
   nh_.param<std::string>("/"+groupName+"/cal_distance/cal_path", calPath, "/");
-  filename = calPath + "/calibration.txt";
-  linename = calPath + "/calibrationLine.txt";
+  //filename = calPath + "/"+groupName+"_calibration.txt";
+  //linename = calPath + "/"+groupName+"_calibrationLine.txt";
 }

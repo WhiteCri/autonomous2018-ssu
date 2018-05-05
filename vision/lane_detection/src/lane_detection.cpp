@@ -16,9 +16,6 @@
 //0 180 0 24 172 255
 
 
-//#include <lanedetection/coordinat0eMsg.h>
-//#include <lanedetection/vecMsg.h>
-//#include <lanedetection/dataSize.h>
 #define COORDI_COUNT 4000
 #define CLOCK_PER_SEC 1000
 static const std::string OPENCV_WINDOW_VF = "Image by videofile";
@@ -58,11 +55,17 @@ int y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax;
 int w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax;
 int check_stop_count;
 
+// only save
+int imgNum = 0;
+cv::Mat output_origin_for_copy;
+
 
 InitImgObjectforROS();
 ~InitImgObjectforROS();
 void imgCb(const sensor_msgs::ImageConstPtr& img_msg);
 void initParam();
+void initMyHSVTrackbar(const string &trackbar_name, int *hmin, int *hmax, int *smin, int *smax, int *vmin, int *vmax);
+void setMyHSVTrackbarValue(const string &trackbar_name,int *hmin, int *hmax, int *smin, int *smax, int *vmin, int *vmax);
 };
 
 
@@ -78,46 +81,9 @@ InitImgObjectforROS::InitImgObjectforROS() : it(nh){
         }
 
         if(track_bar) {
-
-                cv::namedWindow("TRACKBAR_YELLOW", cv::WINDOW_AUTOSIZE);
-                cv::namedWindow("TRACKBAR_WHITE",cv::WINDOW_AUTOSIZE);
-
-                cv::createTrackbar("h min", "TRACKBAR_YELLOW", &y_hmin, 50, NULL);
-                cv::setTrackbarPos("h min", "TRACKBAR_YELLOW", 15);
-
-                cv::createTrackbar("h max", "TRACKBAR_YELLOW", &y_hmax, 50, NULL);
-                cv::setTrackbarPos("h max", "TRACKBAR_YELLOW", 21);
-
-                cv::createTrackbar("s min", "TRACKBAR_YELLOW", &y_smin, 255, NULL);
-                cv::setTrackbarPos("s min", "TRACKBAR_YELLOW", 52);
-
-                cv::createTrackbar("s max", "TRACKBAR_YELLOW", &y_smax, 255, NULL);
-                cv::setTrackbarPos("s max", "TRACKBAR_YELLOW", 151);
-
-                cv::createTrackbar("v min", "TRACKBAR_YELLOW", &y_vmin, 255, NULL);
-                cv::setTrackbarPos("v min", "TRACKBAR_YELLOW", 0);
-
-                cv::createTrackbar("v max", "TRACKBAR_YELLOW", &y_vmax, 255, NULL);
-                cv::setTrackbarPos("v max", "TRACKBAR_YELLOW", 180);
-
-
-                cv::createTrackbar("h min", "TRACKBAR_WHITE", &w_hmin, 180, NULL);
-                cv::setTrackbarPos("h min", "TRACKBAR_WHITE", 0);
-
-                cv::createTrackbar("h max", "TRACKBAR_WHITE", &w_hmax, 180, NULL);
-                cv::setTrackbarPos("h max", "TRACKBAR_WHITE", 180);
-
-                cv::createTrackbar("s min", "TRACKBAR_WHITE", &w_smin, 255, NULL);
-                cv::setTrackbarPos("s min", "TRACKBAR_WHITE", 0);
-
-                cv::createTrackbar("s max", "TRACKBAR_WHITE", &w_smax, 255, NULL);
-                cv::setTrackbarPos("s max", "TRACKBAR_WHITE", 24);
-
-                cv::createTrackbar("v min", "TRACKBAR_WHITE", &w_vmin, 255, NULL);
-                cv::setTrackbarPos("v min", "TRACKBAR_WHITE", 172);
-
-                cv::createTrackbar("v max", "TRACKBAR_WHITE", &w_vmax, 255, NULL);
-                cv::setTrackbarPos("v max", "TRACKBAR_WHITE", 255);
+                
+                initMyHSVTrackbar("TRACKBAR_YELLOW", &y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
+                initMyHSVTrackbar("TRACKBAR_WHITE", &w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
         }
         check_stop_count = 0;
         is_stop_checked = false;
@@ -140,7 +106,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
         cv::Mat frame, canny_img, gray, yellow_hsv, white_hsv,
                 yellow_thresh, white_thresh,yellow_labeling,white_labeling, laneColor, origin;
         uint frame_height, frame_width;
-
+     //   initParam();
         try{
                 cv_ptr = cv_bridge::toCvCopy(img_msg,sensor_msgs::image_encodings::BGR8);
                 frame = cv_ptr->image;
@@ -163,25 +129,22 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         std::memset(H_xResultWhite, 0, sizeof(uint) * frame_height);
 
                         if (track_bar) {
-                                y_hmin = cv::getTrackbarPos("h min", "TRACKBAR_YELLOW");
-                                y_hmax = cv::getTrackbarPos("h max", "TRACKBAR_YELLOW");
-                                y_smin = cv::getTrackbarPos("s min", "TRACKBAR_YELLOW");
-                                y_smax = cv::getTrackbarPos("s max", "TRACKBAR_YELLOW");
-                                y_vmin = cv::getTrackbarPos("v min", "TRACKBAR_YELLOW");
-                                y_vmax = cv::getTrackbarPos("v max", "TRACKBAR_YELLOW");
+                                setMyHSVTrackbarValue("TRACKBAR_YELLOW",&y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
 
-                                w_hmin = cv::getTrackbarPos("h min", "TRACKBAR_WHITE");
-                                w_hmax = cv::getTrackbarPos("h max", "TRACKBAR_WHITE");
-                                w_smin = cv::getTrackbarPos("s min", "TRACKBAR_WHITE");
-                                w_smax = cv::getTrackbarPos("s max", "TRACKBAR_WHITE");
-                                w_vmin = cv::getTrackbarPos("v min", "TRACKBAR_WHITE");
-                                w_vmax = cv::getTrackbarPos("v max", "TRACKBAR_WHITE");
+
+                                setMyHSVTrackbarValue("TRACKBAR_WHITE",&w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+ 
                         }
                         lane_detect_algo::CalLane callane;
-                        cv::Mat bev =frame.clone();
+                        cv::Mat bev = frame.clone();
+                        cv::Mat bev_test = frame.clone();
+                        cv::imshow("bev_test",bev_test);
                         callane.birdEyeView(frame,bev);
                         cv::imshow("mybev",bev);
-
+                        cv::Mat in_bev_test = bev.clone();
+                        callane.inverseBirdEyeView(bev,in_bev_test);
+                        cv::imshow("myinbev",in_bev_test);
+                        
                         if (track_bar) {
                                 callane.detectYHSVcolor(bev, yellow_hsv, y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax);
                                 callane.detectWhiteLane(bev,white_hsv, w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax,0,0);
@@ -198,16 +161,18 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         cv::Mat whiteYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat yellowXProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat whiteXProj(cv::Size(frame_width, frame_height), CV_8UC1);
-                        cv::Mat myhistsrc = bev.clone();
-                        cv::Mat myhistdst = cv::Mat::zeros(bev.rows,bev.cols,CV_8UC1); 
-                      //  callane.makeYProjection(myhistsrc,myhistdst,H_yResultWhite);
-                       // callane.myProjection(myhistsrc,myhistdst,H_yResultWhite);
-                       
+                        cv::Mat myhistsrc = yellow_hsv.clone();
+                        
+                        cv::Mat myhistdst = cv::Mat::zeros(myhistsrc.rows,myhistsrc.cols,CV_8UC1); 
+                        callane.myProjection(myhistsrc,myhistdst,H_yResultWhite);
+                        cv::imshow("myhist_src",myhistsrc);
+                        cv::imshow("myhist",myhistdst);
                         if(lable) {
 
                                 int crosswalk_check = 0;
                                 int *crosswalk = &crosswalk_check;
                                 callane.makeContoursRightLane(white_hsv, white_labeling, crosswalk);
+                                
                                 nh.setParam("cross_walk",false);
                                 if(crosswalk_check) {
                                         ROS_INFO("param set crosswalk true!\n");
@@ -215,26 +180,25 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                         crosswalk_check = 0;
                                 }
                         }
-                        callane.makeContoursLeftLane(yellow_hsv, yellow_labeling); //for labeling(source channel is 1)
+                   //             callane.makeContoursLeftLane(yellow_hsv, yellow_labeling); //for labeling(source channel is 1)
+                   yellow_labeling = yellow_hsv.clone();
                      //   if(!lable) {
-                                callane.makeContoursRightLane(white_hsv, white_labeling); //for labeling(source channel is 1)
+                              //  callane.makeContoursRightLane(white_hsv, white_labeling); //for labeling(source channel is 1)
+                       white_labeling = white_hsv.clone();
                        // }
-
-
+                     
                         if(time_check) {
                                 const int64 start = cv::getTickCount();
                                 int64 elapsed = (cv::getTickCount() - start);
                                 std::cout << "Elapsed time " << elapsed << std::endl;
                         }
                         laneColor = yellow_labeling | white_labeling;
-                        //  callane.makeXProjection(yellow_hsv,yellowXProj,H_xResultYellow);
-
-
+                        
                         cv::Mat inv_bev = frame.clone(); //color inverse bev //do not delete
                         callane.inverseBirdEyeView(bev, inv_bev);
                         cv::Mat newlane = frame.clone();
                         callane.inverseBirdEyeView(laneColor, newlane);
-
+                        cv::imshow("inverseBirdEye", newlane);
                         if(imshow) {
                                 cv::imshow("inverseBirdEye", newlane);
                         }
@@ -244,8 +208,8 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         int coordi_count = 0;
                         coordi_array.data.clear();
                         coordi_array.data.push_back(10);
-                        //cv::imshow("ssss",laneColor);
-                        //coordi_x_array.data.clear();
+                        
+                        
                         int line_check = 0, lane_width_check = 0;
                         int first_x, first_y, second_x, second_y, lane_width;
                         for(int y = output_origin.rows-1; y>=0; y--) {
@@ -267,27 +231,23 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                                         second_x = x;
                                                         second_y = y;
                                                         lane_width = abs(second_x - first_x);
+                                                        lane_width_array.push_back(lane_width);
                                                         
-                                                         
                                                 }
                                                 origin_data[x*output_origin.channels()] = 255;
                                         }
                                 }
                                 if(abs(first_y-second_y)<5){
-                                        if(abs(first_x-second_x)<400){//m/pixel 알아내서 정확한 차선폭을 60대신 쓰기
-                                                second_x = first_x + 400;
+                                        if(abs(first_x-second_x)<500){//m/pixel 알아내서 정확한 차선폭을 60대신 쓰기
+                                                second_x = first_x + 500;
                                                 cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);       
                                         }
                                         else{
                                                 cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
                                         }
                                         }
-                                lane_width_array.push_back(lane_width);
-                                if(lane_width_array.size()>4){
-                                        ROS_INFO("data: %d\n",lane_width);
-                                        
-                                }
-                             //   cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
+                                
+                               cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
                         }
                         
                         std::vector<cv::Vec4i> lines;
@@ -369,13 +329,13 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 cv::imshow("stop_lane_before_crosswalk",my_test_hough);
                         }
                         coordi_array.data[0] = coordi_count;
-
+                        output_origin_for_copy = origin.clone();
                         if(!imshow) {
                                 cv::imshow("colorfulLane",output_origin);
                         }
                 }
 
-                else{                  //frame is empty()!
+                else{ //frame is empty()!
                         while(frame.empty()) {             //for unplugged camera
                                 cv_ptr = cv_bridge::toCvCopy(img_msg,sensor_msgs::image_encodings::BGR8);
                                 frame = cv_ptr->image;
@@ -389,6 +349,13 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
 
         int ckey = cv::waitKey(10);
         if(ckey == 27) exit(1);
+        // only save
+        else if(ckey == 32){
+        std::cout<<"Save screen shot"<<std::endl;
+        cv::imwrite("/home/seuleee/Desktop"+to_string(imgNum)+".jpg", output_origin_for_copy);
+        imgNum++;
+        }
+
 }
 
 
@@ -418,6 +385,66 @@ void InitImgObjectforROS::initParam(){
         nh.param<int>("/"+groupName+"/lane_detection/track_bar", track_bar, 0);
         nh.param<int>("/"+groupName+"/lane_detection/time_check", time_check, 0);
         nh.param<int>("/"+groupName+"/lane_detection/lable", lable, 0);
+        nh.param<int>("/"+groupName+"/lane_detection/y_hmin",y_hmin,15);
+        nh.param<int>("/"+groupName+"/lane_detection/y_hmax",y_hmax,21); 
+        nh.param<int>("/"+groupName+"/lane_detection/y_smin",y_smin,52);
+        nh.param<int>("/"+groupName+"/lane_detection/y_smax",y_smax,151);
+        nh.param<int>("/"+groupName+"/lane_detection/y_vmin",y_vmin,0);
+        nh.param<int>("/"+groupName+"/lane_detection/y_vmax",y_vmax,180);
+        nh.param<int>("/"+groupName+"/lane_detection/w_hmin",w_hmin,0);
+        nh.param<int>("/"+groupName+"/lane_detection/w_hmax",w_hmax,180);
+        nh.param<int>("/"+groupName+"/lane_detection/w_smin",w_smin,0);
+        nh.param<int>("/"+groupName+"/lane_detection/w_smax",w_smax,24);
+        nh.param<int>("/"+groupName+"/lane_detection/w_vmin",w_vmin,172);
+        nh.param<int>("/"+groupName+"/lane_detection/w_vmax",w_vmax,255);
         ROS_INFO("lane_detection %d %d %d %d %d %d", debug, web_cam, imshow, track_bar, time_check, lable);
         ROS_INFO("imshow %d", imshow);
+}
+
+void InitImgObjectforROS::initMyHSVTrackbar(const string &trackbar_name, int *hmin, int *hmax, int *smin, int *smax, int *vmin, int *vmax){
+                cv::namedWindow(trackbar_name, cv::WINDOW_AUTOSIZE);
+                
+                cv::createTrackbar("h min", trackbar_name, hmin, 50, NULL);
+                cv::setTrackbarPos("h min", trackbar_name, *(hmin));
+
+                cv::createTrackbar("h max", trackbar_name, hmax, 50, NULL);
+                cv::setTrackbarPos("h max", trackbar_name, *(hmax));
+
+                cv::createTrackbar("s min", trackbar_name, smin, 255, NULL);
+                cv::setTrackbarPos("s min", trackbar_name, *(smin));
+
+                cv::createTrackbar("s max", trackbar_name, smax, 255, NULL);
+                cv::setTrackbarPos("s max", trackbar_name, *(smax));
+
+                cv::createTrackbar("v min", trackbar_name, vmin, 255, NULL);
+                cv::setTrackbarPos("v min", trackbar_name, *(vmin));
+
+                cv::createTrackbar("v max", trackbar_name, vmax, 255, NULL);
+                cv::setTrackbarPos("v max", trackbar_name, *(vmax));
+               
+}
+void InitImgObjectforROS::setMyHSVTrackbarValue(const string &trackbar_name,int *hmin, int *hmax, int *smin, int *smax, int *vmin, int *vmax){
+                *hmin = cv::getTrackbarPos("h min", trackbar_name);
+                *hmax = cv::getTrackbarPos("h max", trackbar_name);
+                *smin = cv::getTrackbarPos("s min", trackbar_name);
+                *smax = cv::getTrackbarPos("s max", trackbar_name);
+                *vmin = cv::getTrackbarPos("v min", trackbar_name);
+                *vmax = cv::getTrackbarPos("v max", trackbar_name);
+                
+                if(trackbar_name == "TRACKBAR_YELLOW"){
+                        nh.setParam("/"+groupName+"/lane_detection/y_hmin",y_hmin);
+                        nh.setParam("/"+groupName+"/lane_detection/y_hmax",y_hmax);
+                        nh.setParam("/"+groupName+"/lane_detection/y_smin",y_smin);
+                        nh.setParam("/"+groupName+"/lane_detection/y_smax",y_smax);
+                        nh.setParam("/"+groupName+"/lane_detection/y_vmin",y_vmin);
+                        nh.setParam("/"+groupName+"/lane_detection/y_vmax",y_vmax);
+                }
+                if(trackbar_name == "TRACKBAR_WHITE"){
+                        nh.setParam("/"+groupName+"/lane_detection/w_hmin",w_hmin);
+                        nh.setParam("/"+groupName+"/lane_detection/w_hmax",w_hmax);
+                        nh.setParam("/"+groupName+"/lane_detection/w_smin",w_smin);
+                        nh.setParam("/"+groupName+"/lane_detection/w_smax",w_smax);
+                        nh.setParam("/"+groupName+"/lane_detection/w_vmin",w_vmin);
+                        nh.setParam("/"+groupName+"/lane_detection/w_vmax",w_vmax);
+                }                                       
 }

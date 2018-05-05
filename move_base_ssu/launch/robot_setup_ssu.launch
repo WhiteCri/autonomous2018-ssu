@@ -9,19 +9,53 @@
 <!-- Robot Frame Setup (static tf)  -->
     <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
     <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0 0 0 0 base_link laser 100" />
-    <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="-0.68 0 0 0 0 0 base_link camera_main 100" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="0.35 0 0 0 0 0 base_link main/camera_main 100" />
 
 
 <!-- Sensor Setup  -->
 	<!-- Lidar: Ethernet  -->
-    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" respawn="true"/>
-    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>
+    <!--<node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" respawn="true"/>
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>-->
 
 	<!-- Camera -->
-		<!--
-			*** 여기에 카메라 노드 추가 ***
-		-->
-	
+	<arg name="main_camera_name" default="main"/>
+	<arg name="main_camera_num" default="0"/>
+
+	<group ns="$(arg main_camera_name)">
+		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg main_camera_name)">
+			<param name="camera_num" value="$(arg main_camera_num)"/>
+			<param name="frequency" value="30"/>
+			<param name="debug" value="1"/>
+			<param name="calibration" value="0"/>
+			<param name="sizeup" value="0"/>
+		</node>
+
+		<node name="lane_detection" pkg="lane_detection" type="lane_detection" args="$(arg main_camera_name)" output="screen">
+			<param name="debug" value="0"/>
+			<param name="web_cam" value="1"/>
+			<param name="imshow" value="0"/>
+			<param name="track_bar" value="1"/>
+			<param name="timecheck" value="0"/>
+			<param name="lable" value="0"/>
+		</node>-->
+		<!-- <node name="send_vec" pkg="send_vec" type="send_vec"></node> -->
+
+
+		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg main_camera_name)" respawn="true" output="screen">
+			<param name="debug" value="0"/>
+			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+		</node>
+
+		<node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" args="$(arg main_camera_name)" respawn="true" output="screen">
+			<param name="debug" value="0"/>
+		</node>
+
+		<include file="$(find pointcloud_to_laserscan)/launch/sample_node.launch">
+			<arg name="groupName" value="$(arg main_camera_name)"/>
+		</include>
+
+	</group>
+
 	<!-- Platform RX/TX: USB0  -->
     <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test" respawn="true"/>
     <node pkg="platform_tx" type="platform_tx" name="platform_tx" args="/dev/ttyUSB0" respawn="true"/>

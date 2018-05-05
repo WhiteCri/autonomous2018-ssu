@@ -77,6 +77,7 @@ namespace lane_detect_algo
             void voteLabel(cv::Mat src, cv::Mat& dst);
             void laneHist(cv::Mat src, cv::Mat& dst);
             void myProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result);
+            
     };
     
 }
