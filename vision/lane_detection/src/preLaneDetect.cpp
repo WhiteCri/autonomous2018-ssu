@@ -10,8 +10,8 @@ using namespace std;//다하고 지워
 using namespace cv;//다하고 지워
 
 
-static const bool DEBUG_SW = true;
-static const bool IMSHOW_SW = true;
+static const bool DEBUG_SW = false;
+static const bool IMSHOW_SW = false;
 static const bool USE_LABEL_COUNT_FOR_CROSSWALK = false;
 static const bool COUNT_MAX_AREA = false;
 static const bool COUNT_MAX_HEIGHT = true;
@@ -523,8 +523,9 @@ namespace lane_detect_algo{
 
             }
             void CalLane::birdEyeView(cv::Mat src, cv::Mat& dst) {
-             
-                 cv::imshow("test_my_bev_src",src);
+
+                //0507
+                //cv::imshow("test_my_bev_src",src);
                 // Input Quadilateral or Image plane coordinates
                 cv::Point2f inputQuad[4];
                 // Output Quadilateral or World plane coordinates
@@ -541,7 +542,7 @@ namespace lane_detect_algo{
                 inputQuad[0] = cv::Point2f(120, 44);//point 예외처리 추가
                 inputQuad[1] = cv::Point2f(220, 44);//point 예외처리 추가
                 inputQuad[2] = cv::Point2f(4, 220);
-                inputQuad[3] = cv::Point2f(320, 220);   
+                inputQuad[3] = cv::Point2f(320, 220);
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
                 outputQuad[0] = cv::Point2f(0, 24);
                 outputQuad[1] = cv::Point2f(320-1, 24);
@@ -557,7 +558,7 @@ namespace lane_detect_algo{
                 // outputQuad[1] = cv::Point2f(245-100, 84);
                 // outputQuad[2] = cv::Point2f(14+100, 188);
                 // outputQuad[3] = cv::Point2f(270+50, 188);
-                
+
                 // inputQuad[0] = cv::Point2f(100, 49);
                 // inputQuad[1] = cv::Point2f(src.cols-100, 49);
                 // inputQuad[2] = cv::Point2f(2,190);
@@ -573,7 +574,7 @@ namespace lane_detect_algo{
 
                 // double maxW = (w1 < w2) ? w2 : w1;
                 // double maxH = (h1 < h2) ? h2 : h1;
-                
+
                 // // The 4 points where the mapping is to be done , from top-left in clockwise order
                 // outputQuad[0] = cv::Point2f(0, 0);
                 // outputQuad[1] = cv::Point2f(maxW - 1, 0);
@@ -584,10 +585,10 @@ namespace lane_detect_algo{
                 lambda = getPerspectiveTransform(inputQuad, outputQuad);
                 // Apply the Perspective Transform just found to the src image
                 warpPerspective(src, dst, lambda, dst.size());
-               
+
                 }
             void CalLane::inverseBirdEyeView(cv::Mat src, cv::Mat& dst) {
-     
+
                 // Input Quadilateral or Image plane coordinates
                 cv::Point2f inputQuad[4];
                 // Output Quadilateral or World plane coordinates
@@ -601,14 +602,14 @@ namespace lane_detect_algo{
                 inputQuad[0] = cv::Point2f(120, 44);//point 예외처리 추가
                 inputQuad[1] = cv::Point2f(220, 44);//point 예외처리 추가
                 inputQuad[2] = cv::Point2f(4, 220);
-                inputQuad[3] = cv::Point2f(320, 220);   
+                inputQuad[3] = cv::Point2f(320, 220);
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
                 outputQuad[0] = cv::Point2f(0, 24);
                 outputQuad[1] = cv::Point2f(320-1, 24);
                 outputQuad[2] = cv::Point2f(4+100, 220);
                 outputQuad[3] = cv::Point2f(320-100, 220);
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
-                
+
                 /*left*/
                 // inputQuad[0] = cv::Point2f(195, 84);//point 예외처리 추가
                 // inputQuad[1] = cv::Point2f(245, 84);//point 예외처리 추가
@@ -638,7 +639,7 @@ namespace lane_detect_algo{
 
                 // double maxW = (w1 < w2) ? w2 : w1;
                 // double maxH = (h1 < h2) ? h2 : h1;
-                
+
                 // // The 4 points where the mapping is to be done , from top-left in clockwise order
                 // outputQuad[0] = cv::Point2f(0, 0);
                 // outputQuad[1] = cv::Point2f(maxW - 1, 0);
@@ -648,8 +649,8 @@ namespace lane_detect_algo{
                 lambda = getPerspectiveTransform(outputQuad, inputQuad );
                 // Apply the Perspective Transform just found to the src image
                 warpPerspective(src, dst, lambda, dst.size());
-            
-               
+
+
                 }
             void CalLane::myProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result) {
                	int pixel;
@@ -662,7 +663,7 @@ namespace lane_detect_algo{
                             project++;
                             H_result[y]++;
                         }
-                        
+
                         // pixel = src.at<uchar>(x, y);
     			        // if (pixel != (uchar)0) {
     				    //     project++;
@@ -670,7 +671,7 @@ namespace lane_detect_algo{
     	    		    // }
         	    	}
                     if (project > 0) {
-                        for (int k = 0; k < project; k++) { 
+                        for (int k = 0; k < project; k++) {
                                 dst.at<uchar>(dst.rows - k - 1, y) = (uchar)255;
                             }
                         }
@@ -714,27 +715,28 @@ namespace lane_detect_algo{
                 //          if(pixel != (uchar)0){
                 //             H[y]++;
                 //             H_result[y]++;
-                            
+
                 //         }
                 //     }
                 // }
                 // ROS_INFO("dd : %d\n",H[0]);
                 // ROS_INFO(" dd : %d\n",H[1]);
-                 
+
                 // for(int y = 0; y<src.cols; y++){
                 //     for(unsigned int x = 0; x<H[y]; x++){
                 //         dst.at<uchar>(y,x) = (uchar)255;
-                      
+
                 //     }
                 // }
                 // cv::imshow("hist",dst);
                 // delete[] H;
-                }    
+                }
             void CalLane::makeYProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result) {
                 uchar pixel;
                 cv::Mat gray;
                 cv::cvtColor(src,gray,CV_BGR2GRAY);
-                cv::imshow("mysrc",src);
+                //0507
+                //cv::imshow("mysrc",src);
                 unsigned int *H = new unsigned int [gray.rows];
                 std::memset(H,0x00,4*gray.rows);
                 for(int x = 0; x<gray.cols; x++){
@@ -751,7 +753,9 @@ namespace lane_detect_algo{
                         dst.at<uchar>(y,x) = 255;
                     }
                 }
-                cv::imshow("hist",dst);
+                //0507
+                //cv::imshow("hist",dst);
+
                 // // // uchar pixel;
                 // // // unsigned int *H = new unsigned int[src.cols];
                 // // // std::memset(H, 0x00, 4 * src.cols);
@@ -912,7 +916,7 @@ namespace lane_detect_algo{
                     }
                 }
             void CalLane::laneHist(cv::Mat src, cv::Mat& dst){
-                
+
 
             }
             void CalLane::voteLabel(cv::Mat src, cv::Mat& dst){
@@ -968,13 +972,13 @@ namespace lane_detect_algo{
                         uchar* data = dst.ptr<uchar>(row);
                         for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함
                             data[col] = (uchar)0;
-                            }   
+                            }
                         }
                     }
                 }
-                
+
             }
-                
+
             void CalLane::makeContoursLeftLane(cv::Mat src, cv::Mat& dst) {
                 std::vector<std::vector<cv::Point>> countours;
                 std::vector<cv::Vec4i> hierachy;
@@ -1116,7 +1120,7 @@ namespace lane_detect_algo{
                     }
                 }
 
-              
+
 
                 //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
@@ -1241,7 +1245,7 @@ namespace lane_detect_algo{
                     }
                 }
                 }
-          
+
 
                 //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
@@ -1305,7 +1309,7 @@ namespace lane_detect_algo{
                     }
               //  imshow("drawing", draw_max_lable);//for visible lane max lable box
                 }
-           
+
 
 }
 

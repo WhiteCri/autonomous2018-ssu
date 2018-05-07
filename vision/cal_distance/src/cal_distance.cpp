@@ -163,8 +163,7 @@ class CalDistance{
     ros::Subscriber sub_;
     ros::Publisher pub_;
 public:
-    CalDistance(std::string _filename, std::string _linename)
-      //filename(_filename), linename(_linename)//transformer(filename, linename)
+    CalDistance()
     {
       // 싱글카메라
       initParam();
@@ -206,9 +205,7 @@ int main(int argc, char** argv){
     groupName = argv[1];
 
     ros::init(argc, argv, "cal_dirstance");
-    std::string filename = "/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data/main_calibration.txt";
-    std::string linename = "/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data/main_calibrationLine.txt";
-    CalDistance calDist( filename, linename);
+    CalDistance calDist;
     while(calDist.getNh().ok()){
         calDist.sendDist();
         ros::spinOnce();
@@ -290,6 +287,6 @@ ros::NodeHandle CalDistance::getNh(){ return nh_; }
 void CalDistance::initParam(){
   nh_.param("/"+groupName+"/cal_distance/debug", debug, 4);
   nh_.param<std::string>("/"+groupName+"/cal_distance/cal_path", calPath, "/");
-  //filename = calPath + "/"+groupName+"_calibration.txt";
-  //linename = calPath + "/"+groupName+"_calibrationLine.txt";
+  filename = calPath + "/"+groupName+"_calibration.txt";
+  linename = calPath + "/"+groupName+"_calibrationLine.txt";
 }
