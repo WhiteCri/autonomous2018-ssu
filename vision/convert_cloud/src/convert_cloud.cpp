@@ -149,7 +149,9 @@ void ConvertCloud::convert(){
   pc->clear();
 
   // Create header
-  std::string frame_id(groupName+"/camera_main");
+  // std::string frame_id(groupName+"/camera_main");
+  // added by Park
+  std::string frame_id("/camera_main");
   // std::string frame_id("/camera_main");
 
   pc->header.frame_id = frame_id;

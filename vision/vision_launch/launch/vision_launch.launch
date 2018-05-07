@@ -73,5 +73,7 @@
 
 	</group>
 
+	<include file="$(find ira_laser_tools)/launch/laserscan_multi_merger.launch"></include>
+
 
 </launch>
