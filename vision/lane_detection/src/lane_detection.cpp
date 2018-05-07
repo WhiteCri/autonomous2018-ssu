@@ -331,7 +331,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         coordi_array.data[0] = coordi_count;
                         output_origin_for_copy = origin.clone();
 
-                        cv::imshow("colorfulLane",output_origin);
+                        cv::imshow(groupName+"_colorfulLane",output_origin);
                         //0507
                         // if(!imshow) {
                         //         cv::imshow("colorfulLane",output_origin);
