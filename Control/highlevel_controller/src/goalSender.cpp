@@ -1,6 +1,8 @@
 #include "highlevel_controller/goalSender.h"
 #include "highlevel_controller/base_parameter.h"
 #include <thread>
+#include <algorithm>
+#include <cctype>
 
 extern Parameters* param_ptr;
 
@@ -21,9 +23,29 @@ GoalSender::GoalSender() : ac("move_base", true)
 void GoalSender::sendGoal(){
     ac.cancelAllGoals();
     ac.sendGoal(goal);
-    if ((goal_type == "crosswalk")||(goal_type=="movingobj") || (goal_type=="uturn")){
-           
-    }
+    if ((goal_type == "crosswalk")||(goal_type=="movingobj") || (goal_type=="uturn")
+        ||(goal_type=="parking_near")||(goal_type=="parking_far")){
+        std::thread tr([&](){
+            std::string param_name = "hl_controller/"+goal_type;
+            //because there are no function to make uppercase string, I decided to use a STL algorithm function
+            std::string upper_statename(goal_type); // just fit length.
+            std::transform(goal_type.begin(), goal_type.end(), upper_statename.begin(),
+                   [](unsigned char c) -> unsigned char { return std::toupper(c); });
+            std::string curState, targetState = "PROCESS_" + upper_statename;
+
+            while(true){
+ROS_INFO("running stateChanger thread...");
+                param_ptr->nh.setParam(param_name.c_str(), true);
+
+ROS_INFO("param_name : %s",param_name.c_str());                
+ROS_INFO("targetState : %s",targetState.c_str());
+                param_ptr->nh.getParam("hl_controller/curState", curState);
+                if (curState == targetState) break;
+                ros::Rate(param_ptr->frequency).sleep();
+            }
+        });
+        tr.detach();
+    }   
 }
 
 void GoalSender::setGoal(double x, double y, double ori_z, double ori_w, std::string goal_type){

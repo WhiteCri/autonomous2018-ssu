@@ -167,7 +167,6 @@ void process_movingobj(){
 
 void process_parking(){
     ROS_INFO("process parking start");
-    param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING");
 
     ROS_INFO("finding parking point...");
     double parking_point_x;
@@ -192,6 +191,7 @@ void process_parking(){
         backing_point_ori_z  = param_ptr->parking_near_back_point_ori_z;
         backing_point_ori_w  = param_ptr->parking_near_back_point_ori_w;
         ROS_INFO("set near point as a goal...");
+        param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING_NEAR");
     } else{
         parking_point_x      = param_ptr->parking_far_arrive_point_x;
         parking_point_y      = param_ptr->parking_far_arrive_point_y;
@@ -202,6 +202,7 @@ void process_parking(){
         backing_point_ori_z  = param_ptr->parking_far_back_point_ori_z;
         backing_point_ori_w  = param_ptr->parking_far_back_point_ori_w;
         ROS_INFO("set far point as a goal...");
+        param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING_NEAR");
     }
     //set goal to parking point
     ROS_INFO("to the parking point...");

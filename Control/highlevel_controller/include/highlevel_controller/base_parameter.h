@@ -17,7 +17,8 @@ const std::vector<std::string> MOVING_STATUES{
     "normal",
     "crosswalk",
     "movingobj",
-    "parking",
+    "parking_near",
+    "parking_far",
     "uturn",
     "b",
     "skip"
