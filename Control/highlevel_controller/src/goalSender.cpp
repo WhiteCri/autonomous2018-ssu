@@ -4,7 +4,7 @@
 
 extern Parameters* param_ptr;
 
-GoalSender::GoalSender() : ac("move_base", true), HA(nullptr)
+GoalSender::GoalSender() : ac("move_base", true)
 {
     while(!ac.waitForServer(ros::Duration(3.0))){
         ROS_ERROR("Waiting for the move_base action server to come up");
@@ -19,15 +19,17 @@ GoalSender::GoalSender() : ac("move_base", true), HA(nullptr)
 }
 
 void GoalSender::sendGoal(){
-    if(!HA) HA = param_ptr->HA;
     ac.cancelAllGoals();
     ac.sendGoal(goal);
-    if (goal_type == "crosswalk")
-        HA->curState = PROCESS_CROSSWALK;
-    else if (goal_type == "movingobj")
-        HA->curState = PROCESS_MOVINGOBJ;
-    else if (goal_type == "uturn")
-        HA->curState = PROCESS_UTURN;
+    if (goal_type == "crosswalk"){
+    
+    }
+    else if (goal_type == "movingobj"){
+
+    }
+    else if (goal_type == "uturn"){
+        
+    }
 }
 
 void GoalSender::setGoal(double x, double y, double ori_z, double ori_w, std::string goal_type){
@@ -63,10 +65,6 @@ GoalSender::GoalStates GoalSender::getState(){
     }
 
     return ret;
-}
-
-void GoalSender::setHA(HybridAutomata *HA_ptr){
-    this->HA = HA_ptr;
 }
 
 void GoalSender::auto_goal_sender(){

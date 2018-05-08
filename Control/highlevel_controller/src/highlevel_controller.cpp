@@ -4,6 +4,7 @@
 #include "highlevel_controller/condition.h"
 #include "highlevel_controller/StateHandler.h"
 #include "highlevel_controller/goalSender.h"
+#include "highlevel_controller/HybridAutomata.h"
 
 Parameters* param_ptr;
 GoalSender* goalSender_ptr;
@@ -18,9 +19,7 @@ int main(int argc, char *argv[]){
 
     //get ha frequency
     int ha_frequency = param_ptr->frequency;
-
-    //init hybridautomata
-    HybridAutomata ha; param_ptr->setHA(&ha);
+    HybridAutomata ha;
     {
         //init
         ha.setState(INIT, init);
