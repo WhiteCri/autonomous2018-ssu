@@ -34,9 +34,9 @@
 	<rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load"/>
         
 
-	<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>
+	<!--<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>
 	<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>
-	
+	-->
 
 	<!--  **************** Visualisation ****************  -->
 	<node name="rviz" pkg="rviz" type="rviz"/>
