@@ -24,6 +24,18 @@ Parameters::Parameters(){
     ori_w_goal = std::vector<double>(ori_w_goal.rbegin(), ori_w_goal.rend());
     goal_type = std::vector<std::string>(goal_type.rbegin(), goal_type.rend());
 
+    //check goals
+    for(auto& a_goal_type : this->goal_type){
+        bool in = false;
+        for(auto& type : MOVING_STATUES){
+            if (a_goal_type == type) in = true;
+        }
+        if(!in){
+            ROS_ERROR("undefined MOVING STATUS : %s",a_goal_type.c_str());
+            exit(-1);
+        } // if false
+    }
+
     /* tx control parameter */
     nh.param("hl_controller/tx_speed", tx_speed, 0);
     nh.param("hl_controller/tx_steer", tx_steer, 0);

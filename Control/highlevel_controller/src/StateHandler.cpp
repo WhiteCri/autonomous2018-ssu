@@ -56,16 +56,6 @@ void init(){
     ROS_INFO("State Init...");
     param_ptr->nh.setParam("hl_controller/curState","INIT");
 
-    for(auto& a_goal_type : param_ptr->goal_type){
-        bool in = false;
-        for(auto& type : MOVING_STATUES){
-            if (a_goal_type == type) in = true;
-        }
-        if(!in){
-            ROS_ERROR("undefined MOVING STATUS");
-            exit(-1);
-        } // if false
-    }
     handler_setGoal();
 }
 

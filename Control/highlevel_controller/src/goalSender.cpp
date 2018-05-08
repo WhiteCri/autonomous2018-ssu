@@ -21,14 +21,8 @@ GoalSender::GoalSender() : ac("move_base", true)
 void GoalSender::sendGoal(){
     ac.cancelAllGoals();
     ac.sendGoal(goal);
-    if (goal_type == "crosswalk"){
-    
-    }
-    else if (goal_type == "movingobj"){
-
-    }
-    else if (goal_type == "uturn"){
-        
+    if ((goal_type == "crosswalk")||(goal_type=="movingobj") || (goal_type=="uturn")){
+           
     }
 }
 

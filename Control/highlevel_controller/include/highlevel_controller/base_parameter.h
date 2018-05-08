@@ -13,12 +13,12 @@ enum {
     DONE
 };
 
-const std::string MOVING_STATUES[] = {
+const std::vector<std::string> MOVING_STATUES{
     "normal",
     "crosswalk",
     "movingobj",
     "parking",
-    "uturn"
+    "uturn",
     "b",
     "skip"
 };
