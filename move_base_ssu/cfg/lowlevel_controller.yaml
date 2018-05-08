@@ -10,8 +10,8 @@ control:
     shift: 20.0
 
   brake:
-    max: 73
-    kp: 125
+    max: 77
+    kp: 123
     ki: 0.0
     kd: 0.0
 

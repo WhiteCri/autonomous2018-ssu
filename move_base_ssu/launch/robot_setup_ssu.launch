@@ -3,7 +3,7 @@
 <!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
     <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
 	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
-	<arg name="map_name" default="the_place.yaml"/>
+	<arg name="map_name" default="ssara.yaml"/>
 
 
 <!-- Robot Frame Setup (static tf)  -->
@@ -14,11 +14,11 @@
 
 <!-- Sensor Setup  -->
 	<!-- Lidar: Ethernet  -->
-    <!--<node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" respawn="true"/>
-    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>-->
+    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" respawn="true"/>
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>
 
 	<!-- Camera -->
-	<arg name="main_camera_name" default="main"/>
+	<!--<arg name="main_camera_name" default="main"/>
 	<arg name="main_camera_num" default="1"/>
 
 	<group ns="$(arg main_camera_name)">
@@ -41,7 +41,7 @@
 		<!-- <node name="send_vec" pkg="send_vec" type="send_vec"></node> -->
 
 
-		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg main_camera_name)" respawn="true" output="screen">
+		<!--<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg main_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
 			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
 		</node>
@@ -54,7 +54,7 @@
 			<arg name="groupName" value="$(arg main_camera_name)"/>
 		</include>
 
-	</group>
+	</group>-->
 
 	<!-- Platform RX/TX: USB0  -->
     <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test" respawn="true"/>
