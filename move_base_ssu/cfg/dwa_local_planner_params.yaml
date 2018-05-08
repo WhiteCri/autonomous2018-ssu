@@ -2,11 +2,11 @@ DWAPlannerROS:
   controller_frequency: 10.0 # (double, default: 20.0)
 
   ## Robot Configuration Parameters 
-  acc_limit_trans: 3.5
+  acc_limit_trans: 2.0
   max_trans_vel: 8.0
   min_trans_vel: 0.5
 
-  acc_lim_x: 3.5
+  acc_lim_x: 2.0
   max_vel_x: -3.0
   min_vel_x: 8.0
 
@@ -28,8 +28,8 @@ DWAPlannerROS:
 
 
   ## Forward Simulation Parameters
-  sim_time: 2.0
-  sim_granularity: 1.5
+  sim_time: 2.5
+  sim_granularity: 0.7
   angular_sim_granularity: 1.5
   vx_samples: 20 # (integer, default: 3)
   vy_samples: 0 # (integer, default: 10)
