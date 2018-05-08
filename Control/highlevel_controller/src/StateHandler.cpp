@@ -54,6 +54,8 @@ bool handler_setGoal(bool newGoal=false){
 
 void init(){
     ROS_INFO("State Init...");
+    param_ptr->nh.setParam("hl_controller/curState","INIT");
+
     for(auto& a_goal_type : param_ptr->goal_type){
         bool in = false;
         for(auto& type : MOVING_STATUES){
@@ -70,7 +72,8 @@ void init(){
 void toward_goal(){
     typedef GoalSender::GoalStates GoalStates;
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
-
+    param_ptr->nh.setParam("hl_controller/curState","TOWARD_GOAL");
+    
     auto state = goalSender_ptr->getState();
     if (state == GoalStates::STATE_SUCCEEDED){
         ROS_INFO("SUCCEEDED...");
@@ -108,6 +111,7 @@ void toward_goal(){
 
 void process_crosswalk(){
     ROS_INFO("crosswalk start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_CROSSWALK");
 
     //maintaining car's status
     double crosswalk_driving_duration = param_ptr->crosswalk_driving_duration;
@@ -138,6 +142,7 @@ void process_crosswalk(){
 
 void process_movingobj(){
     ROS_INFO("movingobj start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_MOVINGOBJ");
 
     //maintaining car's status
     double movingobj_driving_duration = param_ptr->movingobj_driving_duration;
@@ -172,6 +177,7 @@ void process_movingobj(){
 
 void process_parking(){
     ROS_INFO("process parking start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING");
 
     ROS_INFO("finding parking point...");
     double parking_point_x;
@@ -265,6 +271,7 @@ void process_parking(){
 
 void process_uturn(){
     ROS_INFO("uturn start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_UTURN");
 
     double uturn_duration = param_ptr->uturn_duration;
 
@@ -291,8 +298,10 @@ void process_uturn(){
 
 void process_recovery(){
     param_ptr->nh.setParam("hl_controller/recovery",false);
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_UTURN");
 }
 
 void done(){
+    param_ptr->nh.setParam("hl_controller/curState","DONE");
     ROS_INFO("ALL GOAL had been processed");
 }
