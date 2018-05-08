@@ -10,7 +10,7 @@ hl_controller:
   y_goal:     [91.01,    116.459,111.33,93.66  ]
   ori_z_goal: [0.1814, 0.992  ,-0.376,93.66  ]
   ori_w_goal: [0.9833,  -0.1227,0.9263,-0.0118]
-  goal_type:  ["skip","skip","parking_near","b"]
+  goal_type:  ["crosswalk","skip","parking_near","b"]
 
 #config controller
   frequency: 20
@@ -24,7 +24,7 @@ hl_controller:
   tx_brake: 0
 
 #crosswalk
-  use_process_crosswalk: true
+  use_process_crosswalk: false
   crosswalk_check_duration: 0
   use_crosswalk_onetime_flag: true
 
