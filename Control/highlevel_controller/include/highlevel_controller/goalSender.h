@@ -27,7 +27,6 @@ public:
     //it sends the goal to the server periodically
     void auto_goal_sender();
 
-    void setHA(HybridAutomata* HA_ptr);
     //singletone
 public:
     static GoalSender* getInstancePtr();
@@ -40,5 +39,4 @@ private:
     MoveBaseClient ac;
     move_base_msgs::MoveBaseGoal goal;
     std::string goal_type;
-    HybridAutomata *HA;
 };

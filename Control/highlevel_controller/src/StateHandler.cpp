@@ -14,17 +14,30 @@ inline void showGoal(double x, double y, double ori_z, double ori_w, const std::
         x, y, ori_z, ori_w, str.c_str());
 }
 
-void init(){
-    ROS_INFO("State Init...");
-    for(auto& a_goal_type : param_ptr->goal_type){
-        bool in = false;
-        for(auto& type : MOVING_STATUES){
-            if (a_goal_type == type) in = true;
+bool handler_setGoal(bool newGoal=false){
+    //if new goal, pop
+    if (newGoal){
+        param_ptr->x_goal.pop_back();
+        param_ptr->y_goal.pop_back();
+        param_ptr->ori_z_goal.pop_back();
+        param_ptr->ori_w_goal.pop_back();
+        param_ptr->goal_type.pop_back();
+    }
+    //if any element lack, I assumes all goal has been done
+    if ((param_ptr->x_goal.size()==0)||(param_ptr->y_goal.size()==0)||(param_ptr->ori_z_goal.size()==0)
+            ||(param_ptr->ori_w_goal.size()==0)||(param_ptr->goal_type.size()==0)) return false;
+    
+    //if type is skip, pass the goal
+    while (true){
+        std::string goal_type = param_ptr->goal_type.back();
+        if (goal_type != "skip") break;
+        else {
+            param_ptr->x_goal.pop_back();
+            param_ptr->y_goal.pop_back();
+            param_ptr->ori_z_goal.pop_back();
+            param_ptr->ori_w_goal.pop_back();
+            param_ptr->goal_type.pop_back();
         }
-        if(!in){
-            ROS_ERROR("undefined MOVING STATUS");
-            exit(-1);
-        } // if false
     }
     double x = param_ptr->x_goal.back();
     double y = param_ptr->y_goal.back();
@@ -34,50 +47,36 @@ void init(){
 
     goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
     goalSender_ptr->sendGoal();
-    goalSender_ptr->sendGoal();
     showGoal(x, y, ori_z, ori_w, goal_type);
+
+    return true;
+}
+
+void init(){
+    ROS_INFO("State Init...");
+    param_ptr->nh.setParam("hl_controller/curState","INIT");
+
+    handler_setGoal();
 }
 
 void toward_goal(){
     typedef GoalSender::GoalStates GoalStates;
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
-
+    param_ptr->nh.setParam("hl_controller/curState","TOWARD_GOAL");
+    
     auto state = goalSender_ptr->getState();
     if (state == GoalStates::STATE_SUCCEEDED){
         ROS_INFO("SUCCEEDED...");
-        param_ptr->x_goal.pop_back();
-        param_ptr->y_goal.pop_back();
-        param_ptr->ori_z_goal.pop_back();
-        param_ptr->ori_w_goal.pop_back();
-        param_ptr->goal_type.pop_back();
-       
-        if(param_ptr->goal_type.size() == 0){
+        if (handler_setGoal(true) == false){
+            ROS_INFO("reached all goals!");
             param_ptr->nh.setParam("hl_controller/reached_goal", true);
             return;
         }
-        
-        double x = param_ptr->x_goal.back();
-        double y = param_ptr->y_goal.back();
-        double ori_z = param_ptr->ori_z_goal.back();
-        double ori_w = param_ptr->ori_w_goal.back();
-        std::string goal_type = param_ptr->goal_type.back();
-        
-        goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
-        goalSender_ptr->sendGoal();
-        showGoal(x, y, ori_z, ori_w, goal_type);
         ROS_INFO("success end!");
     }
     else if (state == GoalStates::STATE_LOST){
         ROS_INFO("LOST...");
-        double x = param_ptr->x_goal.back();
-        double y = param_ptr->y_goal.back();
-        double ori_z = param_ptr->ori_z_goal.back();
-        double ori_w = param_ptr->ori_w_goal.back();
-        std::string goal_type = param_ptr->goal_type.back();
-       
-        goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
-        showGoal(x, y, ori_z, ori_w, goal_type);
-        goalSender_ptr->sendGoal();
+        handler_setGoal();
     }
     else if (state == GoalStates::STATE_ACTIVE){}
     else if (state == GoalStates::STATE_PENDING) {
@@ -85,15 +84,7 @@ void toward_goal(){
     }
     else if (state == GoalStates::STATE_PREEMPTED){
         ROS_INFO("PREEMPTED...Are you using rviz to set goal?");
-        double x = param_ptr->x_goal.back();
-        double y = param_ptr->y_goal.back();
-        double ori_z = param_ptr->ori_z_goal.back();
-        double ori_w = param_ptr->ori_w_goal.back();
-        std::string goal_type = param_ptr->goal_type.back();
-       
-        goalSender_ptr->setGoal(x, y, ori_z, ori_w, goal_type);
-        showGoal(x, y, ori_z, ori_w, goal_type);
-        goalSender_ptr->sendGoal();
+        handler_setGoal();
     }
     else if (state == GoalStates::STATE_ABORTED){
 #ifdef ABORT_FLAG
@@ -110,6 +101,7 @@ void toward_goal(){
 
 void process_crosswalk(){
     ROS_INFO("crosswalk start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_CROSSWALK");
 
     //maintaining car's status
     double crosswalk_driving_duration = param_ptr->crosswalk_driving_duration;
@@ -140,6 +132,7 @@ void process_crosswalk(){
 
 void process_movingobj(){
     ROS_INFO("movingobj start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_MOVINGOBJ");
 
     //maintaining car's status
     double movingobj_driving_duration = param_ptr->movingobj_driving_duration;
@@ -198,6 +191,7 @@ void process_parking(){
         backing_point_ori_z  = param_ptr->parking_near_back_point_ori_z;
         backing_point_ori_w  = param_ptr->parking_near_back_point_ori_w;
         ROS_INFO("set near point as a goal...");
+        param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING_NEAR");
     } else{
         parking_point_x      = param_ptr->parking_far_arrive_point_x;
         parking_point_y      = param_ptr->parking_far_arrive_point_y;
@@ -208,6 +202,7 @@ void process_parking(){
         backing_point_ori_z  = param_ptr->parking_far_back_point_ori_z;
         backing_point_ori_w  = param_ptr->parking_far_back_point_ori_w;
         ROS_INFO("set far point as a goal...");
+        param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING_NEAR");
     }
     //set goal to parking point
     ROS_INFO("to the parking point...");
@@ -267,6 +262,7 @@ void process_parking(){
 
 void process_uturn(){
     ROS_INFO("uturn start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_UTURN");
 
     double uturn_duration = param_ptr->uturn_duration;
 
@@ -293,8 +289,10 @@ void process_uturn(){
 
 void process_recovery(){
     param_ptr->nh.setParam("hl_controller/recovery",false);
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_UTURN");
 }
 
 void done(){
+    param_ptr->nh.setParam("hl_controller/curState","DONE");
     ROS_INFO("ALL GOAL had been processed");
 }
