@@ -3,7 +3,7 @@
 <!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
     <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
 	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
-	<arg name="map_name" default="the_place.yaml"/>
+	<arg name="map_name" default="front_of_three.yaml"/>
 
 
 <!-- Robot Frame Setup (static tf)  -->
@@ -14,8 +14,8 @@
 
 <!-- Sensor Setup  -->
 	<!-- Lidar: Ethernet  -->
-    <!--<node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" respawn="true"/>
-    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>-->
+    <node pkg="lms1xx" name="lms1xx" type="LMS1xx_node" respawn="true"/>
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>
 
 	<!-- Camera -->
 	<arg name="main_camera_name" default="main"/>
@@ -110,7 +110,7 @@
 	-->
 
 	<!--obstacle Flag-->
-	<!--<node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
+	<node pkg="obstacle_flag" type="obstacle_flag" name="obstacle_flag" output="screen">
         <rosparam file="$(find obstacle_flag)/cfg/flag_check.yaml" command="load"/>
     </node>
 
@@ -131,8 +131,9 @@
     </node>
     <node pkg="obstacle_detector" type="obstacle_extractor_node" name="parking_obstacle_extractor">
     <remap from="/raw_obstacles" to="/park_obstacle"/>
+	<remap from="/scan" to ="/scan_raw"/>
         <rosparam file="$(find obstacle_flag)/cfg/park_obstacle.yaml" command="load"/>      
-  </node>-->
+  </node>
 	
 <!--  Robot Pose Estimation Node -->	
 	<node pkg="odometry" type="odom_pub" name="odom_wheelbased"/>
