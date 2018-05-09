@@ -3,7 +3,7 @@
 <!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
     <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
 	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
-	<arg name="map_name" default="front_of_three.yaml"/>
+	<arg name="map_name" default="jinry_full.yaml"/>
 
 
 <!-- Robot Frame Setup (static tf)  -->
@@ -18,7 +18,7 @@
     <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain"/>
 
 	<!-- Camera -->
-	<arg name="main_camera_name" default="main"/>
+	<!--<arg name="main_camera_name" default="main"/>
 	<arg name="main_camera_num" default="1"/>
 
 	<arg name="left_camera_name" default="left"/>
@@ -92,7 +92,7 @@
 
 	</group>
 
-	<include file="$(find ira_laser_tools)/launch/laserscan_multi_merger.launch"></include>
+	<include file="$(find ira_laser_tools)/launch/laserscan_multi_merger.launch"></include>-->
 
 	<!-- Platform RX/TX: USB0  -->
     <node pkg="platform_rx_thread_test" name="rx_thread_test" type="rx_thread_test" respawn="true"/>

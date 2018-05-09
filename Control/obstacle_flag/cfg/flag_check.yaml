@@ -1,12 +1,12 @@
 active:
   # active check
-  dynamic: false
+  dynamic: true
   u_turn: false
-  park: true
+  park: false
 
 
 dynamic :
-  # sampling delta y
+  # sampling delta y  
   size_N : 3
   # sampling pose_y
   sample_size: 10
