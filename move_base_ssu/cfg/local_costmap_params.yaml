@@ -6,8 +6,8 @@ local_costmap:
   static_map: false
   rolling_window: true
 
-  width: 13.0
-  height: 13.0
+  width: 10.0
+  height: 10.0
   resolution: 0.1
   transform_tolerance: 0.5
   footprint_padding: 0.11
