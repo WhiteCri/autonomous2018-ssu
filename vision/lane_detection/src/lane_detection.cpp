@@ -148,8 +148,8 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         if (track_bar) {
                                 callane.detectYHSVcolor(bev, yellow_hsv, y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax);
                                 callane.detectWhiteLane(bev,white_hsv, w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax,0,0);
-                                cv::imshow("TRACKBAR_WHITE",white_hsv);
-                                cv::imshow("TRACKBAR_YELLOW",yellow_hsv);
+                                cv::imshow(groupName+"/TRACKBAR_WHITE",white_hsv);
+                                cv::imshow(groupName+"/TRACKBAR_YELLOW",yellow_hsv);
                         }
                         else { // 색상검출 디폴트
                                 callane.detectYHSVcolor(bev, yellow_hsv, 7, 21, 52, 151, 0, 180);

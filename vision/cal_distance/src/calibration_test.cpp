@@ -208,9 +208,15 @@ int main(int argc, char** argv){
     VideoCapture cap(0);
     int key;
     Mat src;
-    cout<<"!!"<<endl;
-    trans = Transformer("../data/main_calibration.txt", "../data/main_calibrationLine.txt");
+    Mat dst;
+    cv::Mat cameraMatrix = cv::Mat::eye(3, 3, CV_64FC1);
+    cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64FC1);
 
+    cout<<"!!"<<endl;
+    trans = Transformer("../data/left_calibration.txt", "../data/left_calibrationLine.txt");
+
+    cameraMatrix=(cv::Mat1d(3, 3) << 603.652456, 0, 328.452174, 0, 604.1248849999999, 228.433349, 0, 0, 1);
+    distCoeffs=(cv::Mat1d(1, 5) << -0.033672, -0.031004, 0.001614, 0.007620999999999999, 0);
 
 
     if(IMAGE){
@@ -218,9 +224,11 @@ int main(int argc, char** argv){
 
       while(1){
         cout<<"!!"<<endl;
-        src = imread("./2.jpg", CV_LOAD_IMAGE_COLOR);
+        src = imread("/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/src/left_1m.png", CV_LOAD_IMAGE_COLOR);
 
-        imshow("origin",src);
+        cv::undistort(src, dst, cameraMatrix, distCoeffs);
+
+        imshow("origin",dst);
 
         setMouseCallback("origin", mouseEvent, &src);
 

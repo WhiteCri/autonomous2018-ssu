@@ -34,8 +34,24 @@ public:
         cap.open(camera_num);
 
         if(calibration){
-            cameraMatrix=(cv::Mat1d(3, 3) << 625.546173, 0, 329.374745, 0, 625.809222, 221.233758, 0, 0, 1);
-            distCoeffs=(cv::Mat1d(1, 5) << 0.103856, -0.124799, -0.001845, 0.012219, 0);
+
+            if(groupName == "main") {
+              cameraMatrix=(cv::Mat1d(3, 3) << 625.546173, 0, 329.374745, 0, 625.809222, 221.233758, 0, 0, 1);
+              distCoeffs=(cv::Mat1d(1, 5) << 0.103856, -0.124799, -0.001845, 0.012219, 0);
+              ROS_INFO("main");
+            }
+            else if(groupName == "left"){// cam 1
+              cameraMatrix=(cv::Mat1d(3, 3) << 630.071853, 0, 322.309971, 0, 632.842228, 247.329905, 0, 0, 1);
+              distCoeffs=(cv::Mat1d(1, 5) << 0.010162, -0.060262, 0.001452, -0.001965, 0);
+              ROS_INFO("left");
+            }
+            else if(groupName == "right"){// cam 3
+              cameraMatrix=(cv::Mat1d(3, 3) << 603.652456, 0, 328.452174, 0, 604.1248849999999, 228.433349, 0, 0, 1);
+              distCoeffs=(cv::Mat1d(1, 5) << -0.033672, -0.031004, 0.001614, 0.007620999999999999, 0);
+              ROS_INFO("right");
+            }
+
+
         }
     }
 
@@ -61,8 +77,7 @@ int main(int argc, char** argv){
 
     ros::init(argc, argv, "camera_image");
     groupName = argv[1];
-    cv::Mat cameraMatrix
-     = cv::Mat::eye(3, 3, CV_64FC1);
+    cv::Mat cameraMatrix = cv::Mat::eye(3, 3, CV_64FC1);
     cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64FC1);
 
     ROS_INFO("%s", groupName.c_str());

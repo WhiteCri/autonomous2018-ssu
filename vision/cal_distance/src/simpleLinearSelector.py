@@ -2,18 +2,18 @@ import cv2
 import numpy as np
 
 N_LINESAVER_BUFFER = 5
-IMG_PATH = './2.jpg'
+IMG_PATH = '/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/src/right_1m.png'
 
-mtx_ls = [708.611809, 0, 320.331083, 0, 703.012319, 260.343059, 0, 0, 1] #camera matrix
-dist = np.array([0.09776299999999999, -0.235306, 0.00463, -0.001884, 0]) #distortion matrix
+mtx_ls = [603.652456, 0, 328.452174, 0, 604.1248849999999, 228.433349, 0, 0, 1] #camera matrix
+dist = np.array([-0.033672, -0.031004, 0.001614, 0.007620999999999999, 0]) #distortion matrix
 fx_=1 #resize x 계수
 fy_=1 #resize y 계수
 
-CAMERA_NAME = 'main_'
+CAMERA_NAME = 'right_'
 
 class LineSaver():
     MAX_SLOPE = 9999
-    v_or_s = 0.5
+    v_or_s = 0.3
     def debugPrint(self):
         print('------debugPrint---------')
         print('len of recent, mathistory : ',len(self.recent), len(self.matHistory))
