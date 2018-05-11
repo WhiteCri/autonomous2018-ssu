@@ -72,6 +72,7 @@ void toward_goal(){
             param_ptr->nh.setParam("hl_controller/reached_goal", true);
             return;
         }
+        ros::Rate(1).sleep();
         ROS_INFO("success end!");
     }
     else if (state == GoalStates::STATE_LOST){
