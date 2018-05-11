@@ -31,6 +31,10 @@ void GoalSender::sendGoal(){
         if (param_ptr->use_process_uturn==false) return;
     }else if ((goal_type=="parking_near")||(goal_type=="parking_far")){
         if (param_ptr->use_process_parking==false) return;
+    }else if ((goal_type=="nload")){
+        if (param_ptr->use_process_nload==false) return;
+    }else if ((goal_type=="sload")){
+        if (param_ptr->use_process_sload==false) return;
     }
     else return; //if not allowed status, return;
 

@@ -22,6 +22,8 @@ const std::vector<std::string> MOVING_STATUES{
     "parking_near",
     "parking_far",
     "uturn",
+    "nload",
+    "sload",
     "b",
     "skip"
 };

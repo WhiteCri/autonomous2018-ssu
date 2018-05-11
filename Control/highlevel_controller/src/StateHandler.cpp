@@ -291,6 +291,8 @@ void process_sload(){
     ROS_INFO("sload start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_SLOAD");
 
+    ros::Rate(1/2.0).sleep();
+
     param_ptr->nh.setParam("hl_controller/sload_onetime_flag", true);
     ROS_INFO("sload done...");
 }
@@ -299,6 +301,8 @@ void process_nload(){
     ROS_INFO("nlaod start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_NLOAD");
 
+    ros::Rate(1/2.0).sleep();
+    
     param_ptr->nh.setParam("hl_controller/nload_onetime_flag", true);
     ROS_INFO("nload done...");
 }
