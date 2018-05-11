@@ -8,7 +8,7 @@
 
 <!-- Robot Frame Setup (static tf)  -->
     <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0 0 0 0 base_link laser 100" />
+    <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0 0 0 3.14 base_link laser 100" />
     <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="0.35 0 0 0 0 0 base_link /camera_main 100" />
 
 
@@ -68,10 +68,11 @@
  	 </node>
 	
 <!--  Robot Pose Estimation Node -->	
-	<node pkg="odometry" type="odom_pub" name="odom_wheelbased"/>
+	<node pkg="odometry" type="odom_pub" name="odom_wheelbased">
+		<remap from="odom/wheelbased" to="odom"/>
+	</node>
 
 	<node pkg="amcl" type="amcl" name="amcl" output="screen"/>
-
 
 <!--   Map Server   -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find move_base_ssu)/maps/$(arg map_name)" output="screen"/>

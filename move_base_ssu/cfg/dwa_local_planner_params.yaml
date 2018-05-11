@@ -2,11 +2,11 @@ DWAPlannerROS:
   controller_frequency: 10.0 # (double, default: 20.0)
 
   ## Robot Configuration Parameters 
-  acc_limit_trans: 3.0
+  acc_limit_trans: 4.0
   max_trans_vel: 8.0
   min_trans_vel: 0.2
 
-  acc_lim_x: 3.0
+  acc_lim_x: 4.0
   max_vel_x: 8.0
   min_vel_x: 7.0
 
@@ -15,7 +15,7 @@ DWAPlannerROS:
   min_vel_y: 0.0
   #trans_stopped_vel: 0.01
 
-  acc_lim_theta: 3.5
+  acc_lim_theta: 5.5
   max_rot_vel: 8.0
   min_rot_vel: 0.001
   #rot_stopped_vel: 0.01
