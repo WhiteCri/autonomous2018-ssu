@@ -23,7 +23,7 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="1"/>
+			<param name="track_bar" value="0"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 		</node>

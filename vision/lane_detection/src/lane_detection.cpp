@@ -148,8 +148,8 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         if (track_bar) {
                                 callane.detectYHSVcolor(bev, yellow_hsv, y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax);
                                 callane.detectWhiteLane(bev,white_hsv, w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax,0,0);
-                                cv::imshow(groupName+"/TRACKBAR_WHITE",white_hsv);
-                                cv::imshow(groupName+"/TRACKBAR_YELLOW",yellow_hsv);
+                                cv::imshow("TRACKBAR_WHITE",white_hsv);
+                                cv::imshow("TRACKBAR_YELLOW",yellow_hsv);
                         }
                         else { // 색상검출 디폴트
                                 callane.detectYHSVcolor(bev, yellow_hsv, 7, 21, 52, 151, 0, 180);
@@ -397,9 +397,9 @@ void InitImgObjectforROS::initParam(){
         nh.param<int>("/"+groupName+"/lane_detection/w_hmin",w_hmin,0);
         nh.param<int>("/"+groupName+"/lane_detection/w_hmax",w_hmax,180);
         nh.param<int>("/"+groupName+"/lane_detection/w_smin",w_smin,0);
-        nh.param<int>("/"+groupName+"/lane_detection/w_smax",w_smax,26);
-        nh.param<int>("/"+groupName+"/lane_detection/w_vmin",w_vmin,0);
-        nh.param<int>("/"+groupName+"/lane_detection/w_vmax",w_vmax,150);
+        nh.param<int>("/"+groupName+"/lane_detection/w_smax",w_smax,24);
+        nh.param<int>("/"+groupName+"/lane_detection/w_vmin",w_vmin,172);
+        nh.param<int>("/"+groupName+"/lane_detection/w_vmax",w_vmax,255);
         ROS_INFO("lane_detection %d %d %d %d %d %d", debug, web_cam, imshow, track_bar, time_check, lable);
         ROS_INFO("imshow %d", imshow);
 }
