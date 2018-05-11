@@ -9,6 +9,8 @@ enum {
     PROCESS_MOVINGOBJ,
     PROCESS_PARKING,
     PROCESS_UTURN,
+    PROCESS_SLOAD,
+    PROCESS_NLOAD,
     PROCESS_RECOVERY,
     DONE
 };
@@ -20,6 +22,8 @@ const std::vector<std::string> MOVING_STATUES{
     "parking_near",
     "parking_far",
     "uturn",
+    "nload",
+    "sload",
     "b",
     "skip"
 };
@@ -106,6 +110,18 @@ public:
     int uturn_tx_brake;
     double uturn_duration;
 
+    /* narrow load members */
+    bool nload;
+    bool use_process_nload;
+    bool use_nload_onetime_flag;
+    bool nload_onetime_flag;
+
+    /* s-load members */
+    bool sload;
+    bool use_process_sload;
+    bool use_sload_onetime_flag;
+    bool sload_onetime_flag;
+
     /* recovery members */
     bool recovery;
     bool use_process_recovery;
@@ -129,6 +145,10 @@ public:
         nh.getParam("hl_controller/parking_onetime_flag",   parking_onetime_flag);
         nh.getParam("hl_controller/uturn",                  uturn);
         nh.getParam("hl_controller/uturn_onetime_flag",     uturn_onetime_flag);
+        nh.getParam("hl_controller/sload",                  sload);
+        nh.getParam("hl_controller/sload_onetime_flag",     sload_onetime_flag);
+        nh.getParam("hl_controller/nload",                  nload);
+        nh.getParam("hl_controller/nload_onetime_flag",     nload_onetime_flag);
         nh.getParam("hl_controller/recovery",               recovery);
         nh.getParam("hl_controller/reached_goal",           reached_goal);
         
@@ -146,6 +166,8 @@ public:
             msg.parking_far = parking_far;
             msg.recovery = recovery;
             msg.uturn = uturn;
+            msg.sload = sload;
+            msg.nload = nload;
 
             param_pub.publish(msg);
         }

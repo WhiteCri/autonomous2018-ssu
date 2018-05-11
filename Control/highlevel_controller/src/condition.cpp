@@ -63,6 +63,34 @@ bool Process_uturn_to_toward_goal::timedCheck(HybridAutomata *HA){
     return true;
 }
 
+/* sload */
+bool Toward_goal_to_process_sload::timedCheck(HybridAutomata* HA){
+    bool ret = true;
+    ret &= param_ptr->sload;
+    if (param_ptr->use_sload_onetime_flag)
+        ret &= !param_ptr->sload_onetime_flag;
+      
+    return ret;
+}
+
+bool Process_sload_to_toward_goal::timedCheck(HybridAutomata *HA){
+    return true;
+}
+
+/* nload */
+bool Toward_goal_to_process_nload::timedCheck(HybridAutomata* HA){
+    bool ret = true;
+    ret &= param_ptr->nload;
+    if (param_ptr->use_nload_onetime_flag)
+        ret &= !param_ptr->nload_onetime_flag;
+      
+    return ret;
+}
+
+bool Process_nload_to_toward_goal::timedCheck(HybridAutomata *HA){
+    return true;
+}
+
 /* recovery */
 bool Toward_goal_to_process_recovery::timedCheck(HybridAutomata* HA){
     bool ret = true;

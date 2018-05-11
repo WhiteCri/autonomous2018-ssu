@@ -12,6 +12,10 @@ void process_parking();
 
 void process_uturn();
 
+void process_sload();
+
+void process_nload();
+
 void process_recovery();
 
 void done();

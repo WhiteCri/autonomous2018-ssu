@@ -5,7 +5,7 @@
 	<arg name="LocalROS" 			default="DWAPlannerROS"/> 		<!--TebLocalPlannerROS-->
 	
 	<arg name="planner_frequency"	default="1.0"/>	<arg name="controller_frequency"   default="10.0"/>
-	<arg name="planner_patience"	default="5.0"/>	<arg name="controller_patience"	   default="15.0"/>
+	<arg name="planner_patience"	default="5.0"/>	<arg name="controller_patience"	   default="10.0"/>
 	
 		
 	<!--  ****** Move_Base ******  -->
@@ -35,8 +35,8 @@
 	<rosparam file="$(find move_base_ssu)/cfg/lowlevel_controller.yaml" command="load"/>
         
 
-	<!--<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>
-	<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>-->
+	<node pkg="highlevel_controller" type="highlevel_controller" name="hl_controller" output="screen"/>
+	<rosparam file="$(find highlevel_controller)/cfg/hl_controller.yaml" command="load"/>
 	
 	<!--  **************** Visualisation ****************  -->
 	<node name="rviz" pkg="rviz" type="rviz"/>
