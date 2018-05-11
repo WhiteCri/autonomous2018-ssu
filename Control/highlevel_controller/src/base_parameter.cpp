@@ -122,6 +122,15 @@ Parameters::Parameters(){
 
     /* Done members */
     nh.param("hl_controller/reached_goal", reached_goal, false);
+
+    //onetime initial check
+    if (crosswalk_onetime_flag)        { ROS_ERROR("crosswalk    onetimeflag error. Re-run the roscore..."); throw std::runtime_error("onetimeflag");}
+    else if (movingobj_onetime_flag)   { ROS_ERROR("movingobj    onetimeflag error. Re-run the roscore..."); throw std::runtime_error("onetimeflag");}
+    else if (parking_onetime_flag)     { ROS_ERROR("parking      onetimeflag error. Re-run the roscore..."); throw std::runtime_error("onetimeflag");}
+    else if (uturn_onetime_flag)       { ROS_ERROR("uturn        onetimeflag error. Re-run the roscore..."); throw std::runtime_error("onetimeflag");}
+    else if (nload_onetime_flag)       { ROS_ERROR("nload        onetimeflag error. Re-run the roscore..."); throw std::runtime_error("onetimeflag");}
+    else if (sload_onetime_flag)       { ROS_ERROR("sload        onetimeflag error. Re-run the roscore..."); throw std::runtime_error("onetimeflag");}
+    
 }
 
 Parameters* Parameters::obj_ptr = nullptr;
