@@ -6,11 +6,16 @@ hl_controller:
 #  ori_z_goal: [0.939, 0.911,0.3782]
 #  ori_w_goal: [-0.343,0.412,0.9256]
 #  goal_type:  ["normal","normal","normal"]
-  x_goal:     [66.96,    49.81  ,57.54 ,49.49  ]
-  y_goal:     [91.01,    116.459,111.33,93.66  ]
-  ori_z_goal: [0.1814, 0.992  ,-0.376,93.66  ]
-  ori_w_goal: [0.9833,  -0.1227,0.9263,-0.0118]
-  goal_type:  ["b","uturn","parking","b"]
+#  x_goal:     [66.96,    49.81  ,57.54 ,49.49  ]
+#  y_goal:     [91.01,    116.459,111.33,93.66  ]
+#  ori_z_goal: [0.1814, 0.992  ,-0.376,93.66  ]
+#  ori_w_goal: [0.9833,  -0.1227,0.9263,-0.0118]
+#  goal_type:  ["crosswalk","skip","parking_near","b"]
+  x_goal:     [23.2,    34.47   ,33.08  ,1.38   ,8.48 ]
+  y_goal:     [39.39,   42.031  ,4.90   ,2.65   ,26.43]
+  ori_z_goal: [0.6563, -0.0447  ,-0.7506,0.6721 ,0.0324]
+  ori_w_goal: [0.7544,  0.9989  ,0.6607 , 0.7403,0.9994]
+  goal_type:  ["b",     "b",    "b",    "b"     ,"b"]
 
 #config controller
   frequency: 20
@@ -24,8 +29,8 @@ hl_controller:
   tx_brake: 0
 
 #crosswalk
-  use_process_crosswalk: true
-  crosswalk_check_duration: 0.2
+  use_process_crosswalk: false
+  crosswalk_check_duration: 0
   use_crosswalk_onetime_flag: true
 
   crosswalk_driving_duration: 1.0
@@ -41,7 +46,7 @@ hl_controller:
 
 #parking
   use_process_parking: true
-  parking_check_duration: 2.0
+  parking_check_duration: 0
   use_parking_onetime_flag: true
 
   parking_stop_duration: 10.0

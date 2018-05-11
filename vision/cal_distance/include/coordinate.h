@@ -36,9 +36,8 @@ std::istream& operator>>(std::istream& is, Line& line){
   return is;
 }
 
-void parsePixel(std::string filename_, vector<vector<Pos> >& posVec, Pos& center){
-  std::string filename = "/home/yun/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data/main_calibration.txt";
-  
+void parsePixel(std::string filename, vector<vector<Pos> >& posVec, Pos& center){
+
   std::ifstream in(filename);
   std::string err= "file open error! in parsePixel... : " + filename;
   if(in.fail()) throw std::runtime_error(err.c_str());
@@ -62,9 +61,8 @@ void parsePixel(std::string filename_, vector<vector<Pos> >& posVec, Pos& center
   }
 }
 
-void parseLine(std::string filename_, vector<Line> & hlines, vector<Line>& vlines){
-  std::string filename = "/home/yun/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data/main_calibrationLine.txt";
-  
+void parseLine(std::string filename, vector<Line> & hlines, vector<Line>& vlines){
+
   std::ifstream in(filename);
   if(in.fail()) throw std::runtime_error("file open error! in parseLine...");
   std::string str;

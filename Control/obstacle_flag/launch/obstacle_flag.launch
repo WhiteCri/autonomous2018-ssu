@@ -13,6 +13,11 @@
 		<remap from="/scan"  to="/dynamic_scan"/>
 	</node>
 
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="park_filter">
+        <rosparam file="$(find laser_filters)/cfg/park_cut.yaml" command="load"/>  
+		<remap from="/scan"  to="/park_scan"/>
+	</node>
+
     <node pkg="obstacle_detector" type="obstacle_extractor_node" name="dynamic_obstacle_extractor">
   	    <remap from="/scan"  to="/dynamic_scan"/>
         <remap from="/raw_obstacles" to="/dynamic_obstacle"/>
@@ -20,6 +25,7 @@
     </node>
     <node pkg="obstacle_detector" type="obstacle_extractor_node" name="parking_obstacle_extractor">
     <remap from="/raw_obstacles" to="/park_obstacle"/>
+    <remap from="/scan" to="/park_scan"/>
         <rosparam file="$(find obstacle_flag)/cfg/park_obstacle.yaml" command="load"/>      
   </node>
 

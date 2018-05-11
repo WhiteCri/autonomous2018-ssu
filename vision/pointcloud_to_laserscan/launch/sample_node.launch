@@ -3,9 +3,9 @@
 <launch>
     <arg name="groupName" default="cam5"/>
     <!-- run pointcloud_to_laserscan node -->
-    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" arg="groupName" output="screen">
-        <remap from="cloud_in"  to="/main/point_cloud"/>
-        <remap from="scan" to="/scan"/>
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
+        <remap from="cloud_in"  to="/$(arg groupName)/point_cloud"/>
+        <remap from="scan" to="/$(arg groupName)/scan"/>
         <!-- #target_frame: camera_main # Leave disabled to output scan in pointcloud frame -->
         <rosparam>
 

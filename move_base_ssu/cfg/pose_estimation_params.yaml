@@ -40,7 +40,7 @@ amcl:
   max_particles: 2000
   kld_err: 0.05
   kld_z: 0.99
-
+  
   laser_max_beams: 60
   laser_max_range: 12.0
   laser_z_hit: 0.5

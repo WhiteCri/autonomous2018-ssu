@@ -51,7 +51,7 @@ void readSerial(int serial_read_loop_rate){
         const char *check = raw.c_str();
         if((check[0] == 0x53) & (check[1] == 0x54) & (check[2] == 0x58) & check[16] == 0x0D & check[17] == 0x0a ){
             lock.lock();
-            for(int i = 0 ; i < 18; ++i) *(packet + i) = *(check + i);        
+            for(int i = 0 ; i < 18; ++i) *(packet + i) = *(check + i);
             lock.unlock();
         }
         loop_rate.sleep();

@@ -1,7 +1,6 @@
 #pragma once
 #include <ros/ros.h>
 #include <highlevel_controller/params.h>
-#include "HybridAutomata.h"
 
 enum {
     INIT = 0,
@@ -14,13 +13,15 @@ enum {
     DONE
 };
 
-const std::string MOVING_STATUES[] = {
+const std::vector<std::string> MOVING_STATUES{
     "normal",
     "crosswalk",
     "movingobj",
-    "parking",
-    "uturn"
-    "b"
+    "parking_near",
+    "parking_far",
+    "uturn",
+    "b",
+    "skip"
 };
 
 
@@ -114,9 +115,6 @@ public:
     /* Done members */
     bool reached_goal;
 
-    /* HybridAutomata */
-    HybridAutomata *HA;
-
     //nodehandle
     ros::NodeHandle nh;
 
@@ -152,9 +150,6 @@ public:
             param_pub.publish(msg);
         }
     }
-
-    void setHA(HybridAutomata* HA_ptr);
-
     //singletone
     static Parameters* getInstancePtr();
 private:

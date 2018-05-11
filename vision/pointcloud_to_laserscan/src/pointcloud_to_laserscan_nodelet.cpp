@@ -60,7 +60,9 @@ namespace pointcloud_to_laserscan
 
    // private_nh_.param<std::string>("target_frame", target_frame_, "camera_main");
 // modefied by Park
-    private_nh_.param<std::string>("target_frame", target_frame_, groupName+"/camera_main");
+    // private_nh_.param<std::string>("target_frame", target_frame_, groupName+"/camera_main");
+    // added by Park
+    private_nh_.param<std::string>("target_frame", target_frame_, "/camera_main");
     private_nh_.param<double>("transform_tolerance", tolerance_, 0.01);
     private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min());
     private_nh_.param<double>("max_height", max_height_, std::numeric_limits<double>::max());
@@ -113,7 +115,7 @@ namespace pointcloud_to_laserscan
       sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
     }
 
-    pub_ = nh_.advertise<sensor_msgs::LaserScan>("/scan", 100,
+    pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan", 100,
                                                  boost::bind(&PointCloudToLaserScanNodelet::connectCb, this),
                                                  boost::bind(&PointCloudToLaserScanNodelet::disconnectCb, this));
   }
