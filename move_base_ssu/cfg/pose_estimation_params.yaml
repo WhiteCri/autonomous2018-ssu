@@ -5,7 +5,7 @@ map_server:
 ## Wheel-based Odometry Parameters
 odom_wheelbased:
   tf_publish: true
-  wheelbase: 0.99
+  wheelbase: 0.95
   frame_id: "odom"
   child_frame_id: "base_footprint"        
   initial_y: 0.0
@@ -26,12 +26,15 @@ amcl:
   initial_pose_y: 0.0
   initial_pose_a: 0.0
 
+  update_min_d: 0.1
+  update_min_a: 0.1
+
   odom_model_type: "diff"
   odom_alpha1: 0.2
   odom_alpha2: 0.2
   odom_alpha3: 0.2
   odom_alpha4: 1.0
-  odom_alpha5: 0.2
+  odom_alpha5: 0.1
   gui_publish_rate: 10.0
   min_particles: 300
   max_particles: 2000
@@ -48,8 +51,6 @@ amcl:
   laser_lambda_short: 0.1
   laser_model_type: "likelihood_field" # "likelihood_field" or "beam"
   laser_likelihood_max_dist: 2.0
-  update_min_d: 0.25
-  update_min_a: 0.2
 
   resample_interval: 1
   transform_tolerance: 1.0

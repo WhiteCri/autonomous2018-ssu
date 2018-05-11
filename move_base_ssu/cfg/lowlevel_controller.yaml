@@ -11,7 +11,7 @@ control:
 
   brake:
     max: 75
-    kp: 123
+    kp: 130
     ki: 0.0
     kd: 0.0
 
