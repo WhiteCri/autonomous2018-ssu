@@ -111,10 +111,14 @@ public:
     /* narrow load members */
     bool nload;
     bool use_process_nload;
+    bool use_nload_onetime_flag;
+    bool nload_onetime_flag;
 
     /* s-load members */
     bool sload;
     bool use_process_sload;
+    bool use_sload_onetime_flag;
+    bool sload_onetime_flag;
 
     /* recovery members */
     bool recovery;
@@ -140,7 +144,9 @@ public:
         nh.getParam("hl_controller/uturn",                  uturn);
         nh.getParam("hl_controller/uturn_onetime_flag",     uturn_onetime_flag);
         nh.getParam("hl_controller/sload",                  sload);
+        nh.getParam("hl_controller/sload_onetime_flag",     sload_onetime_flag);
         nh.getParam("hl_controller/nload",                  nload);
+        nh.getParam("hl_controller/nload_onetime_flag",     nload_onetime_flag);
         nh.getParam("hl_controller/recovery",               recovery);
         nh.getParam("hl_controller/reached_goal",           reached_goal);
         
