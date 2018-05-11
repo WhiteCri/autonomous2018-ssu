@@ -31,29 +31,32 @@ void GoalSender::sendGoal(){
         if (param_ptr->use_process_uturn==false) return;
     }else if ((goal_type=="parking_near")||(goal_type=="parking_far")){
         if (param_ptr->use_process_parking==false) return;
+    }else if ((goal_type=="nload")){
+        if (param_ptr->use_process_nload==false) return;
+    }else if ((goal_type=="sload")){
+        if (param_ptr->use_process_sload==false) return;
     }
     else return; //if not allowed status, return;
 
     std::thread tr([&](){
-    std::string param_name = "hl_controller/"+goal_type;
-    //because there are no function to make uppercase string, I decided to use a STL algorithm function
-    std::string upper_statename(goal_type); // just fit length.
-    std::transform(goal_type.begin(), goal_type.end(), upper_statename.begin(),
-            [](unsigned char c) -> unsigned char { return std::toupper(c); });
-    std::string curState, targetState = "PROCESS_" + upper_statename;
+        std::string param_name = "hl_controller/"+goal_type;
+        //because there are no function to make uppercase string, I decided to use a STL algorithm function
+        std::string upper_statename(goal_type); // just fit length.
+        std::transform(goal_type.begin(), goal_type.end(), upper_statename.begin(),
+            [](unsigned char c) -> unsigned char { return std::toupper(c);});
+        std::string curState, targetState = "PROCESS_" + upper_statename;
 
-    while(true){
+        while(true){
 ROS_INFO("running stateChanger thread...");
-        param_ptr->nh.setParam(param_name.c_str(), true);
+            param_ptr->nh.setParam(param_name.c_str(), true);
 
 ROS_INFO("param_name : %s",param_name.c_str());                
 ROS_INFO("targetState : %s",targetState.c_str());
-        param_ptr->nh.getParam("hl_controller/curState", curState);
-        if (curState == targetState) break;
-            ros::Rate(param_ptr->frequency).sleep();
-        }
+            param_ptr->nh.getParam("hl_controller/curState", curState);
+            if (curState == targetState) break;
+                ros::Rate(param_ptr->frequency).sleep();
+            }
     });
-
     tr.detach(); 
 }
 

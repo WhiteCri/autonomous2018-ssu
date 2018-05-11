@@ -8,7 +8,7 @@ global_costmap:
  
   transform_tolerance: 0.5
   resolution: 0.1
-  footprint_padding: 0.12
+  footprint_padding: 0.15
   plugins:
     - {name: static_layer,            type: "costmap_2d::StaticLayer"}
     - {name: obstacle_layer,          type: "costmap_2d::VoxelLayer"}

@@ -397,9 +397,9 @@ void InitImgObjectforROS::initParam(){
         nh.param<int>("/"+groupName+"/lane_detection/w_hmin",w_hmin,0);
         nh.param<int>("/"+groupName+"/lane_detection/w_hmax",w_hmax,180);
         nh.param<int>("/"+groupName+"/lane_detection/w_smin",w_smin,0);
-        nh.param<int>("/"+groupName+"/lane_detection/w_smax",w_smax,24);
-        nh.param<int>("/"+groupName+"/lane_detection/w_vmin",w_vmin,172);
-        nh.param<int>("/"+groupName+"/lane_detection/w_vmax",w_vmax,255);
+        nh.param<int>("/"+groupName+"/lane_detection/w_smax",w_smax,26);
+        nh.param<int>("/"+groupName+"/lane_detection/w_vmin",w_vmin,0);
+        nh.param<int>("/"+groupName+"/lane_detection/w_vmax",w_vmax,150);
         ROS_INFO("lane_detection %d %d %d %d %d %d", debug, web_cam, imshow, track_bar, time_check, lable);
         ROS_INFO("imshow %d", imshow);
 }

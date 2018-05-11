@@ -43,7 +43,7 @@
 		</node>
 
 
-		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg main_camera_name)" respawn="true" output="screen">
+		<!--<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg main_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
 			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
 		</node>
@@ -56,7 +56,7 @@
 			<arg name="groupName" value="$(arg main_camera_name)"/>
 		</include>
 
-	</group>
+	</group>-->
 
 	<group ns="$(arg left_camera_name)">
 		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg left_camera_name)">

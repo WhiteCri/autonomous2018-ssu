@@ -86,10 +86,14 @@ Parameters::Parameters(){
     /* sload paramter */
     nh.param("hl_controller/sload", sload, false);
     nh.param("hl_controller/use_process_sload", use_process_sload, false);
+    nh.param("hl_controller/use_sload_onetime_flag", use_sload_onetime_flag, true);
+    nh.param("hl_controller/sload_onetime_flag", sload_onetime_flag, false);
 
     /* nload paramter */
     nh.param("hl_controller/nload", nload, false);
     nh.param("hl_controller/use_process_nload", use_process_nload, false);
+    nh.param("hl_controller/use_nload_onetime_flag", use_nload_onetime_flag, true);
+    nh.param("hl_controller/nload_onetime_flag", nload_onetime_flag, false);
 
     //goalpoint members    
     nh.param("hl_controller/parking_near_arrive_point_x",       parking_near_arrive_point_x, -200.0);  
