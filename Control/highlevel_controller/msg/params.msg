@@ -4,5 +4,7 @@ bool parking_near
 bool parking_far
 bool recovery
 bool uturn
+bool sload
+bool nload
 time stamp
 uint32 seq

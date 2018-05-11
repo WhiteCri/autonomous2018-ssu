@@ -78,6 +78,12 @@ hl_controller:
   uturn_tx_steer: -1999
   uturn_tx_brake: 0
   uturn_duration: 10.0
+
+#sload
+  use_process_sload: true
+
+#nload
+  use_process_nload: true
   
 
 #recovery 

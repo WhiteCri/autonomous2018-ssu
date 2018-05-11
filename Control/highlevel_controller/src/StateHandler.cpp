@@ -287,9 +287,19 @@ void process_uturn(){
     ROS_INFO("uturn done");
 }
 
+void process_sload(){
+    ROS_INFO("sload start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_SLOAD");
+}
+
+void process_nload(){
+    ROS_INFO("nlaod start");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_NLOAD");
+}
+
 void process_recovery(){
     param_ptr->nh.setParam("hl_controller/recovery",false);
-    param_ptr->nh.setParam("hl_controller/curState","PROCESS_UTURN");
+    param_ptr->nh.setParam("hl_controller/curState","PROCESS_RECOVERY");
 }
 
 void done(){

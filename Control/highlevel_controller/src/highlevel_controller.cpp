@@ -102,6 +102,40 @@ int main(int argc, char *argv[]){
             ROS_INFO("set process uturn!");
         }
 
+        //register sload
+        if (param_ptr->use_process_sload){
+            ha.setState(PROCESS_SLOAD, process_sload);
+
+            ha.setCondition(
+                TOWARD_GOAL,
+                new Toward_goal_to_process_sload(0),
+                PROCESS_SLOAD
+            );
+            ha.setCondition(
+                PROCESS_SLOAD,
+                new Process_sload_to_toward_goal(0),
+                TOWARD_GOAL
+            );
+            ROS_INFO("set process sload!");
+        }
+
+        //register nload
+        if (param_ptr->use_process_nload){
+            ha.setState(PROCESS_NLOAD, process_nload);
+
+            ha.setCondition(
+                TOWARD_GOAL,
+                new Toward_goal_to_process_nload(0),
+                PROCESS_NLOAD
+            );
+            ha.setCondition(
+                PROCESS_NLOAD,
+                new Process_nload_to_toward_goal(0),
+                TOWARD_GOAL
+            );
+            ROS_INFO("set process nload!");
+        }
+
         //register recovery
         if (param_ptr->use_process_recovery){
             ha.setState(PROCESS_RECOVERY, process_recovery);

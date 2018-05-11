@@ -68,6 +68,36 @@ public:
     std::string toString() const {return "Process_uturn_to_toward_goal";}
 };
 
+/* nload class */
+class Toward_goal_to_process_nload: public TimedCondition{
+public:
+    Toward_goal_to_process_nload(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
+    std::string toString() const {return "Toward_goal_to_process_nload";}
+};
+
+class Process_nload_to_toward_goal : public TimedCondition{
+public:
+    Process_nload_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
+    std::string toString() const {return "Process_nload_to_toward_goal";}
+};
+
+/* sturn class */
+class Toward_goal_to_process_sload: public TimedCondition{
+public:
+    Toward_goal_to_process_sload(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
+    std::string toString() const {return "Toward_goal_to_process_sload";}
+};
+
+class Process_sload_to_toward_goal : public TimedCondition{
+public:
+    Process_sload_to_toward_goal(unsigned int condCount) : TimedCondition(condCount) {}
+    virtual bool timedCheck(HybridAutomata *HA);
+    std::string toString() const {return "Process_sload_to_toward_goal";}
+};
+
 /* recovery */
 class Toward_goal_to_process_recovery: public TimedCondition{
 public:

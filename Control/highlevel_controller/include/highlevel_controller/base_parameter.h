@@ -9,6 +9,8 @@ enum {
     PROCESS_MOVINGOBJ,
     PROCESS_PARKING,
     PROCESS_UTURN,
+    PROCESS_SLOAD,
+    PROCESS_NLOAD,
     PROCESS_RECOVERY,
     DONE
 };
@@ -106,6 +108,14 @@ public:
     int uturn_tx_brake;
     double uturn_duration;
 
+    /* narrow load members */
+    bool nload;
+    bool use_process_nload;
+
+    /* s-load members */
+    bool sload;
+    bool use_process_sload;
+
     /* recovery members */
     bool recovery;
     bool use_process_recovery;
@@ -129,6 +139,8 @@ public:
         nh.getParam("hl_controller/parking_onetime_flag",   parking_onetime_flag);
         nh.getParam("hl_controller/uturn",                  uturn);
         nh.getParam("hl_controller/uturn_onetime_flag",     uturn_onetime_flag);
+        nh.getParam("hl_controller/sload",                  sload);
+        nh.getParam("hl_controller/nload",                  nload);
         nh.getParam("hl_controller/recovery",               recovery);
         nh.getParam("hl_controller/reached_goal",           reached_goal);
         
@@ -146,6 +158,8 @@ public:
             msg.parking_far = parking_far;
             msg.recovery = recovery;
             msg.uturn = uturn;
+            msg.sload = sload;
+            msg.nload = nload;
 
             param_pub.publish(msg);
         }
