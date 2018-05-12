@@ -91,13 +91,13 @@ public:
 
       idx = find_idx(pos);
 
-      if (idx_x <= 0) return Pos(0,0);
-      if (idx_y <= 0) return Pos(0,0);
+      if (idx.x <= 0) return Pos(0,0);
+      if (idx.y <= 0) return Pos(0,0);
       // //to avoid divide by zero, throw away when hlines.slope == 0
       if ((hlines[idx.y].slope == 0) || (hlines[idx.y-1].slope == 0)) return Pos(0,0);
 
       // calc top-left coordinate
-      Pos real_dr = realVec[idx_y][idx_x];
+      Pos real_dr = realVec[idx.y][idx.x];
 
       // 타겟 지점부터 상하좌우 직선 좌표차
       double up, down, right, left;

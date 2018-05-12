@@ -1,32 +1,35 @@
 hl_controller:
 #goal
-#jinry_final_goals
-  x_goal:     [12.85,   5.35]
-  y_goal:     [9.181,   0.067]
-  ori_z_goal: [-0.8096, 0.9800]
-  ori_w_goal: [ 0.5869, 0.1989]
-  goal_type:  ["b",     "sload","normal"]
+##re_jinry goals
+#  x_goal:     [12.85,   5.35]
+#  y_goal:     [9.181,   0.067]
+#  ori_z_goal: [-0.8096, 0.9800]
+#  ori_w_goal: [ 0.5869, 0.1989]
+#  goal_type:  ["b",     "sload","normal"]
+
+##the place goals
 #  x_goal:     [66.96,    49.81  ,57.54 ,49.49  ]
 #  y_goal:     [91.01,    116.459,111.33,93.66  ]
 #  ori_z_goal: [0.1814, 0.992  ,-0.376,93.66  ]
 #  ori_w_goal: [0.9833,  -0.1227,0.9263,-0.0118]
 #  goal_type:  ["crosswalk","skip","parking_near","b"]
-  # x_goal:     [23.2,    34.47   ,33.08  ,1.38   ,8.48 ]
-  # y_goal:     [39.39,   42.031  ,4.90   ,2.65   ,26.43]
-  # ori_z_goal: [0.6563, -0.0447  ,-0.7506,0.6721 ,0.0324]
-  # ori_w_goal: [0.7544,  0.9989  ,0.6607 , 0.7403,0.9994]
-  # goal_type:  ["normal","nload","b","normal","normal"]
+#  x_goal:     [23.2    ,34.47   ,33.08  ,1.38   ,8.48 ]
+#  y_goal:     [39.39   ,42.031  ,4.90   ,2.65   ,26.43]
+#  ori_z_goal: [0.6563  ,-0.0447 ,-0.7506,0.6721 ,0.0324]
+#  ori_w_goal: [0.7544  ,0.9989  ,0.6607 , 0.7403,0.9994]
+#  goal_type:  ["normal","uturn","crosswalk","parking","movingobj"]
+
 #teb fake dynamic reconfigure goals
-#  x_goal:     [5.094]
-#  y_goal:     [4.363]
-#  ori_z_goal: [0.0389]
-#  ori_w_goal: [0.9992]
-#  goal_type:  ["sload","nload","b","normal","normal"]
+  x_goal:     [5.094,7.618]
+  y_goal:     [4.363,5.810]
+  ori_z_goal: [0.0389,0.7175]
+  ori_w_goal: [0.9992,0.6965]
+  goal_type:  ["normal","uturn"]
 
 
 #config controller
   frequency: 20
-  publish_param: true
+  publish_param: false
 
 #tx
 ##IMPORTANT : THIS VALUES ARE BASED ON SERIAL VALUES
@@ -40,57 +43,39 @@ hl_controller:
   crosswalk_check_duration: 0
   use_crosswalk_onetime_flag: true
 
-  crosswalk_driving_duration: 1.0
+  crosswalk_driving_duration: 0
   crosswalk_stop_duration: 3.0
 
 #movingobj
   use_process_movingobj: true
   movingobj_check_duration: 0
-  use_movingobj_onetime_flag: false
+  use_movingobj_onetime_flag: true
 
-  movingobj_driving_duration: 1.0
+  movingobj_driving_duration: 0
   movingobj_stop_duration: 5.0
 
 #parking
   use_process_parking: true
   parking_check_duration: 0
   use_parking_onetime_flag: true
-
   parking_stop_duration: 10.0
-
-  parking_near_arrive_point_x: -200.0
-  parking_near_arrive_point_y: -200.0
-  parking_near_arrive_point_ori_z: 0
-  parking_near_arrive_point_ori_w: 1
-  parking_near_back_point_x: -200.0
-  parking_near_back_point_y: -200.0
-  parking_near_back_point_ori_z: 0
-  parking_near_back_point_ori_w: 1
-
-  parking_far_back_point_x: -200.0
-  parking_far_back_point_y: -200.0
-  parking_far_back_point_ori_z: 0
-  parking_far_back_point_ori_w: 1
-  parking_far_arrive_point_x: -200.0
-  parking_far_arrive_point_y: -200.0
-  parking_far_arrive_point_ori_z: 0
-  parking_far_arrive_point_ori_w: 1
 
 #uturn
   use_process_uturn: true
-  uturn_check_duration: 1.0
-  use_uturn_onetime_flag: false
+  uturn_check_duration: 0
+  use_uturn_onetime_flag: true
 
   uturn_tx_speed: 70
   uturn_tx_steer: -1999
   uturn_tx_brake: 0
-  uturn_duration: 10.0
+  uturn_duration: 1.0
 
 #sload
   use_process_sload: true
   use_sload_onetime_flag: true
+
 #nload
-  use_process_nload: true
+  use_process_nload: false
   use_nload_onetime_flag: true
 
 #recovery 

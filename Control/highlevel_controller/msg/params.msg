@@ -1,7 +1,6 @@
 bool crosswalk
 bool movingobj
-bool parking_near
-bool parking_far
+bool parking
 bool recovery
 bool uturn
 bool sload
