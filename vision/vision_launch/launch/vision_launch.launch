@@ -10,7 +10,7 @@
 
 
 
-	<group ns="$(arg left_camera_name)">
+	<!--<group ns="$(arg left_camera_name)">
 		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg left_camera_name)">
 			<param name="camera_num" value="$(arg left_camera_num)"/>
 			<param name="frequency" value="30"/>
@@ -23,7 +23,7 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="0"/>
+			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 		</node>
@@ -31,9 +31,9 @@
 
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg left_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
-			 <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> 
+			 <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> -->
 			<!--<param name="cal_path" value="/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
-		</node>
+		<!--</node>
 
 		<node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" args="$(arg left_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
@@ -43,7 +43,7 @@
 			<arg name="groupName" value="$(arg left_camera_name)"/>
 		</include>
 
-	</group>
+	</group>-->
 
 	<group ns="$(arg right_camera_name)">
 		 <node name="camera_image" pkg="camera_image" type="camera_image" args="$(arg right_camera_name)">
@@ -58,7 +58,7 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="0"/>
+			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 		</node>

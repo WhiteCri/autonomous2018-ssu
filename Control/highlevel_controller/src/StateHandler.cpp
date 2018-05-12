@@ -15,7 +15,7 @@ extern GoalSender* goalSender_ptr;
 
 class DynamicParamSender{
 public:
-    DynamicParamSender(): node_name("/move_base/TebLocalPlannerROS/set_parameters")
+    DynamicParamSender(): node_name("/move_base/DWAPlannerROS/set_parameters")
     {}
 
     void saveDynamicParams(std::string name, double val){
@@ -23,11 +23,15 @@ public:
         double_param.name = name;
         double_param.value = val;
         conf.doubles.push_back(double_param);
+
+        srv_req.config = conf;
+        ros::service::call(node_name.c_str(), srv_req, srv_resp);
+
+        conf.doubles.clear();
+        conf.doubles.resize(0);
     }
     void fixParams(){
         ROS_INFO("send dynamic reconfigure params...");
-        srv_req.config = conf;
-        ros::service::call(node_name.c_str(), srv_req, srv_resp);
     }
 private:
     std::string node_name;
@@ -323,16 +327,17 @@ void process_sload(){
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_SLOAD");
 
     ROS_INFO("stop...");
-    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
-    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
-    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
+    //param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    //param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    //param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    //param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     DynamicParamSender ds;
-    ds.saveDynamicParams("max_vel_theta", 3.0);
-    ds.fixParams();
+    for(int i = 0 ; i < 10 ; ++i)
+        ds.saveDynamicParams("max_trans_vel", 0.1);
+    //ds.fixParams();
 
-    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
+    //ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
     
     ROS_INFO("unlock stop...");
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
