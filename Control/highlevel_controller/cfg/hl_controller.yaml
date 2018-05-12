@@ -11,11 +11,18 @@ hl_controller:
 #  ori_z_goal: [0.1814, 0.992  ,-0.376,93.66  ]
 #  ori_w_goal: [0.9833,  -0.1227,0.9263,-0.0118]
 #  goal_type:  ["crosswalk","skip","parking_near","b"]
-  x_goal:     [23.2,    34.47   ,33.08  ,1.38   ,8.48 ]
-  y_goal:     [39.39,   42.031  ,4.90   ,2.65   ,26.43]
-  ori_z_goal: [0.6563, -0.0447  ,-0.7506,0.6721 ,0.0324]
-  ori_w_goal: [0.7544,  0.9989  ,0.6607 , 0.7403,0.9994]
-  goal_type:  ["normal","nload","b","normal","normal"]
+  # x_goal:     [23.2,    34.47   ,33.08  ,1.38   ,8.48 ]
+  # y_goal:     [39.39,   42.031  ,4.90   ,2.65   ,26.43]
+  # ori_z_goal: [0.6563, -0.0447  ,-0.7506,0.6721 ,0.0324]
+  # ori_w_goal: [0.7544,  0.9989  ,0.6607 , 0.7403,0.9994]
+  # goal_type:  ["normal","nload","b","normal","normal"]
+#teb fake dynamic reconfigure goals
+  x_goal:     [5.094]
+  y_goal:     [4.363]
+  ori_z_goal: [0.0389]
+  ori_w_goal: [0.9992]
+  goal_type:  ["sload","nload","b","normal","normal"]
+
 
 #config controller
   frequency: 20

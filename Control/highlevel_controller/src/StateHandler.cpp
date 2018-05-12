@@ -1,13 +1,41 @@
+#include <ros/ros.h>
+#include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/Reconfigure.h>
+#include <dynamic_reconfigure/Config.h>
 #include "highlevel_controller/StateHandler.h"
 #include "highlevel_controller/base_parameter.h"
 #include "highlevel_controller/goalSender.h"
-#include <ros/ros.h>
 
 #define ABORT_FLAG TRUE
 #define TX_STOP_BRAKE 75
 
+static constexpr double LOAD_STOP_DURATION = 1.0;
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
+
+class DynamicParamSender{
+public:
+    DynamicParamSender(): node_name("/move_base/TebLocalPlannerROS/set_parameters")
+    {}
+
+    void saveDynamicParams(std::string name, double val){
+        ROS_INFO("setting %s to %lf...", name.c_str(), val);
+        double_param.name = name;
+        double_param.value = val;
+        conf.doubles.push_back(double_param);
+    }
+    void fixParams(){
+        ROS_INFO("send dynamic reconfigure params...");
+        srv_req.config = conf;
+        ros::service::call(node_name.c_str(), srv_req, srv_resp);
+    }
+private:
+    std::string node_name;
+    dynamic_reconfigure::ReconfigureRequest srv_req;
+    dynamic_reconfigure::ReconfigureResponse srv_resp;
+    dynamic_reconfigure::DoubleParameter double_param;
+    dynamic_reconfigure::Config conf;
+};
 
 inline void showGoal(double x, double y, double ori_z, double ori_w, const std::string& str){
     ROS_INFO("set new goal : %lf, %lf, %lf, %lf, %s",
@@ -51,6 +79,7 @@ bool handler_setGoal(bool newGoal=false){
 
     return true;
 }
+
 
 void init(){
     ROS_INFO("State Init...");
@@ -289,11 +318,25 @@ void process_uturn(){
 }
 
 void process_sload(){
+
     ROS_INFO("sload start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_SLOAD");
 
-    ros::Rate(1/2.0).sleep();
+    ROS_INFO("stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
+    DynamicParamSender ds;
+    ds.saveDynamicParams("max_vel_theta", 3.0);
+    ds.fixParams();
+
+    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
+    
+    ROS_INFO("unlock stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+    
     param_ptr->nh.setParam("hl_controller/sload_onetime_flag", true);
     ROS_INFO("sload done...");
 }
@@ -302,7 +345,15 @@ void process_nload(){
     ROS_INFO("nlaod start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_NLOAD");
 
-    ros::Rate(1/2.0).sleep();
+    ROS_INFO("stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
+    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
+    
+    ROS_INFO("unlock stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
     
     param_ptr->nh.setParam("hl_controller/nload_onetime_flag", true);
     ROS_INFO("nload done...");
