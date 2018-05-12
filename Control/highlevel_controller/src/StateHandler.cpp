@@ -10,6 +10,7 @@
 #define TX_STOP_BRAKE 75
 
 static constexpr double LOAD_STOP_DURATION = 1.0;
+static constexpr double ABORT_WAIT_DURATION = 3.0;
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
 
@@ -122,7 +123,26 @@ void toward_goal(){
     }
     else if (state == GoalStates::STATE_ABORTED){
 #ifdef ABORT_FLAG
-        ROS_ERROR("ABORTED... IF YOU WANT TO KILL THE PROGRAM, SET THE ABORT FLAG");
+        ROS_ERROR("waiting for 3 seconds...");
+        ros::Rate(1/ABORT_WAIT_DURATION).sleep();
+        
+        ROS_ERROR("waiting for estop mode...");
+        ros::Rate loop_rate(param_ptr->frequency);
+        while(true){
+            int isEstop = 0;
+            param_ptr->nh.getParam("/isEstop", isEstop);
+ROS_INFO("my estop : %d", isEstop);
+            if (isEstop) break;
+            loop_rate.sleep();
+        }
+        ROS_INFO("handling ABORT STATUS end...");
+        ROS_ERROR("SEND NEW GOAL...");
+
+        if (handler_setGoal(true) == false){
+            ROS_INFO("reached all goals!");
+            param_ptr->nh.setParam("hl_controller/reached_goal", true);
+            return;
+        }
 #elif 
         ROS_ERROR("ABORTED... exit the program");
         exit(-1);
