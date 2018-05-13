@@ -1,7 +1,15 @@
 
 ## footprint 값 조정. x와 y의 방향은 차량의 axes와 동일
 #footprint: [[-0.35,-0.60],[1.60,-0.60],[1.60,0.60],[-0.35,0.60]] # 정확한 값
-footprint: [[-0.20,-0.45],[1.45,-0.45],[1.45,0.45],[-0.20,0.45]] # 0.15m 줄인 값(feasibile warning 잡기 위해)
+#footprint: [[-0.23,-0.485],[1.47,-0.485],[1.47,0.485],[-0.23,0.485]] # 0.15m 줄인 값(feasibile warning 잡기 위해)
+
+## 5/13 base_link 위치에 따른 planning, 거동 비교 실험 ##
+footprint: [[-0.30,-0.60],[1.50,-0.60],[1.50,0.60],[-0.30,0.60]] # base_link -> rear-axle (base - lidar = 1.4 m)
+#footprint: [[-0.60,-0.60],[1.20,-0.60],[1.20,0.60],[-0.60,0.60]] # base_link -> 3/4 (base - lidar = 1.1 m)
+#footprint: [[-0.90,-0.60],[0.90,-0.60],[0.90,0.60],[-0.90,0.60]] # base_link -> center (base - lidar = 0.8 m)
+#footprint: [[-1.20,-0.60],[0.60,-0.60],[0.60,0.60],[-1.20,0.60]] # base_link -> 1/4 (base - lidar = 0.5 m)
+#footprint: [[-1.50,-0.60],[0.30,-0.60],[0.30,0.60],[-1.50,0.60]] # base_link -> front-axle (base - lidar = 0.2 m)
+
 
 transform_tolerance: 0.2
 map_type: costmap
