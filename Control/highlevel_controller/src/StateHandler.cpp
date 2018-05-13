@@ -25,11 +25,12 @@ public:
         double_param.name = name;
         double_param.value = val;
         conf.doubles.emplace_back(double_param);
-    }
-    void fixParams(){
+
         srv_req.config = conf;
         ros::service::call(node_name.c_str(), srv_req, srv_resp);
-        ROS_INFO("send dynamic reconfigure params...");
+
+        conf.doubles.clear();
+        conf.doubles.resize(0);
     }
 private:
     std::string node_name;
@@ -255,18 +256,19 @@ void process_parking(){
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
     
     DynamicParamSender ds;
-    ds.saveDynamicParams("max_vel_x", 5.0);
-    ds.saveDynamicParams("max_vel_x", 5.0);
-    ds.fixParams();
-    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
+    ds.saveDynamicParams("max_vel_x", -3.0);
+    ds.saveDynamicParams("min_vel_x", -2.0);    
+    //ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
     
     ROS_INFO("unlock stop...");
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
 
     waitUntilReach();
+
+    ds.saveDynamicParams("max_vel_x", 8.0);
+    ds.saveDynamicParams("min_vel_x", 7.0);
     
     //reload default params
-    ds.saveDynamicParams("max_vel_x", 5.0);
     ds.saveDynamicParams("max_vel_x", 5.0);
 
     ROS_INFO("to the backing point...");
@@ -294,11 +296,18 @@ void process_uturn(){
 //
     ////erase tx_control_static flag
     //param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+    ROS_INFO("change move_base params...");
+    DynamicParamSender ds;
+    ds.saveDynamicParams("acc_lim_x", 5.5);
 
     waitUntilReach();
 
+    ROS_INFO("reload pre-move_base params...");
+    ds.saveDynamicParams("acc_lim_x", 3.5);
+
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/uturn_onetime_flag",true);
+
 
     ROS_INFO("uturn done");
 }
@@ -315,21 +324,12 @@ void process_sload(){
     param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
     ROS_INFO("change move_base params...");
-    DynamicParamSender ds;
-    ds.saveDynamicParams("max_vel_x", 5.0);
-    ds.saveDynamicParams("max_vel_x", 5.0);
-    ds.fixParams();
-    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
     
     ROS_INFO("unlock stop...");
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
 
     waitUntilReach();
-    
-    //reload default params
-    ds.saveDynamicParams("max_vel_x", 5.0);
-    ds.saveDynamicParams("max_vel_x", 5.0);
-    
+     
     param_ptr->nh.setParam("hl_controller/sload_onetime_flag", true);
     ROS_INFO("sload done...");
 }
