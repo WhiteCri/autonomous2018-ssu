@@ -38,7 +38,7 @@ bool Process_movingobj_to_toward_goal::timedCheck(HybridAutomata *HA){
 /* parking */
 bool Toward_goal_to_process_parking::timedCheck(HybridAutomata* HA){
     bool ret = true;
-    ret &= (param_ptr->parking_near | param_ptr->parking_far);
+    ret &= param_ptr->parking;
     if (param_ptr->use_parking_onetime_flag)
         ret &= !param_ptr->parking_onetime_flag;
 

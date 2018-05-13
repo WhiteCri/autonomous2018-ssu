@@ -19,12 +19,10 @@ const std::vector<std::string> MOVING_STATUES{
     "normal",
     "crosswalk",
     "movingobj",
-    "parking_near",
-    "parking_far",
+    "parking",
     "uturn",
     "nload",
     "sload",
-    "b",
     "skip"
 };
 
@@ -68,33 +66,13 @@ public:
     bool movingobj_onetime_flag;
 
     /* parking parameter */
-    bool parking_near;
-    bool parking_far;
+    bool parking;
     bool use_process_parking;
     bool use_parking_onetime_flag;
 
     double parking_check_duration;
     double parking_stop_duration;
     bool parking_onetime_flag;
-
-    //goalpoint members    
-    double parking_near_arrive_point_x;
-    double parking_near_arrive_point_y;
-    double parking_near_arrive_point_ori_z;
-    double parking_near_arrive_point_ori_w;
-    double parking_near_back_point_x;
-    double parking_near_back_point_y;
-    double parking_near_back_point_ori_z;
-    double parking_near_back_point_ori_w;
-    
-    double parking_far_arrive_point_x;
-    double parking_far_arrive_point_y;
-    double parking_far_arrive_point_ori_z;
-    double parking_far_arrive_point_ori_w;
-    double parking_far_back_point_x;
-    double parking_far_back_point_y;
-    double parking_far_back_point_ori_z;
-    double parking_far_back_point_ori_w;
 
     /* uturn members */
     bool uturn;
@@ -140,8 +118,7 @@ public:
         nh.getParam("hl_controller/crosswalk_onetime_flag", crosswalk_onetime_flag);
         nh.getParam("hl_controller/movingobj",              movingobj);
         nh.getParam("hl_controller/movingobj_onetime_flag", movingobj_onetime_flag);
-        nh.getParam("hl_controller/parking_near",           parking_near);
-        nh.getParam("hl_controller/parking_far",            parking_far);
+        nh.getParam("hl_controller/parking",           parking);
         nh.getParam("hl_controller/parking_onetime_flag",   parking_onetime_flag);
         nh.getParam("hl_controller/uturn",                  uturn);
         nh.getParam("hl_controller/uturn_onetime_flag",     uturn_onetime_flag);
@@ -162,8 +139,7 @@ public:
             msg.seq = seq++;
             msg.crosswalk = crosswalk;
             msg.movingobj = movingobj;
-            msg.parking_near = parking_near;
-            msg.parking_far = parking_far;
+            msg.parking = parking;
             msg.recovery = recovery;
             msg.uturn = uturn;
             msg.sload = sload;

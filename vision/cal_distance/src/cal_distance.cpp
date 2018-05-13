@@ -87,44 +87,27 @@ public:
     }
 
     Pos pixel_to_real(const Pos& pos){
-      int idx_x = -1, idx_y = -1;
-      //find upper y (in pixel coordinate)
-      for(size_t i = 0 ; i < fileVec.size(); ++i){
-        if (fileVec[i][0].y > pos.y) {
-          idx_y = i;
-          break;
-        }
+      Pos idx;
 
-      }
-      // exception handling
-      if (idx_y <= 0) return Pos(0,0);
+      idx = find_idx(pos);
 
-
-      //find upper x (in pixel coordinate)
-     for(size_t i = 0 ; i < fileVec[0].size(); ++i){
-        if (fileVec[idx_y][i].x > pos.x) {
-          idx_x = i;
-          break;
-        }
-      }
-
-      if (idx_x <= 0) return Pos(0,0);
-
+      if (idx.x <= 0) return Pos(0,0);
+      if (idx.y <= 0) return Pos(0,0);
       // //to avoid divide by zero, throw away when hlines.slope == 0
-      if ((hlines[idx_y].slope == 0) || (hlines[idx_y-1].slope == 0)) return Pos(0,0);
+      if ((hlines[idx.y].slope == 0) || (hlines[idx.y-1].slope == 0)) return Pos(0,0);
 
       // calc top-left coordinate
-      Pos real_dr = realVec[idx_y][idx_x];
+      Pos real_dr = realVec[idx.y][idx.x];
 
       // 타겟 지점부터 상하좌우 직선 좌표차
       double up, down, right, left;
-      up   = abs( pos.y - ( hlines[idx_y - 1].slope * pos.x + hlines[idx_y-1].intercept ) );
-      down = abs( pos.y - ( hlines[idx_y].slope  * pos.x + hlines[idx_y].intercept ) );
+      up   = abs( pos.y - ( hlines[idx.y - 1].slope * pos.x + hlines[idx.y-1].intercept ) );
+      down = abs( pos.y - ( hlines[idx.y].slope  * pos.x + hlines[idx.y].intercept ) );
 
-      right = abs( pos.x - ( pos.y - vlines[idx_x].intercept) / vlines[idx_x].slope ); // 1
+      right = abs( pos.x - ( pos.y - vlines[idx.x].intercept) / vlines[idx.x].slope ); // 1
 
       // px - ( py - b) / a
-      left = abs( pos.x -  ( pos.y - vlines[idx_x - 1].intercept ) / vlines[idx_x - 1].slope); // 0
+      left = abs( pos.x -  ( pos.y - vlines[idx.x - 1].intercept ) / vlines[idx.x - 1].slope); // 0
 
       Pos distance( real_dr.x+  0.5 * down / ( up + down ), real_dr.y + 0.5 * right / ( left + right ) );
       return distance;

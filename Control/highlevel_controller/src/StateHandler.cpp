@@ -1,13 +1,42 @@
+#include <ros/ros.h>
+#include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/Reconfigure.h>
+#include <dynamic_reconfigure/Config.h>
 #include "highlevel_controller/StateHandler.h"
 #include "highlevel_controller/base_parameter.h"
 #include "highlevel_controller/goalSender.h"
-#include <ros/ros.h>
 
 #define ABORT_FLAG TRUE
 #define TX_STOP_BRAKE 75
-
+#define SUCCEEDED_BUG_RESOLVE_TIME 0.5
+static constexpr double LOAD_STOP_DURATION = 1.0;
+static constexpr double ABORT_WAIT_DURATION = 3.0;
 extern Parameters* param_ptr;
 extern GoalSender* goalSender_ptr;
+
+class DynamicParamSender{
+public:
+    DynamicParamSender(): node_name("/move_base/DWAPlannerROS/set_parameters")
+    {}
+
+    void saveDynamicParams(std::string name, double val){
+        ROS_INFO("setting %s to %lf...", name.c_str(), val);
+        dynamic_reconfigure::DoubleParameter double_param;
+        double_param.name = name;
+        double_param.value = val;
+        conf.doubles.emplace_back(double_param);
+    }
+    void fixParams(){
+        srv_req.config = conf;
+        ros::service::call(node_name.c_str(), srv_req, srv_resp);
+        ROS_INFO("send dynamic reconfigure params...");
+    }
+private:
+    std::string node_name;
+    dynamic_reconfigure::ReconfigureRequest srv_req;
+    dynamic_reconfigure::ReconfigureResponse srv_resp;
+    dynamic_reconfigure::Config conf;
+};
 
 inline void showGoal(double x, double y, double ori_z, double ori_w, const std::string& str){
     ROS_INFO("set new goal : %lf, %lf, %lf, %lf, %s",
@@ -15,6 +44,10 @@ inline void showGoal(double x, double y, double ori_z, double ori_w, const std::
 }
 
 bool handler_setGoal(bool newGoal=false){
+    //if already all goals has been done, return false.
+    if ((param_ptr->x_goal.size()==0)||(param_ptr->y_goal.size()==0)||(param_ptr->ori_z_goal.size()==0)
+            ||(param_ptr->ori_w_goal.size()==0)||(param_ptr->goal_type.size()==0)) return false;
+
     //if new goal, pop
     if (newGoal){
         param_ptr->x_goal.pop_back();
@@ -52,6 +85,24 @@ bool handler_setGoal(bool newGoal=false){
     return true;
 }
 
+static void waitUntilReach(){
+    while(true){
+        auto state = goalSender_ptr->getState();
+        if (state == GoalSender::GoalStates::STATE_SUCCEEDED){
+            ROS_INFO("SUCCEEDED...");
+            if (handler_setGoal(true) == false){
+                ROS_INFO("reached all goals!");
+                param_ptr->nh.setParam("hl_controller/reached_goal", true);
+                return;
+            }
+            ros::Rate(1).sleep();
+            ROS_INFO("success end!");
+            break;
+        }
+    }
+}
+
+
 void init(){
     ROS_INFO("State Init...");
     param_ptr->nh.setParam("hl_controller/curState","INIT");
@@ -72,7 +123,7 @@ void toward_goal(){
             param_ptr->nh.setParam("hl_controller/reached_goal", true);
             return;
         }
-        ros::Rate(1).sleep();
+        ros::Rate((double)1/SUCCEEDED_BUG_RESOLVE_TIME).sleep();
         ROS_INFO("success end!");
     }
     else if (state == GoalStates::STATE_LOST){
@@ -89,7 +140,26 @@ void toward_goal(){
     }
     else if (state == GoalStates::STATE_ABORTED){
 #ifdef ABORT_FLAG
-        ROS_ERROR("ABORTED... IF YOU WANT TO KILL THE PROGRAM, SET THE ABORT FLAG");
+        ROS_ERROR("waiting for 3 seconds...");
+        ros::Rate(1/ABORT_WAIT_DURATION).sleep();
+        
+        ROS_ERROR("waiting for estop mode...");
+        ros::Rate loop_rate(param_ptr->frequency);
+        while(true){
+            int isEstop = 0;
+            param_ptr->nh.getParam("/isEstop", isEstop);
+ROS_INFO("my estop : %d", isEstop);
+            if (isEstop) break;
+            loop_rate.sleep();
+        }
+        ROS_INFO("handling ABORT STATUS end...");
+        ROS_ERROR("SEND NEW GOAL...");
+
+        if (handler_setGoal(true) == false){
+            ROS_INFO("reached all goals!");
+            param_ptr->nh.setParam("hl_controller/reached_goal", true);
+            return;
+        }
 #elif 
         ROS_ERROR("ABORTED... exit the program");
         exit(-1);
@@ -157,73 +227,18 @@ void process_movingobj(){
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/movingobj_onetime_flag",true);
 
-    while(param_ptr->movingobj){
-        param_ptr->nh.getParam("hl_controller/movingobj", param_ptr->movingobj);
-        ROS_INFO("wait for hl_controller/movingobj to be false...");
-        ros::Rate(1).sleep();
-    }
+    //we decided to use global map, so we don't use this...
+    //while(param_ptr->movingobj){
+    //    param_ptr->nh.getParam("hl_controller/movingobj", param_ptr->movingobj);
+    //    ROS_INFO("wait for hl_controller/movingobj to be false...");
+    //    ros::Rate(1).sleep();
+    //}
     ROS_INFO("movingobj done");
     param_ptr->load_param();
 }
 
 void process_parking(){
     ROS_INFO("process parking start");
-
-    ROS_INFO("finding parking point...");
-    double parking_point_x;
-    double parking_point_y;
-    double parking_point_ori_z;
-    double parking_point_ori_w;
-    double backing_point_x;
-    double backing_point_y;
-    double backing_point_ori_z;
-    double backing_point_ori_w;
-    /* 
-        I haven't find the solution to select the goal. So temporarily, just select the near goal.
-        this code should be modified until the contest
-    */
-    if (param_ptr->parking_near){
-        parking_point_x      = param_ptr->parking_near_arrive_point_x;
-        parking_point_y      = param_ptr->parking_near_arrive_point_y;
-        parking_point_ori_z  = param_ptr->parking_near_arrive_point_ori_z;
-        parking_point_ori_w  = param_ptr->parking_near_arrive_point_ori_w;
-        backing_point_x      = param_ptr->parking_near_back_point_x;
-        backing_point_y      = param_ptr->parking_near_back_point_y;
-        backing_point_ori_z  = param_ptr->parking_near_back_point_ori_z;
-        backing_point_ori_w  = param_ptr->parking_near_back_point_ori_w;
-        ROS_INFO("set near point as a goal...");
-        param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING_NEAR");
-    } else{
-        parking_point_x      = param_ptr->parking_far_arrive_point_x;
-        parking_point_y      = param_ptr->parking_far_arrive_point_y;
-        parking_point_ori_z  = param_ptr->parking_far_back_point_ori_z;
-        parking_point_ori_w  = param_ptr->parking_far_back_point_ori_w;
-        backing_point_x      = param_ptr->parking_far_back_point_x;
-        backing_point_y      = param_ptr->parking_far_back_point_y;
-        backing_point_ori_z  = param_ptr->parking_far_back_point_ori_z;
-        backing_point_ori_w  = param_ptr->parking_far_back_point_ori_w;
-        ROS_INFO("set far point as a goal...");
-        param_ptr->nh.setParam("hl_controller/curState","PROCESS_PARKING_NEAR");
-    }
-    //set goal to parking point
-    ROS_INFO("to the parking point...");
-    goalSender_ptr->setGoal(
-        parking_point_x,
-        parking_point_y,
-        parking_point_ori_z,
-        parking_point_ori_w,
-        "parking"
-    );
-    goalSender_ptr->sendGoal();
-
-    //wait until arrive.
-    while(true){
-        auto state = goalSender_ptr->getState();
-        if (state == GoalSender::GoalStates::STATE_SUCCEEDED) break;
-        ros::Rate(param_ptr->frequency).sleep();
-        ROS_INFO("parking point has not been arrived...");
-    }
-    ROS_INFO("Arrived parking point...");
 
     //take car to stop
     ROS_INFO("stop...");
@@ -238,25 +253,23 @@ void process_parking(){
     //set goal to backing point
     ROS_INFO("set tx_stop false");
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+    
+    DynamicParamSender ds;
+    ds.saveDynamicParams("max_vel_x", 5.0);
+    ds.saveDynamicParams("max_vel_x", 5.0);
+    ds.fixParams();
+    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
+    
+    ROS_INFO("unlock stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+
+    waitUntilReach();
+    
+    //reload default params
+    ds.saveDynamicParams("max_vel_x", 5.0);
+    ds.saveDynamicParams("max_vel_x", 5.0);
 
     ROS_INFO("to the backing point...");
-    goalSender_ptr->setGoal(
-        backing_point_x,
-        backing_point_y,
-        backing_point_ori_z,
-        backing_point_ori_w,
-        "parking"
-    );
-    goalSender_ptr->sendGoal();
-
-    //wait until arrive.
-    while(true){
-        auto state = goalSender_ptr->getState();
-        if (state == GoalSender::GoalStates::STATE_SUCCEEDED) break;
-        ros::Rate(param_ptr->frequency).sleep();
-        ROS_INFO("backing point has not been arrived...");
-    }
-    ROS_INFO("Arrived backing point...");
 
     param_ptr->nh.setParam("hl_controller/parking_onetime_flag",true);
 }
@@ -268,19 +281,21 @@ void process_uturn(){
     double uturn_duration = param_ptr->uturn_duration;
 
     //set tx_control_static
-    ROS_INFO("set tx_control value - speed : %d, steer : %d, brake : %d", 
-        param_ptr->uturn_tx_speed, param_ptr->uturn_tx_steer, param_ptr->uturn_tx_brake);
-    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
-    param_ptr->nh.setParam("hl_controller/tx_speed", param_ptr->uturn_tx_speed);
-    param_ptr->nh.setParam("hl_controller/tx_steer", param_ptr->uturn_tx_steer);
-    param_ptr->nh.setParam("hl_controller/tx_brake", param_ptr->uturn_tx_brake);
+    //ROS_INFO("set tx_control value - speed : %d, steer : %d, brake : %d", 
+    //    param_ptr->uturn_tx_speed, param_ptr->uturn_tx_steer, param_ptr->uturn_tx_brake);
+    //param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    //param_ptr->nh.setParam("hl_controller/tx_speed", param_ptr->uturn_tx_speed);
+    //param_ptr->nh.setParam("hl_controller/tx_steer", param_ptr->uturn_tx_steer);
+    //param_ptr->nh.setParam("hl_controller/tx_brake", param_ptr->uturn_tx_brake);
+//
+    ////wait until duration ends
+    //ROS_INFO("maintaing for %lf seconds...", param_ptr->uturn_duration);
+    //ros::Rate(1/param_ptr->uturn_duration).sleep();
+//
+    ////erase tx_control_static flag
+    //param_ptr->nh.setParam("hl_controller/tx_control_static", false);
 
-    //wait until duration ends
-    ROS_INFO("maintaing for %lf seconds...", param_ptr->uturn_duration);
-    ros::Rate(1/param_ptr->uturn_duration).sleep();
-
-    //erase tx_control_static flag
-    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+    waitUntilReach();
 
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/uturn_onetime_flag",true);
@@ -289,11 +304,32 @@ void process_uturn(){
 }
 
 void process_sload(){
+
     ROS_INFO("sload start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_SLOAD");
 
-    ros::Rate(1/2.0).sleep();
+    ROS_INFO("stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
+    ROS_INFO("change move_base params...");
+    DynamicParamSender ds;
+    ds.saveDynamicParams("max_vel_x", 5.0);
+    ds.saveDynamicParams("max_vel_x", 5.0);
+    ds.fixParams();
+    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
+    
+    ROS_INFO("unlock stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+
+    waitUntilReach();
+    
+    //reload default params
+    ds.saveDynamicParams("max_vel_x", 5.0);
+    ds.saveDynamicParams("max_vel_x", 5.0);
+    
     param_ptr->nh.setParam("hl_controller/sload_onetime_flag", true);
     ROS_INFO("sload done...");
 }
@@ -302,7 +338,15 @@ void process_nload(){
     ROS_INFO("nlaod start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_NLOAD");
 
-    ros::Rate(1/2.0).sleep();
+    ROS_INFO("stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
+    ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
+    
+    ROS_INFO("unlock stop...");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
     
     param_ptr->nh.setParam("hl_controller/nload_onetime_flag", true);
     ROS_INFO("nload done...");

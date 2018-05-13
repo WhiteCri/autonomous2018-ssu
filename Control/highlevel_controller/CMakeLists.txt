@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   actionlib
   actionlib_msgs
+  dynamic_reconfigure
 )
 
 add_message_files(FILES

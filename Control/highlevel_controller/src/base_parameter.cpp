@@ -74,8 +74,7 @@ Parameters::Parameters(){
 
 
     /* parking parameter */
-    nh.param("hl_controller/parking_near", parking_near, false);
-    nh.param("hl_controller/parking_far", parking_far, false);  
+    nh.param("hl_controller/parking", parking, false); 
     nh.param("hl_controller/parking_check_duration", parking_check_duration, 1.0);
     nh.param("hl_controller/use_process_parking", use_process_parking, true);
     nh.param("hl_controller/use_parking_onetime_flag", use_parking_onetime_flag, true);
@@ -94,25 +93,6 @@ Parameters::Parameters(){
     nh.param("hl_controller/use_process_nload", use_process_nload, false);
     nh.param("hl_controller/use_nload_onetime_flag", use_nload_onetime_flag, true);
     nh.param("hl_controller/nload_onetime_flag", nload_onetime_flag, false);
-
-    //goalpoint members    
-    nh.param("hl_controller/parking_near_arrive_point_x",       parking_near_arrive_point_x, -200.0);  
-    nh.param("hl_controller/parking_near_arrive_point_y",       parking_near_arrive_point_y, -200.0);
-    nh.param("hl_controller/parking_near_arrive_point_ori_z",   parking_near_arrive_point_ori_z, 0.0);  
-    nh.param("hl_controller/parking_near_arrive_point_ori_w",   parking_near_arrive_point_ori_w, 0.0);
-    nh.param("hl_controller/parking_near_back_point_x",         parking_near_back_point_x, -200.0);
-    nh.param("hl_controller/parking_near_back_point_y",         parking_near_back_point_y, -200.0);
-    nh.param("hl_controller/parking_near_back_point_ori_z",     parking_near_back_point_ori_z, 0.0);
-    nh.param("hl_controller/parking_near_back_point_ori_w",     parking_near_back_point_ori_w, 0.0);
-
-    nh.param("hl_controller/parking_far_arrive_point_x",       parking_far_arrive_point_x, -200.0);  
-    nh.param("hl_controller/parking_far_arrive_point_y",       parking_far_arrive_point_y, -200.0);
-    nh.param("hl_controller/parking_far_arrive_point_ori_z",   parking_far_arrive_point_ori_z, 0.0);  
-    nh.param("hl_controller/parking_far_arrive_point_ori_w",   parking_far_arrive_point_ori_w, 0.0);
-    nh.param("hl_controller/parking_far_back_point_x",         parking_far_back_point_x, -200.0);
-    nh.param("hl_controller/parking_far_back_point_y",         parking_far_back_point_y, -200.0);
-    nh.param("hl_controller/parking_far_back_point_ori_z",     parking_far_back_point_ori_z, 0.0);
-    nh.param("hl_controller/parking_far_back_point_ori_w",     parking_far_back_point_ori_w, 0.0);
 
     /* recovery members */
     nh.param("hl_controller/recovery", recovery, false);
