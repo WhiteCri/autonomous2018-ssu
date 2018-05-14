@@ -62,8 +62,10 @@ namespace lane_detect_algo
             void detectYHSVcolor(const cv::Mat& src, cv::Mat& dst, double minHue, double maxHue, double minSat, double maxSat, double minVal, double maxVal);
             void detectWHSVcolor(const cv::Mat& src, cv::Mat& dst, double minHue, double maxHue, double minSat, double maxSat, double minVal, double maxVal);
             void detectWhiteLane(cv::Mat src, cv::Mat& dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax, int amin, int amax);
-            void birdEyeView(cv::Mat src, cv::Mat& dst);
-            void inverseBirdEyeView(cv::Mat src, cv::Mat& dst);
+            void birdEyeView_left(cv::Mat src, cv::Mat& dst);
+            void inverseBirdEyeView_left(cv::Mat src, cv::Mat& dst);
+            void birdEyeView_right(cv::Mat src, cv::Mat& dst);
+            void inverseBirdEyeView_right(cv::Mat src, cv::Mat& dst);
             void makeYProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result);
             void makeXProjection(cv::Mat src, cv::Mat dst, unsigned int* H_result);
             void medianForXHistogram(unsigned int* H_result, int H_result_size);
