@@ -138,12 +138,21 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         lane_detect_algo::CalLane callane;
                         cv::Mat bev = frame.clone();
                         cv::Mat bev_test = frame.clone();
-                        if(debug)cv::imshow("bev_test",bev_test);
-                        callane.birdEyeView(frame,bev);
-                        if(debug)cv::imshow("mybev",bev);
+                  
+                        if(groupName == "left"){
+                                callane.birdEyeView_left(frame,bev);
+                        } else if ( groupName == "right"){
+                                callane.birdEyeView_right(frame,bev);
+                        }
+                       // if(debug)cv::imshow("mybev",bev);
                         cv::Mat in_bev_test = bev.clone();
-                        callane.inverseBirdEyeView(bev,in_bev_test);
-                        if(debug)cv::imshow("myinbev",in_bev_test);
+                        
+                        if(groupName == "left"){
+                                callane.inverseBirdEyeView_left(bev,in_bev_test);
+                        } else if ( groupName == "right"){
+                                callane.inverseBirdEyeView_right(bev,in_bev_test);
+                        }
+                     
 
                         if (track_bar) {
                                 callane.detectYHSVcolor(bev, yellow_hsv, y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax);
@@ -156,7 +165,25 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 callane.detectWhiteLane(bev, white_hsv, 0, 180, 0, 29, 179, 255,0,0);
                         }
 
-
+                //         std::vector<cv::Vec4i> lines_white;
+                //         std::vector<cv::Vec4i>::iterator it_white;
+                //         cv::Mat hough_white = white_hsv.clone();
+                //         cv::Mat hough_white_color = bev.clone();
+                //         cv::HoughLinesP(hough_white, lines_white, 1, CV_PI / 180.0, 80, 80, 5);
+                //         float ladian_w;
+                //         int degree_w;
+                //         if(!lines_white.empty()){
+                //         it_white = lines_white.end() - 1;
+                //         ladian_w = atan2f((*it_white)[3] - (*it_white)[1], (*it_white)[2] - (*it_white)[0]);
+                //         degree_w = ladian_w * 180 / CV_PI;
+                //         if(abs(degree_w)>=90 && abs(degree_w)<=130) {
+                //                cv::line(hough_white_color, cv::Point((*it_white)[0], (*it_white)[1]),
+                //                           cv::Point((*it_white)[2], (*it_white)[3] ),
+                //                           cv::Scalar(255,0, 0 ), 3, 0);
+                //         }
+                //         if(!debug)cv::imshow("dddd",hough_white_color);
+                //         }
+                        
                         cv::Mat yellowYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat whiteYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat yellowXProj(cv::Size(frame_width, frame_height), CV_8UC1);
@@ -180,11 +207,13 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                         crosswalk_check = 0;
                                 }
                         }
-                   //             callane.makeContoursLeftLane(yellow_hsv, yellow_labeling); //for labeling(source channel is 1)
-                   yellow_labeling = yellow_hsv.clone();
+                                callane.makeContoursLeftLane(yellow_hsv, yellow_labeling); //for labeling(source channel is 1)
+                   
                      //   if(!lable) {
-                              //  callane.makeContoursRightLane(white_hsv, white_labeling); //for labeling(source channel is 1)
-                       white_labeling = white_hsv.clone();
+                               int crosswalk_check = 0;
+                                int *crosswalk = &crosswalk_check;
+                                callane.makeContoursRightLane(white_hsv, white_labeling, crosswalk); //for labeling(source channel is 1)
+                    
                        // }
 
                         if(time_check) {
@@ -192,13 +221,44 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 int64 elapsed = (cv::getTickCount() - start);
                                 std::cout << "Elapsed time " << elapsed << std::endl;
                         }
+                        cv::Mat zero_mask = cv::Mat(cv::Size(yellow_labeling.cols, yellow_labeling.rows), yellow_labeling.type(),cv::Scalar::all(255));
+                        
+                        for(int y = zero_mask.rows-1; y>=0; y--) {
+                        //        uchar* zero_mask_origin_size_data = zero_mask_origin_size.ptr<uchar>(y);
+                                if(y<zero_mask.rows - 130){
+                                        break;
+                                }
+                                uchar* zero_mask_data = zero_mask.ptr<uchar>(y); //resize 복구(0.5 -> 1))
+                                for(int x = 0; x<zero_mask.cols; x++) {
+                                       // int temp = x*0.5; //resize 복구(0.5 -> 1)
+                                        if(x>130 && x<zero_mask.cols-130 ) {
+                                                zero_mask_data[x*zero_mask.channels()] = (uchar)0;              
+                                        }
+                                }
+                         }
+                         
                         laneColor = yellow_labeling | white_labeling;
-
+                        if(!debug)cv::imshow("zero_mask_before",laneColor);
+                      //  laneColor = yellow_labeling  & white_labeling;
+                      //  if(!debug)cv::imshow("zero_mask_after",laneColor);
                         cv::Mat inv_bev = frame.clone(); //color inverse bev //do not delete
-                        callane.inverseBirdEyeView(bev, inv_bev);
+                        if(debug)cv::imshow("orgin_test",frame);
+                        if(debug)cv::imshow("bev_test",bev);
+                        if(groupName=="left"){
+                               callane.inverseBirdEyeView_left(bev, inv_bev);
+                        }else{
+                               callane.inverseBirdEyeView_right(bev, inv_bev);
+                        }
+                        
+                        if(!debug)cv::imshow("inv_bev_test_____",inv_bev);
                         cv::Mat newlane = frame.clone();
-                        callane.inverseBirdEyeView(laneColor, newlane);
-                        if(debug) cv::imshow("inverseBirdEye", newlane);
+                        if(groupName=="left"){
+                                callane.inverseBirdEyeView_left(laneColor, newlane);
+                        }else{
+                                callane.inverseBirdEyeView_right(laneColor, newlane);
+                        }
+                        
+                        if(debug) cv::imshow("inverseBirdEye___newlane", newlane);
                         if(imshow) {
                                 cv::imshow("inverseBirdEye", newlane);
                         }
@@ -240,14 +300,14 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 if(abs(first_y-second_y)<5){
                                         if(abs(first_x-second_x)<500){//m/pixel 알아내서 정확한 차선폭을 60대신 쓰기
                                                 second_x = first_x + 500;
-                                                cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
+                                                if(debug)cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
                                         }
                                         else{
-                                                cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
+                                                if(debug)cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
                                         }
                                         }
 
-                               cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
+                               if(debug)cv::line(output_origin,cv::Point(first_x,first_y),cv::Point(second_x,second_y),cv::Scalar(255,0,0),3);
                         }
 
                         std::vector<cv::Vec4i> lines;

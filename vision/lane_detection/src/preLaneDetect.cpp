@@ -522,7 +522,7 @@ namespace lane_detect_algo{
 
 
             }
-            void CalLane::birdEyeView(cv::Mat src, cv::Mat& dst) {
+            void CalLane::birdEyeView_left(cv::Mat src, cv::Mat& dst) {
 
                 //0507
                 //cv::imshow("test_my_bev_src",src);
@@ -539,15 +539,30 @@ namespace lane_detect_algo{
 
                 // The 4 points that select quadilateral on the input , from top-left in clockwise order
                 // These four pts are the sides of the rect box used as input
-                inputQuad[0] = cv::Point2f(120, 44);//point 예외처리 추가
-                inputQuad[1] = cv::Point2f(220, 44);//point 예외처리 추가
-                inputQuad[2] = cv::Point2f(4, 220);
-                inputQuad[3] = cv::Point2f(320, 220);
+               
+                ///////// /*right bev*/ //////////
+                inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows-1);
+                inputQuad[3] = cv::Point2f(-30, dst.rows-1);
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
-                outputQuad[0] = cv::Point2f(0, 24);
-                outputQuad[1] = cv::Point2f(320-1, 24);
-                outputQuad[2] = cv::Point2f(4+100, 200);
-                outputQuad[3] = cv::Point2f(320-100, 200);
+                outputQuad[0] = cv::Point2f(0, 0);
+                outputQuad[1] = cv::Point2f(dst.cols+50, 0);
+                outputQuad[2] = cv::Point2f(dst.cols*0.5, dst.rows - 1);
+                outputQuad[3] = cv::Point2f(dst.cols*0.1, dst.rows - 1);
+                ///////// /*right bev*/ //////////
+                
+                ///////// /*left bev*/ //////////
+                // inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                // inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                // inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows-1);
+                // inputQuad[3] = cv::Point2f(-30, dst.rows);
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 0);
+                // outputQuad[1] = cv::Point2f(dst.cols - 1, 0);
+                // outputQuad[2] = cv::Point2f(dst.cols*0.8, dst.rows - 1);
+                // outputQuad[3] = cv::Point2f(dst.cols*0.4, dst.rows - 1);
+                ///////// /*left bev*/ //////////
                 /*left*/
                 // inputQuad[0] = cv::Point2f(195, 84);//point 예외처리 추가
                 // inputQuad[1] = cv::Point2f(245, 84);//point 예외처리 추가
@@ -587,8 +602,10 @@ namespace lane_detect_algo{
                 warpPerspective(src, dst, lambda, dst.size());
 
                 }
-            void CalLane::inverseBirdEyeView(cv::Mat src, cv::Mat& dst) {
+            void CalLane::birdEyeView_right(cv::Mat src, cv::Mat& dst) {
 
+                //0507
+                //cv::imshow("test_my_bev_src",src);
                 // Input Quadilateral or Image plane coordinates
                 cv::Point2f inputQuad[4];
                 // Output Quadilateral or World plane coordinates
@@ -598,16 +615,108 @@ namespace lane_detect_algo{
                 cv::Mat lambda(2, 4, CV_32FC1);
 
                 // Set the lambda matrix the same type and size as input
-                lambda = cv::Mat::zeros(src.rows, src.cols, src.type());
-                inputQuad[0] = cv::Point2f(120, 44);//point 예외처리 추가
-                inputQuad[1] = cv::Point2f(220, 44);//point 예외처리 추가
-                inputQuad[2] = cv::Point2f(4, 220);
-                inputQuad[3] = cv::Point2f(320, 220);
+                lambda = cv::Mat::zeros(dst.rows, dst.cols, dst.type());
+
+                // The 4 points that select quadilateral on the input , from top-left in clockwise order
+                // These four pts are the sides of the rect box used as input
+               
+                ///////// /*right bev*/ //////////
+                // inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                // inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                // inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows-1);
+                // inputQuad[3] = cv::Point2f(-30, dst.rows-1);
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 0);
+                // outputQuad[1] = cv::Point2f(dst.cols+50, 0);
+                // outputQuad[2] = cv::Point2f(dst.cols*0.5, dst.rows - 1);
+                // outputQuad[3] = cv::Point2f(dst.cols*0.1, dst.rows - 1);
+                ///////// /*right bev*/ //////////
+                
+                ///////// /*left bev*/ //////////
+                inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows-1);
+                inputQuad[3] = cv::Point2f(-30, dst.rows);
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
-                outputQuad[0] = cv::Point2f(0, 24);
-                outputQuad[1] = cv::Point2f(320-1, 24);
-                outputQuad[2] = cv::Point2f(4+100, 200);
-                outputQuad[3] = cv::Point2f(320-100, 200);
+                outputQuad[0] = cv::Point2f(0, 0);
+                outputQuad[1] = cv::Point2f(dst.cols - 1, 0);
+                outputQuad[2] = cv::Point2f(dst.cols*0.8, dst.rows - 1);
+                outputQuad[3] = cv::Point2f(dst.cols*0.4, dst.rows - 1);
+                ///////// /*left bev*/ //////////
+                /*left*/
+                // inputQuad[0] = cv::Point2f(195, 84);//point 예외처리 추가
+                // inputQuad[1] = cv::Point2f(245, 84);//point 예외처리 추가
+                // inputQuad[2] = cv::Point2f(14, 188);
+                // inputQuad[3] = cv::Point2f(270, 188);
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 84);
+                // outputQuad[1] = cv::Point2f(245-100, 84);
+                // outputQuad[2] = cv::Point2f(14+100, 188);
+                // outputQuad[3] = cv::Point2f(270+50, 188);
+
+                // inputQuad[0] = cv::Point2f(100, 49);
+                // inputQuad[1] = cv::Point2f(src.cols-100, 49);
+                // inputQuad[2] = cv::Point2f(2,190);
+                // inputQuad[3] = cv::Point2f(340, 190);
+                // double w1 = sqrt(pow(inputQuad[2].x - inputQuad[3].x,2)
+                //                 +pow(inputQuad[2].y - inputQuad[3].y,2));
+                // double w2 = sqrt(pow(inputQuad[1].x - inputQuad[0].x,2)
+                //                 +pow(inputQuad[1].y - inputQuad[0].y,2));
+                // double h1 = sqrt(pow(inputQuad[1].x - inputQuad[2].x,2)
+                //                 +pow(inputQuad[1].y - inputQuad[2].y,2));
+                // double h2 = sqrt(pow(inputQuad[0].x - inputQuad[3].x,2)
+                //                 +pow(inputQuad[0].y - inputQuad[3].y,2));
+
+                // double maxW = (w1 < w2) ? w2 : w1;
+                // double maxH = (h1 < h2) ? h2 : h1;
+
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 0);
+                // outputQuad[1] = cv::Point2f(maxW - 1, 0);
+                // outputQuad[2] = cv::Point2f(0, maxH-1);
+                // outputQuad[3] = cv::Point2f(maxW-1, maxH-1);
+
+                // Get the Perspective Transform Matrix i.e. lambda
+                lambda = getPerspectiveTransform(inputQuad, outputQuad);
+                // Apply the Perspective Transform just found to the src image
+                warpPerspective(src, dst, lambda, dst.size());
+
+                }    
+            void CalLane::inverseBirdEyeView_left(cv::Mat src, cv::Mat& dst) {
+
+                // Input Quadilateral or Image plane coordinates
+                cv::Point2f inputQuad[4];
+                // Output Quadilateral or World plane coordinates
+                cv::Point2f outputQuad[4];
+
+                // Lambda Matrix
+                cv::Mat lambda(2, 4, CV_32FC1);
+                lambda = cv::Mat::zeros(src.rows, src.cols, src.type());
+                // Set the lambda matrix the same type and size as input
+                inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows-1);
+                inputQuad[3] = cv::Point2f(-30, dst.rows-1);
+                // The 4 points where the mapping is to be done , from top-left in clockwise order
+                outputQuad[0] = cv::Point2f(0, 0);
+                outputQuad[1] = cv::Point2f(dst.cols+50, 0);
+                outputQuad[2] = cv::Point2f(dst.cols*0.5, dst.rows - 1);
+                outputQuad[3] = cv::Point2f(dst.cols*0.1, dst.rows - 1);
+                
+                
+                ///////// /*left bev*/ //////////
+                // lambda = cv::Mat::zeros(src.rows, src.cols, src.type());
+                // inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                // inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                // inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows*0.95);
+                // inputQuad[3] = cv::Point2f(-30, dst.rows);
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 0);
+                // outputQuad[1] = cv::Point2f(dst.cols - 1, 0);
+                // outputQuad[2] = cv::Point2f(dst.cols*0.8, dst.rows - 1);
+                // outputQuad[3] = cv::Point2f(dst.cols*0.4, dst.rows - 1);
+                
+                ///////// /*left bev*/ //////////
                 // The 4 points where the mapping is to be done , from top-left in clockwise order
 
                 /*left*/
@@ -649,9 +758,88 @@ namespace lane_detect_algo{
                 lambda = getPerspectiveTransform(outputQuad, inputQuad );
                 // Apply the Perspective Transform just found to the src image
                 warpPerspective(src, dst, lambda, dst.size());
-
+                
 
                 }
+            void CalLane::inverseBirdEyeView_right(cv::Mat src, cv::Mat& dst) {
+
+                // Input Quadilateral or Image plane coordinates
+                cv::Point2f inputQuad[4];
+                // Output Quadilateral or World plane coordinates
+                cv::Point2f outputQuad[4];
+
+                // Lambda Matrix
+                cv::Mat lambda(2, 4, CV_32FC1);
+                lambda = cv::Mat::zeros(src.rows, src.cols, src.type());
+                // Set the lambda matrix the same type and size as input
+                // inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                // inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                // inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows-1);
+                // inputQuad[3] = cv::Point2f(-30, dst.rows-1);
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 0);
+                // outputQuad[1] = cv::Point2f(dst.cols+50, 0);
+                // outputQuad[2] = cv::Point2f(dst.cols*0.5, dst.rows - 1);
+                // outputQuad[3] = cv::Point2f(dst.cols*0.1, dst.rows - 1);
+                
+                
+                ///////// /*left bev*/ //////////
+                // lambda = cv::Mat::zeros(src.rows, src.cols, src.type());
+                inputQuad[0] = cv::Point2f(0, dst.rows*0.2);
+                inputQuad[1] = cv::Point2f(dst.cols-1, dst.rows*0.2);
+                inputQuad[2] = cv::Point2f(dst.cols+30, dst.rows*0.95);
+                inputQuad[3] = cv::Point2f(-30, dst.rows);
+                // The 4 points where the mapping is to be done , from top-left in clockwise order
+                outputQuad[0] = cv::Point2f(0, 0);
+                outputQuad[1] = cv::Point2f(dst.cols - 1, 0);
+                outputQuad[2] = cv::Point2f(dst.cols*0.8, dst.rows - 1);
+                outputQuad[3] = cv::Point2f(dst.cols*0.4, dst.rows - 1);
+                
+                ///////// /*left bev*/ //////////
+                // The 4 points where the mapping is to be done , from top-left in clockwise order
+
+                /*left*/
+                // inputQuad[0] = cv::Point2f(195, 84);//point 예외처리 추가
+                // inputQuad[1] = cv::Point2f(245, 84);//point 예외처리 추가
+                // inputQuad[2] = cv::Point2f(14, 188);
+                // inputQuad[3] = cv::Point2f(270, 188);
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 84);
+                // outputQuad[1] = cv::Point2f(245-100, 84);
+                // outputQuad[2] = cv::Point2f(14+100, 188);
+                // outputQuad[3] = cv::Point2f(270+50, 188);
+
+
+                // The 4 points that select quadilateral on the input , from top-left in clockwise order
+                // These four pts are the sides of the rect box used as input
+                // inputQuad[0] = cv::Point2f(100, 49);
+                // inputQuad[1] = cv::Point2f(src.cols-100, 49);
+                // inputQuad[2] = cv::Point2f(2,190);
+                // inputQuad[3] = cv::Point2f(340, 190);
+                // double w1 = sqrt(pow(inputQuad[2].x - inputQuad[3].x,2)
+                //                 +pow(inputQuad[2].y - inputQuad[3].y,2));
+                // double w2 = sqrt(pow(inputQuad[1].x - inputQuad[0].x,2)
+                //                 +pow(inputQuad[1].y - inputQuad[0].y,2));
+                // double h1 = sqrt(pow(inputQuad[1].x - inputQuad[2].x,2)
+                //                 +pow(inputQuad[1].y - inputQuad[2].y,2));
+                // double h2 = sqrt(pow(inputQuad[0].x - inputQuad[3].x,2)
+                //                 +pow(inputQuad[0].y - inputQuad[3].y,2));
+
+                // double maxW = (w1 < w2) ? w2 : w1;
+                // double maxH = (h1 < h2) ? h2 : h1;
+
+                // // The 4 points where the mapping is to be done , from top-left in clockwise order
+                // outputQuad[0] = cv::Point2f(0, 0);
+                // outputQuad[1] = cv::Point2f(maxW - 1, 0);
+                // outputQuad[2] = cv::Point2f(0, maxH-1);
+                // outputQuad[3] = cv::Point2f(maxW-1, maxH-1);
+                // Get the Perspective Transform Matrix i.e. lambda
+                lambda = getPerspectiveTransform(outputQuad, inputQuad );
+                // Apply the Perspective Transform just found to the src image
+                warpPerspective(src, dst, lambda, dst.size());
+                
+
+                }    
             void CalLane::myProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result) {
                	int pixel;
             	int project = 0;
@@ -1036,14 +1224,14 @@ namespace lane_detect_algo{
 
                 cv::rectangle(draw_lable,cv::Point(left,top),cv::Point(left+width,top+height),cv::Scalar(0,0,255),1);
 
-              //  imshow("y_lable", draw_lable);
+                imshow("y_lable", draw_lable);
                 if(IMSHOW_SW){
                   //modified by Hayean
                //   imshow("y_lable", draw_lable);
                 }
 
               //-for max area and extra-//  if (area == max_area && width<height && left<src.cols / 2 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
-                if(area == max_area){
+                if (area == max_area && width<height && left<src.cols-100 && width<src.cols / 2){
               //  if (abs(max_height - height)<100 && abs(max_bottom-(top+height))<50) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                     for (int delete_row = dst.rows - 1; delete_row >= 0; --delete_row) {
                         uchar* delete_data = dst.ptr<uchar>(delete_row);
@@ -1154,7 +1342,7 @@ namespace lane_detect_algo{
                 }
 
                 //--for max area and extra//    if (area == max_area && width<height && left>src.cols / 3 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
-                    if (abs(max_height - height)<50 && abs(max_bottom - (top+height))<50) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
+                    if (abs(max_height - height)<120 ) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                         for (int delete_row = dst.rows-1; delete_row >= 0; --delete_row) {
                             uchar* delete_data = dst.ptr<uchar>(delete_row);
                             for (int delete_col = 0; delete_col < dst.cols; ++delete_col) {
@@ -1210,7 +1398,14 @@ namespace lane_detect_algo{
 
                 cv::Mat img_labels, stats, centroids;
                 int numOfLables = cv::connectedComponentsWithStats(dst, img_labels, stats, centroids, 8, CV_32S);
-
+                 int temp_bottom = 0, max_bottom = 0;
+                    for(int row = 1; row < numOfLables; row++){
+                    int* bottom_data = stats.ptr<int>(row);
+                    temp_bottom = bottom_data[cv::CC_STAT_TOP]+bottom_data[cv::CC_STAT_HEIGHT];
+                    if(temp_bottom>max_bottom){
+                        max_bottom = temp_bottom;
+                    }
+                }
                 if(COUNT_MAX_AREA){//쓸때는 if문 빼고
                     int temp_area = 0, max_area = 0;
                     for (int row = 1; row < numOfLables; row++) {
@@ -1245,7 +1440,7 @@ namespace lane_detect_algo{
                     }
                 }
                 }
-
+          
 
                 //USE_MAX_HEIGHT
                 int temp_height= 0, max_height = 0;
@@ -1272,7 +1467,7 @@ namespace lane_detect_algo{
                 }
 
                 //--for max area and extra//    if (area == max_area && width<height && left>src.cols / 3 && width<src.cols / 2) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
-                    if (height == max_height ) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
+                    if (abs(max_height - height)<130 && abs(max_bottom - (top+height))<130) {//이 조건들에 추가조건 더해서 레이블 유효성 검사
                         for (int delete_row = dst.rows-1; delete_row >= 0; --delete_row) {
                             uchar* delete_data = dst.ptr<uchar>(delete_row);
                             for (int delete_col = 0; delete_col < dst.cols; ++delete_col) {
@@ -1298,12 +1493,14 @@ namespace lane_detect_algo{
 
                     }
                     else {//delete wrong lable
+                    if(*crosswalk){
                         for (int row = top; row < top + height; row++) {
                             uchar* data = dst.ptr<uchar>(row);
                                 for (int col = left; col < left + width; col++) {//1채널이라 (left+width)에 채널값 안곱함
                                 data[col] = (uchar)0;
                                 }
                         }
+                    }
                     }
                 //    imshow("lane_right", dst);
                     }

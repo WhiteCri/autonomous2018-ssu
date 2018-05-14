@@ -9,7 +9,7 @@
 <!-- Robot Frame Setup (static tf)  -->
     <node pkg="tf" type="static_transform_publisher" name="footprint2baselink" args="0 0 0 0 0 0 base_footprint base_link 100" />
     <node pkg="tf" type="static_transform_publisher" name="lidar2baselink" args="1.4 0 0.1 0 0 3.14159265358979323846 base_link laser 100" />
-    <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="0.35 0 0 0 0 0 base_link /camera_main 100" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_main2baselink" args="0 0 0 0 0 0 base_link /camera_main 100" />
 
 
 <!-- Sensor Setup  -->

@@ -35,6 +35,7 @@ public:
         initParam();
         sub_ = nh_.subscribe("/"+groupName+"/dist",100,&ConvertCloud::distCb,this);
         sub_scan = nh_.subscribe("/"+groupName+"/scan",100,&ConvertCloud::laserCb,this);
+        // sub_scan = nh_.subscribe("/scan",100,&ConvertCloud::laserCb,this);
         pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/"+groupName+"/point_cloud",100);
         pcl::PointCloud<pcl::PointXYZ>::Ptr ref_pc(new pcl::PointCloud<pcl::PointXYZ>);
         pc = ref_pc;
