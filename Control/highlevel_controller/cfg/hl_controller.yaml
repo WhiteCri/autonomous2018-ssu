@@ -1,11 +1,11 @@
 hl_controller:
 #goal
-##re_jinry goals
-#  x_goal:     [12.85,   5.35]
-#  y_goal:     [9.181,   0.067]
-#  ori_z_goal: [-0.8096, 0.9800]
-#  ori_w_goal: [ 0.5869, 0.1989]
-#  goal_type:  ["b",     "sload","normal"]
+##jinry_full goals
+  x_goal:     [27.02,   49.09, 57.86]
+  y_goal:     [44.03,   44.74, 43.46]
+  ori_z_goal: [-0.0576, -0.0627, -0.10509]
+  ori_w_goal: [0.9983,  0.9980, 0.99446]
+  goal_type:  ["normal","normal","normal"]
 
 ##the place goals
 #  x_goal:     [66.96,    49.81  ,57.54 ,49.49  ]
@@ -20,11 +20,11 @@ hl_controller:
 #  goal_type:  ["normal","uturn","crosswalk","parking","movingobj"]
 
 #teb fake dynamic reconfigure goals
-  x_goal:     [5.094,7.618]
-  y_goal:     [4.363,5.810]
-  ori_z_goal: [0.0389,0.7175]
-  ori_w_goal: [0.9992,0.6965]
-  goal_type:  ["normal","uturn"]
+#  x_goal:     [5.094,7.618]
+#  y_goal:     [4.363,5.810]
+#  ori_z_goal: [0.0389,0.7175]
+#  ori_w_goal: [0.9992,0.6965]
+#  goal_type:  ["normal","uturn"]
 
 
 #config controller

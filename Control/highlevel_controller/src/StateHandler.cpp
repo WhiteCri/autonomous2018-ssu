@@ -317,16 +317,16 @@ void process_sload(){
     ROS_INFO("sload start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_SLOAD");
 
-    ROS_INFO("stop...");
-    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
-    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
-    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
-
-    ROS_INFO("change move_base params...");
-    
-    ROS_INFO("unlock stop...");
-    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+//    ROS_INFO("stop...");
+//    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+//    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+//    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+//    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
+//
+//    ROS_INFO("change move_base params...");
+//    
+//    ROS_INFO("unlock stop...");
+//    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
 
     waitUntilReach();
      
