@@ -227,10 +227,10 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
     size = (*it);
 
     // debug
-    if(groupName == "left")
-    ROS_INFO("left input size : %d", size);
-    else if(groupName == "right")
-    ROS_INFO("right input size : %d", size);
+    // if(groupName == "left")
+    // ROS_INFO("left input size : %d", size);
+    // else if(groupName == "right")
+    // ROS_INFO("right input size : %d", size);
     // count
     int count = 0;
     //
@@ -265,10 +265,10 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
     }
 
     // COUNT
-    if(groupName == "left")
-      ROS_INFO("left output size : %d", count);
-    else
-      ROS_INFO("right output size : %d", count);
+    // if(groupName == "left")
+    //   ROS_INFO("left output size : %d", count);
+    // else
+    //   ROS_INFO("right output size : %d", count);
     //
 
 }
