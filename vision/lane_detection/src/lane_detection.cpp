@@ -138,7 +138,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         lane_detect_algo::CalLane callane;
                         cv::Mat bev = frame.clone();
                         cv::Mat bev_test = frame.clone();
-                  
+
                         if(groupName == "left"){
                                 callane.birdEyeView_left(frame,bev);
                         } else if ( groupName == "right"){
@@ -146,13 +146,13 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         }
                        // if(debug)cv::imshow("mybev",bev);
                         cv::Mat in_bev_test = bev.clone();
-                        
+
                         if(groupName == "left"){
                                 callane.inverseBirdEyeView_left(bev,in_bev_test);
                         } else if ( groupName == "right"){
                                 callane.inverseBirdEyeView_right(bev,in_bev_test);
                         }
-                     
+
 
                         if (track_bar) {
                                 callane.detectYHSVcolor(bev, yellow_hsv, y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax);
@@ -183,7 +183,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                 //         }
                 //         if(!debug)cv::imshow("dddd",hough_white_color);
                 //         }
-                        
+
                         cv::Mat yellowYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat whiteYProj(cv::Size(frame_width, frame_height), CV_8UC1);
                         cv::Mat yellowXProj(cv::Size(frame_width, frame_height), CV_8UC1);
@@ -208,12 +208,12 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 }
                         }
                                 callane.makeContoursLeftLane(yellow_hsv, yellow_labeling); //for labeling(source channel is 1)
-                   
+
                      //   if(!lable) {
                                int crosswalk_check = 0;
                                 int *crosswalk = &crosswalk_check;
                                 callane.makeContoursRightLane(white_hsv, white_labeling, crosswalk); //for labeling(source channel is 1)
-                    
+
                        // }
 
                         if(time_check) {
@@ -222,7 +222,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 std::cout << "Elapsed time " << elapsed << std::endl;
                         }
                         cv::Mat zero_mask = cv::Mat(cv::Size(yellow_labeling.cols, yellow_labeling.rows), yellow_labeling.type(),cv::Scalar::all(255));
-                        
+
                         for(int y = zero_mask.rows-1; y>=0; y--) {
                         //        uchar* zero_mask_origin_size_data = zero_mask_origin_size.ptr<uchar>(y);
                                 if(y<zero_mask.rows - 130){
@@ -232,11 +232,11 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 for(int x = 0; x<zero_mask.cols; x++) {
                                        // int temp = x*0.5; //resize 복구(0.5 -> 1)
                                         if(x>130 && x<zero_mask.cols-130 ) {
-                                                zero_mask_data[x*zero_mask.channels()] = (uchar)0;              
+                                                zero_mask_data[x*zero_mask.channels()] = (uchar)0;
                                         }
                                 }
                          }
-                         
+
                         laneColor = yellow_labeling | white_labeling;
                         if(!debug)cv::imshow("zero_mask_before",laneColor);
                       //  laneColor = yellow_labeling  & white_labeling;
@@ -249,7 +249,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         }else{
                                callane.inverseBirdEyeView_right(bev, inv_bev);
                         }
-                        
+
                         if(!debug)cv::imshow("inv_bev_test_____",inv_bev);
                         cv::Mat newlane = frame.clone();
                         if(groupName=="left"){
@@ -257,7 +257,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         }else{
                                 callane.inverseBirdEyeView_right(laneColor, newlane);
                         }
-                        
+
                         if(debug) cv::imshow("inverseBirdEye___newlane", newlane);
                         if(imshow) {
                                 cv::imshow("inverseBirdEye", newlane);

@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 
 N_LINESAVER_BUFFER = 5
-IMG_PATH = '/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/src/right_1m.png'
+IMG_PATH = '/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/src/right_2_5m.png'
 
-mtx_ls = [603.652456, 0, 328.452174, 0, 604.1248849999999, 228.433349, 0, 0, 1] #camera matrix
-dist = np.array([-0.033672, -0.031004, 0.001614, 0.007620999999999999, 0]) #distortion matrix
+mtx_ls = [630.071853, 0, 322.309971, 0, 632.842228, 247.329905, 0, 0, 1] #camera matrix
+dist = np.array([0.010162, -0.060262, 0.001452, -0.001965, 0]) #distortion matrix
 fx_=1 #resize x 계수
 fy_=1 #resize y 계수
 
