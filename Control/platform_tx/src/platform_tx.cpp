@@ -7,7 +7,7 @@
 #include "platform_controller/cmd_platform.h"
 
 #define TX_PACKET_LENGTH 14
-#define TX_SERIAL_FREQUENCY 25
+#define TX_SERIAL_FREQUENCY 10
 #define TX_STOP_CHECK_PERIOD 10
 
 /*
@@ -72,6 +72,7 @@ void rxMsgCallBack(const platform_rx_msg::platform_rx_msg::ConstPtr& msg){
 
 void serialWrite(){
     ros::Rate loop_rate(TX_SERIAL_FREQUENCY);
+    uint8_t alive = 0;
     while(true){
         if(txControlStatic.tx_control_static){
             lock.lock();
@@ -82,6 +83,9 @@ void serialWrite(){
             packet[10] = txControlStatic.tx_brake; // brake
             lock.unlock();
         }
+        // ALIVE
+        packet[11] = static_cast<uint8_t>(alive);    alive = (alive + 1) % 256;
+        
         ser->write(packet,TX_PACKET_LENGTH);
         loop_rate.sleep();
     }
@@ -104,7 +108,6 @@ void processTxStop(ros::NodeHandle& nh){
 
 
 void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
-    static uint8_t alive = 0;
 /*  
     GEAR
     0x00 : forward
@@ -130,9 +133,6 @@ void createSerialPacket(const platform_controller::cmd_platform::ConstPtr& msg){
     int brake = msg->brake; //   checkBrakeBound(brake); 
     packet[10] = static_cast<uint8_t>(brake);
     ROS_INFO("serial brake : %u", brake);
-
-// ALIVE
-    packet[11] = static_cast<uint8_t>(alive);    alive = (alive + 1) % 256;
 }
 
 
