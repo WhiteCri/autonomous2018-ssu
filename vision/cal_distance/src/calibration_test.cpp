@@ -139,56 +139,58 @@ public:
     }
 
     Pos pixel_to_real(const Pos& pos){
-      cout<<"11"<<endl;
-      int idx_x = -1, idx_y = -1;
-      //find upper y (in pixel coordinate)
-      cout<<pos.x<<" "<<pos.y<<endl;
-      for(size_t i = 0 ; i < fileVec.size(); ++i){
-        if (fileVec[i][0].y > pos.y) {
-          idx_y = i;
-          break;
-        }
+      Pos idx;
 
-      }
-      cout<<"22 idx_y : "<<idx_y<<endl;
-      // exception handling
-      if (idx_y <= 0) return Pos(0,0);
+      idx = find_idx(pos);
+      cout<<"idx.x : "<<idx.x<<endl;
+      cout<<"idx.y : "<<idx.y<<endl;
 
-
-      //find upper x (in pixel coordinate)
-     for(size_t i = 0 ; i < fileVec[0].size(); ++i){
-        if (fileVec[idx_y][i].x > pos.x) {
-          cout<<fileVec[idx_y][i].x<<" ";
-          idx_x = i;
-          break;
-        }
-      }
-
-      cout<<"33 idx_x : "<<idx_x<<endl;
-      if (idx_x <= 0) return Pos(0,0);
-
+      if (idx.x <= 0) return Pos(0,0);
+      if (idx.y <= 0) return Pos(0,0);
       // //to avoid divide by zero, throw away when hlines.slope == 0
-      if ((hlines[idx_y].slope == 0) || (hlines[idx_y-1].slope == 0)) return Pos(0,0);
-      cout<<"44"<<endl;
+      if ((hlines[idx.y].slope == 0) || (hlines[idx.y-1].slope == 0)) return Pos(0,0);
 
       // calc top-left coordinate
-      Pos real_dr = realVec[idx_y][idx_x];
+      Pos real_dr = realVec[idx.y][idx.x];
 
       // 타겟 지점부터 상하좌우 직선 좌표차
       double up, down, right, left;
-      up   = abs( pos.y - ( hlines[idx_y - 1].slope * pos.x + hlines[idx_y-1].intercept ) );
-      down = abs( pos.y - ( hlines[idx_y].slope  * pos.x + hlines[idx_y].intercept ) );
+      up   = abs( pos.y - ( hlines[idx.y - 1].slope * pos.x + hlines[idx.y-1].intercept ) );
+      down = abs( pos.y - ( hlines[idx.y].slope  * pos.x + hlines[idx.y].intercept ) );
 
-      right = abs( pos.x - ( pos.y - vlines[idx_x].intercept) / vlines[idx_x].slope ); // 1
+      right = abs( pos.x - ( pos.y - vlines[idx.x].intercept) / vlines[idx.x].slope ); // 1
 
       // px - ( py - b) / a
-      left = abs( pos.x -  ( pos.y - vlines[idx_x - 1].intercept ) / vlines[idx_x - 1].slope); // 0
+      left = abs( pos.x -  ( pos.y - vlines[idx.x - 1].intercept ) / vlines[idx.x - 1].slope); // 0
 
-      cout <<"up : "<< up << "/ down : " << down << " / left : " << left << " / right : "<<right<<endl;
-      cout<<"55"<<endl;
       Pos distance( real_dr.x+  0.5 * down / ( up + down ), real_dr.y + 0.5 * right / ( left + right ) );
-      cout<<"dist:"<<distance.x <<" / "<<distance.y<<endl;
+
+      cout<<"x : "<<distance.x<<endl;
+      cout<<"y : "<<distance.y<<endl;
+
+      return distance;
     }
+
+    Pos find_idx(const Pos& pos){
+
+      for(int i = 1 ; i < fileVec.size(); ++i){
+        for(int j = 1; j < fileVec[0].size(); ++j){
+          // bigger than UP_Y
+          if( ( ( hlines[i-1].slope * pos.x + hlines[i-1].intercept ) <= pos.y )
+          // smaller than DOWN_Y
+          &&( ( hlines[i].slope * pos.x + hlines[i].intercept ) > pos.y )
+          // bigger than LEFT_X
+          &&( ( ( pos.y - vlines[j-1].intercept ) / vlines[j-1].slope ) <= pos.x )
+          // smaller than RIGHT_X
+          &&( ( (pos.y - vlines[j].intercept ) / vlines[j].slope ) > pos.x ) ){
+              return Pos((int)j,(int)i);
+          }
+        }
+      }
+
+      return Pos(-1,-1);
+    }
+
 private:
   Pos center;
   vector<vector<Pos> > fileVec;
@@ -213,7 +215,7 @@ int main(int argc, char** argv){
     cv::Mat distCoeffs = cv::Mat::zeros(1, 5, CV_64FC1);
 
     cout<<"!!"<<endl;
-    trans = Transformer("../data/left_calibration.txt", "../data/left_calibrationLine.txt");
+    trans = Transformer("../data/right_calibration.txt", "../data/right_calibrationLine.txt");
 
     cameraMatrix=(cv::Mat1d(3, 3) << 603.652456, 0, 328.452174, 0, 604.1248849999999, 228.433349, 0, 0, 1);
     distCoeffs=(cv::Mat1d(1, 5) << -0.033672, -0.031004, 0.001614, 0.007620999999999999, 0);
@@ -224,7 +226,7 @@ int main(int argc, char** argv){
 
       while(1){
         cout<<"!!"<<endl;
-        src = imread("/home/seuleee/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/src/right_1m.png", CV_LOAD_IMAGE_COLOR);
+        src = imread("/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/src/right_2_5m.png", CV_LOAD_IMAGE_COLOR);
 
         cv::undistort(src, dst, cameraMatrix, distCoeffs);
 
