@@ -12,7 +12,7 @@ hl_controller:
   y_goal:     [90.30,     96.61   ,92.63    ,126.02  ,118.26, 115.65  ,110.41   ,113.18 ,111.21 ,113.49 ,93.57]
   ori_z_goal: [0.01401,   0.0185  ,0.0196   ,0.9999  ,0.9987, 0.9938  ,-0.3633  ,0.0722 ,-0.3589,0.1251 ,0.9999]
   ori_w_goal: [0.9999,    0.9998  ,0.9998   ,-0.0073 ,-0.0503,-0.1108 ,0.9316   ,0.9973 ,0.9333 ,0.9921 ,-0.0076]
-  goal_type:  ["crosswalk","normal","normal","normal",normal, uturn   ,normal   ,parking,skip   ,skip   ,normal]
+  goal_type:  ["normal","crosswalk","normal","normal",normal, uturn   ,normal   ,parking,skip   ,skip   ,normal]
 #                             nload   (s_obj) (m_obj) (sload)         np_goal,    np_back
 #  x_goal:     [23.2    ,34.47   ,33.08  ,1.38   ,8.48 ]
 #  y_goal:     [39.39   ,42.031  ,4.90   ,2.65   ,26.43]

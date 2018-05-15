@@ -107,6 +107,7 @@ static void waitUntilReach(){
 void init(){
     ROS_INFO("State Init...");
     param_ptr->nh.setParam("hl_controller/curState","INIT");
+    param_ptr->nh.setParam("hl_controller/use_base_filter",true);
 
     handler_setGoal();
 }
@@ -175,12 +176,16 @@ void process_crosswalk(){
     ROS_INFO("crosswalk start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_CROSSWALK");
 
+    //wait until reaching goal
+    //ROS_INFO("wait for reaching goall...");
+    //waitUntilReach();
+
     //maintaining car's status
-    double crosswalk_driving_duration = param_ptr->crosswalk_driving_duration;
-    if (crosswalk_driving_duration > 0){
-        ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->crosswalk_driving_duration);
-        ros::Rate(param_ptr->crosswalk_driving_duration).sleep();
-    }
+    //double crosswalk_driving_duration = param_ptr->crosswalk_driving_duration;
+    //if (crosswalk_driving_duration > 0){
+    //    ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->crosswalk_driving_duration);
+    //    ros::Rate(param_ptr->crosswalk_driving_duration).sleep();
+    //}
 
     //take car to stop
     ROS_INFO("stop for %lf seconds...", param_ptr->crosswalk_stop_duration);
@@ -194,12 +199,18 @@ void process_crosswalk(){
 
     //unlock tx_control_static
     param_ptr->nh.setParam("hl_controller/tx_control_static",false);
-    
+
+    //lock base filter
+    param_ptr->nh.setParam("hl_controller/use_base_filter",false);
+       
     //check that process_crosswalk had been done.
     param_ptr->nh.setParam("hl_controller/crosswalk_onetime_flag",true);
+    
 
     ROS_INFO("crosswalk done");    
     param_ptr->load_param();
+    
+    
 }
 
 void process_movingobj(){
@@ -267,6 +278,7 @@ void process_parking(){
 
     ds.saveDynamicParams("max_vel_x", 8.0);
     ds.saveDynamicParams("min_vel_x", 7.0);
+    param_ptr->nh.setParam("hl_controller/use_base_filter",false);
     
     //reload default params
     ds.saveDynamicParams("max_vel_x", 5.0);
@@ -300,10 +312,14 @@ void process_uturn(){
     DynamicParamSender ds;
     ds.saveDynamicParams("acc_lim_x", 5.5);
 
+    //lock camera
+    param_ptr->nh.setParam("hl_controller/use_base_filter",true);
+
     waitUntilReach();
 
     ROS_INFO("reload pre-move_base params...");
     ds.saveDynamicParams("acc_lim_x", 3.5);
+    param_ptr->nh.setParam("hl_controller/use_base_filter",false);
 
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/uturn_onetime_flag",true);

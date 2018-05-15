@@ -32,6 +32,13 @@ static int time_check;
 // ?
 static int lable;
 // 횡단보도 탐지방법 찾기
+
+
+static int y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax;
+static int w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax;
+
+
+
 static std::string groupName;
 
 lane_detect_algo::vec_mat_t lane_m_vec;
@@ -51,8 +58,7 @@ public:
         cv::Mat pub_img;
         ros::Publisher pub = nh.advertise<std_msgs::Int32MultiArray>("/"+groupName+"/lane",100); //파라미터로 카메라 번호 받도록하기
 
-        int y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax;
-        int w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax;
+        
         int check_stop_count;
 
 // only save
@@ -81,9 +87,20 @@ InitImgObjectforROS::InitImgObjectforROS() : it(nh){
         }
 
         if(track_bar) {
-
-                initMyHSVTrackbar("TRACKBAR_YELLOW", &y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
-                initMyHSVTrackbar("TRACKBAR_WHITE", &w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+                 if(groupName == "left"){
+                                initMyHSVTrackbar("LEFT_YELLOW_TRACKBAR", &y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
+                                initMyHSVTrackbar("LEFT_WHITE_TRACKBAR", &w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+                
+                 }
+                 else if(groupName == "right"){
+                                initMyHSVTrackbar("RIGHT_YELLOW_TRACKBAR", &y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
+                                initMyHSVTrackbar("RIGHT_WHITE_TRACKBAR", &w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+                 }
+                 else if(groupName == "main"){
+                                initMyHSVTrackbar("YELLOW_TRACKBAR", &y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
+                                initMyHSVTrackbar("WHITE_TRACKBAR", &w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+                 }
+                 
         }
         check_stop_count = 0;
         is_stop_checked = false;
@@ -129,36 +146,80 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         std::memset(H_xResultWhite, 0, sizeof(uint) * frame_height);
 
                         if (track_bar) {
-                                setMyHSVTrackbarValue("TRACKBAR_YELLOW",&y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
-
-
-                                setMyHSVTrackbarValue("TRACKBAR_WHITE",&w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
-
+                                if(groupName == "left"){
+                                        setMyHSVTrackbarValue("LEFT_YELLOW_TRACKBAR",&y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
+                                        setMyHSVTrackbarValue("LEFT_WHITE_TRACKBAR",&w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+                                }
+                                else if(groupName == "right"){
+                                       
+                                        setMyHSVTrackbarValue("RIGHT_WHITE_TRACKBAR",&w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+                                        setMyHSVTrackbarValue("RIGHT_YELLOW_TRACKBAR",&y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
+                                }
+                                else if(groupName == "main"){
+                                        setMyHSVTrackbarValue("WHITE_TRACKBAR",&w_hmin, &w_hmax, &w_smin, &w_smax, &w_vmin, &w_vmax);
+                                        setMyHSVTrackbarValue("YELLOW_TRACKBAR",&y_hmin, &y_hmax, &y_smin, &y_smax, &y_vmin, &y_vmax);
+                                }        
                         }
                         lane_detect_algo::CalLane callane;
                         cv::Mat bev = frame.clone();
                         cv::Mat bev_test = frame.clone();
+                        
+                        /*delete after test*/
+                     //   callane.birdEyeView_left(frame,bev);
+                        //callane.birdEyeView_right(frame,bev);
 
+                        // *업로드시 복구 ///////////////////////
                         if(groupName == "left"){
                                 callane.birdEyeView_left(frame,bev);
-                        } else if ( groupName == "right"){
+                                cv::imshow("test_0515_le",bev);
+                        } 
+                        else if ( groupName == "right"){
+                                callane.birdEyeView_right(frame,bev);
+                                cv::imshow("test_0515_ri",bev);
+                        }
+                        else if(groupName == "main"){
+                          //      callane.birdEyeView_left(frame,bev);
                                 callane.birdEyeView_right(frame,bev);
                         }
-                       // if(debug)cv::imshow("mybev",bev);
+                        //////////////////////////////////////////
+
                         cv::Mat in_bev_test = bev.clone();
 
+                        /// *테스트하고 지우기* //////////
+                        //callane.inverseBirdEyeView_left(bev,in_bev_test);
+                        //callane.inverseBirdEyeView_right(bev,in_bev_test);
+                        //////////////////////
+                        
+
+                        //* 업로드시 복구 *//////////////////////
                         if(groupName == "left"){
                                 callane.inverseBirdEyeView_left(bev,in_bev_test);
-                        } else if ( groupName == "right"){
+                        } 
+                        else if ( groupName == "right"){
                                 callane.inverseBirdEyeView_right(bev,in_bev_test);
                         }
-
+                        else if(groupName=="main"){
+                            //    callane.inverseBirdEyeView_left(frame,bev);
+                                callane.inverseBirdEyeView_right(bev,in_bev_test);
+                        }
+                        //////////////////////
 
                         if (track_bar) {
                                 callane.detectYHSVcolor(bev, yellow_hsv, y_hmin, y_hmax, y_smin, y_smax, y_vmin, y_vmax);
                                 callane.detectWhiteLane(bev,white_hsv, w_hmin, w_hmax, w_smin, w_smax, w_vmin, w_vmax,0,0);
-                                cv::imshow("TRACKBAR_WHITE",white_hsv);
-                                cv::imshow("TRACKBAR_YELLOW",yellow_hsv);
+                                if(groupName == "left"){
+                                        cv::imshow("LEFT_WHITE_TRACKBAR",white_hsv);
+                                        cv::imshow("LEFT_YELLOW_TRACKBAR",yellow_hsv);
+                                }
+                                else if(groupName == "right"){
+                                        cv::imshow("RIGHT_WHITE_TRACKBAR",white_hsv);
+                                        cv::imshow("RIGHT_YELLOW_TRACKBAR",yellow_hsv);
+                                }
+                                else if(groupName == "main"){
+                                        cv::imshow("WHITE_TRACKBAR",white_hsv);
+                                        cv::imshow("YELLOW_TRACKBAR",yellow_hsv);
+                                } 
+                                
                         }
                         else { // 색상검출 디폴트
                                 callane.detectYHSVcolor(bev, yellow_hsv, 7, 21, 52, 151, 0, 180);
@@ -238,29 +299,56 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                          }
 
                         laneColor = yellow_labeling | white_labeling;
-                        if(!debug)cv::imshow("zero_mask_before",laneColor);
+                        if(debug)cv::imshow("zero_mask_before",laneColor);
                       //  laneColor = yellow_labeling  & white_labeling;
                       //  if(!debug)cv::imshow("zero_mask_after",laneColor);
                         cv::Mat inv_bev = frame.clone(); //color inverse bev //do not delete
                         if(debug)cv::imshow("orgin_test",frame);
-                        if(debug)cv::imshow("bev_test",bev);
+                     
+                        /*  // delete after test // */
+                     //   callane.inverseBirdEyeView_left(bev, inv_bev);
+                        // callane.inverseBirdEyeView_right(bev, inv_bev);
+                        // if(!debug)cv::imshow("bev_test_rit",bev);
+                        // if(!debug)cv::imshow("inv_bev_test_rit",inv_bev);
+                        
+
+                         //업로드시 복구//
                         if(groupName=="left"){
                                callane.inverseBirdEyeView_left(bev, inv_bev);
-                        }else{
-                               callane.inverseBirdEyeView_right(bev, inv_bev);
+                               if(!debug)cv::imshow("bev_test_left",bev);
+                               if(!debug)cv::imshow("inv_bev_test_left",inv_bev);
                         }
+                        else if(groupName=="right"){
+                               callane.inverseBirdEyeView_right(bev, inv_bev);
+                               if(!debug)cv::imshow("bev_test_right",bev);
+                               if(!debug)cv::imshow("inv_bev_test_right",inv_bev);
+                        }
+                        else if(groupName=="main"){
+                        //        callane.inverseBirdEyeView_left(bev, inv_bev);
+                        //        if(!debug)cv::imshow("bev_test_left",bev);
+                        //        if(!debug)cv::imshow("inv_bev_test_left",inv_bev); 
+                               callane.inverseBirdEyeView_right(bev, inv_bev);
+                               if(!debug)cv::imshow("bev_test_right",bev);
+                               if(!debug)cv::imshow("inv_bev_test_right",inv_bev);
+                        }
+                        
 
-                        if(!debug)cv::imshow("inv_bev_test_____",inv_bev);
                         cv::Mat newlane = frame.clone();
+                        
+                        //테스트후 지우기/////////////
+                     //   callane.inverseBirdEyeView_left(laneColor, newlane);
+                     //   callane.inverseBirdEyeView_right(laneColor, newlane);
+                        //////// *업로드시 복구* ////////////////
                         if(groupName=="left"){
                                 callane.inverseBirdEyeView_left(laneColor, newlane);
-                        }else{
+                                
+                        }
+                        else if(groupName == "right"){
                                 callane.inverseBirdEyeView_right(laneColor, newlane);
                         }
-
-                        if(debug) cv::imshow("inverseBirdEye___newlane", newlane);
-                        if(imshow) {
-                                cv::imshow("inverseBirdEye", newlane);
+                        else if(groupName == "main"){
+                              //  callane.inverseBirdEyeView_left(laneColor, newlane);
+                                callane.inverseBirdEyeView_right(laneColor, newlane);
                         }
 
                         cv::Mat output_origin = origin.clone();
@@ -467,10 +555,10 @@ void InitImgObjectforROS::initParam(){
 void InitImgObjectforROS::initMyHSVTrackbar(const string &trackbar_name, int *hmin, int *hmax, int *smin, int *smax, int *vmin, int *vmax){
                 cv::namedWindow(trackbar_name, cv::WINDOW_AUTOSIZE);
 
-                cv::createTrackbar("h min", trackbar_name, hmin, 50, NULL);
+                cv::createTrackbar("h min", trackbar_name, hmin, 255, NULL);
                 cv::setTrackbarPos("h min", trackbar_name, *(hmin));
 
-                cv::createTrackbar("h max", trackbar_name, hmax, 50, NULL);
+                cv::createTrackbar("h max", trackbar_name, hmax, 255, NULL);
                 cv::setTrackbarPos("h max", trackbar_name, *(hmax));
 
                 cv::createTrackbar("s min", trackbar_name, smin, 255, NULL);
@@ -494,20 +582,59 @@ void InitImgObjectforROS::setMyHSVTrackbarValue(const string &trackbar_name,int 
                 *vmin = cv::getTrackbarPos("v min", trackbar_name);
                 *vmax = cv::getTrackbarPos("v max", trackbar_name);
 
-                if(trackbar_name == "TRACKBAR_YELLOW"){
-                        nh.setParam("/"+groupName+"/lane_detection/y_hmin",y_hmin);
-                        nh.setParam("/"+groupName+"/lane_detection/y_hmax",y_hmax);
-                        nh.setParam("/"+groupName+"/lane_detection/y_smin",y_smin);
-                        nh.setParam("/"+groupName+"/lane_detection/y_smax",y_smax);
-                        nh.setParam("/"+groupName+"/lane_detection/y_vmin",y_vmin);
-                        nh.setParam("/"+groupName+"/lane_detection/y_vmax",y_vmax);
-                }
-                if(trackbar_name == "TRACKBAR_WHITE"){
-                        nh.setParam("/"+groupName+"/lane_detection/w_hmin",w_hmin);
-                        nh.setParam("/"+groupName+"/lane_detection/w_hmax",w_hmax);
-                        nh.setParam("/"+groupName+"/lane_detection/w_smin",w_smin);
-                        nh.setParam("/"+groupName+"/lane_detection/w_smax",w_smax);
-                        nh.setParam("/"+groupName+"/lane_detection/w_vmin",w_vmin);
-                        nh.setParam("/"+groupName+"/lane_detection/w_vmax",w_vmax);
-                }
+
+                 if(groupName=="left"){
+                        if(trackbar_name == "LEFT_YELLOW_TRACKBAR"){
+                                nh.setParam("/"+groupName+"/lane_detection/y_hmin",y_hmin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_hmax",y_hmax);
+                                nh.setParam("/"+groupName+"/lane_detection/y_smin",y_smin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_smax",y_smax);
+                                nh.setParam("/"+groupName+"/lane_detection/y_vmin",y_vmin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_vmax",y_vmax);
+                        }
+                        if(trackbar_name == "LEFT_WHITE_TRACKBAR"){
+                                nh.setParam("/"+groupName+"/lane_detection/w_hmin",w_hmin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_hmax",w_hmax);
+                                nh.setParam("/"+groupName+"/lane_detection/w_smin",w_smin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_smax",w_smax);
+                                nh.setParam("/"+groupName+"/lane_detection/w_vmin",w_vmin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_vmax",w_vmax);
+                        }
+                 }
+                 else if(groupName == "right"){
+                        if(trackbar_name == "RIGHT_YELLOW_TRACKBAR"){
+                                nh.setParam("/"+groupName+"/lane_detection/y_hmin",y_hmin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_hmax",y_hmax);
+                                nh.setParam("/"+groupName+"/lane_detection/y_smin",y_smin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_smax",y_smax);
+                                nh.setParam("/"+groupName+"/lane_detection/y_vmin",y_vmin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_vmax",y_vmax);
+                        }
+                        if(trackbar_name == "RIGHT_WHITE_TRACKBAR"){
+                                nh.setParam("/"+groupName+"/lane_detection/w_hmin",w_hmin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_hmax",w_hmax);
+                                nh.setParam("/"+groupName+"/lane_detection/w_smin",w_smin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_smax",w_smax);
+                                nh.setParam("/"+groupName+"/lane_detection/w_vmin",w_vmin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_vmax",w_vmax);
+                        }
+                 }
+                 else if(groupName == "main"){
+                         if(trackbar_name == "YELLOW_TRACKBAR"){
+                                nh.setParam("/"+groupName+"/lane_detection/y_hmin",y_hmin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_hmax",y_hmax);
+                                nh.setParam("/"+groupName+"/lane_detection/y_smin",y_smin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_smax",y_smax);
+                                nh.setParam("/"+groupName+"/lane_detection/y_vmin",y_vmin);
+                                nh.setParam("/"+groupName+"/lane_detection/y_vmax",y_vmax);
+                        }
+                        if(trackbar_name == "WHITE_TRACKBAR"){
+                                nh.setParam("/"+groupName+"/lane_detection/w_hmin",w_hmin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_hmax",w_hmax);
+                                nh.setParam("/"+groupName+"/lane_detection/w_smin",w_smin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_smax",w_smax);
+                                nh.setParam("/"+groupName+"/lane_detection/w_vmin",w_vmin);
+                                nh.setParam("/"+groupName+"/lane_detection/w_vmax",w_vmax);
+                        }
+                 }
 }
