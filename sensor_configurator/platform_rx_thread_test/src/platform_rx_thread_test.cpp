@@ -9,6 +9,7 @@
 serial::Serial ser;
 std::mutex lock;
 
+#define ALIVE_UPDATE_FRE 23
 #define EPSILON 0.1
 
 class ParamReader{
@@ -105,7 +106,7 @@ int main (int argc, char** argv){
     auto calc_speed =[&]()->double{
         double total_encoder_gap = encoder.front().first - encoder.back().first;
         ALIVE_datatype alive_gap = encoder.front().second - encoder.back().second;
-        double time_interval = alive_gap * 1.0 / 25; // platform send information for 50hz
+        double time_interval = alive_gap * 1.0 / ALIVE_UPDATE_FRE; // platform send information for 50hz
         double speed = total_encoder_gap / 99.2 * 1.655 / time_interval;
         return speed;
     };

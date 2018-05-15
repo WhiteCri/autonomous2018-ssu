@@ -21,7 +21,7 @@
 
 	<!-- Camera -->
 	<arg name="left_camera_name" default="left"/>
-	<arg name="left_camera_num" default="2"/>
+	<arg name="left_camera_num" default="0"/>
 
 	<arg name="right_camera_name" default="right"/>
 	<arg name="right_camera_num" default="1"/>
