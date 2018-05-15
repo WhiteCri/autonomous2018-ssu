@@ -191,11 +191,7 @@ int main(int argc, char** argv){
 
     ros::init(argc, argv, "cal_dirstance");
     CalDistance calDist;
-    while(calDist.getNh().ok()){
-        calDist.sendDist();
-        ros::spinOnce();
-    }
-    return 0;
+    ros::spin();
 }
 
 void CalDistance::sendDist(){
@@ -281,7 +277,7 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
     // else
     //   ROS_INFO("right output size : %d", count);
     //
-
+    this->sendDist();
 }
 
 ros::NodeHandle CalDistance::getNh(){ return nh_; }
