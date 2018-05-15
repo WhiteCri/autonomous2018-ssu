@@ -21,10 +21,10 @@
 
 	<!-- Camera -->
 	<arg name="left_camera_name" default="left"/>
-	<arg name="left_camera_num" default="1"/>
+	<arg name="left_camera_num" default="2"/>
 
 	<arg name="right_camera_name" default="right"/>
-	<arg name="right_camera_num" default="2"/>
+	<arg name="right_camera_num" default="1"/>
 
 
 
@@ -41,7 +41,7 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="1"/>
+			<param name="track_bar" value="0"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 			<param name="y_hmin" value="9"/>
@@ -89,7 +89,7 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="1"/>
+			<param name="track_bar" value="0"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 			<param name="y_hmin" value="9"/>
