@@ -21,10 +21,10 @@
 
 	<!-- Camera -->
 	<arg name="left_camera_name" default="left"/>
-	<arg name="left_camera_num" default="0"/>
+	<arg name="left_camera_num" default="1"/>
 
 	<arg name="right_camera_name" default="right"/>
-	<arg name="right_camera_num" default="1"/>
+	<arg name="right_camera_num" default="2"/>
 
 
 
@@ -62,7 +62,7 @@
 
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg left_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
-			 <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> 
+			 <param name="cal_path" value="/home/yun/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> 
 			<!--<param name="cal_path" value="/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
 		</node>
 
@@ -110,7 +110,7 @@
 
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg right_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
-			 <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> 
+			 <param name="cal_path" value="/home/yun/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> 
 			<!--<param name="cal_path" value="/home/kite9240/catautonomous_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
 		</node>
 

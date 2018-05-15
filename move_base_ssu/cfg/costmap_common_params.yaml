@@ -1,7 +1,10 @@
+map_type: costmap
 
-## footprint 값 조정. x와 y의 방향은 차량의 axes와 동일
-#footprint: [[-0.35,-0.60],[1.60,-0.60],[1.60,0.60],[-0.35,0.60]] # 정확한 값
-#footprint: [[-0.23,-0.485],[1.47,-0.485],[1.47,0.485],[-0.23,0.485]] # 0.15m 줄인 값(feasibile warning 잡기 위해)
+global_frame: /map
+robot_base_frame: base_link
+
+transform_tolerance: 0.5
+resolution: 0.1
 
 ## 5/13 base_link 위치에 따른 planning, 거동 비교 실험 ##
 footprint: [[-0.30,-0.60],[1.50,-0.60],[1.50,0.60],[-0.30,0.60]] # base_link -> rear-axle (base - lidar = 1.4 m)
@@ -10,9 +13,10 @@ footprint: [[-0.30,-0.60],[1.50,-0.60],[1.50,0.60],[-0.30,0.60]] # base_link -> 
 #footprint: [[-1.20,-0.60],[0.60,-0.60],[0.60,0.60],[-1.20,0.60]] # base_link -> 1/4 (base - lidar = 0.5 m)
 #footprint: [[-1.50,-0.60],[0.30,-0.60],[0.30,0.60],[-1.50,0.60]] # base_link -> front-axle (base - lidar = 0.2 m)
 
-
-transform_tolerance: 0.2
-map_type: costmap
+inflation_layer:
+  enabled:              true
+  cost_scaling_factor:  10.0  # exponential rate at which the obstacle cost drops off (default: 10)
+  inflation_radius:     1.0  # max. distance from an obstacle at which costs are incurred for planning paths.
 
 obstacle_layer:
   enabled: true
@@ -21,17 +25,3 @@ obstacle_layer:
   inflation_radius: 1.4
   track_unknown_space: false
   combination_method: 1
-
-  #observation_sources: laser_scan_sensor
-  observation_sources: lidar_scan_sensor
-  lidar_scan_sensor: {data_type: LaserScan, topic: scan_lidar, marking: true, clearing: true}
-  #laser_scan_sensor: {data_type: LaserScan, topic: scan, marking: true, clearing: true}
-
-inflation_layer:
-  enabled:              true
-  cost_scaling_factor:  10.0  # exponential rate at which the obstacle cost drops off (default: 10)
-  inflation_radius:     1.0  # max. distance from an obstacle at which costs are incurred for planning paths.
-
-static_layer:
-  enabled:              true
-  map_topic:            "/map"
