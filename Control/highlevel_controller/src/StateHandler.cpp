@@ -187,6 +187,9 @@ void process_crosswalk(){
     //    ros::Rate(param_ptr->crosswalk_driving_duration).sleep();
     //}
 
+    waitUntilReach();
+
+
     //take car to stop
     ROS_INFO("stop for %lf seconds...", param_ptr->crosswalk_stop_duration);
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
@@ -201,7 +204,7 @@ void process_crosswalk(){
     param_ptr->nh.setParam("hl_controller/tx_control_static",false);
 
     //lock base filter
-    param_ptr->nh.setParam("hl_controller/use_base_filter",false);
+    //param_ptr->nh.setParam("hl_controller/use_base_filter",false);
        
     //check that process_crosswalk had been done.
     param_ptr->nh.setParam("hl_controller/crosswalk_onetime_flag",true);
@@ -218,11 +221,14 @@ void process_movingobj(){
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_MOVINGOBJ");
 
     //maintaining car's status
-    double movingobj_driving_duration = param_ptr->movingobj_driving_duration;
-    if (movingobj_driving_duration > 0){
-        ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->movingobj_driving_duration);
-        ros::Rate(param_ptr->movingobj_driving_duration).sleep();
-    }
+    //double movingobj_driving_duration = param_ptr->movingobj_driving_duration;
+    //if (movingobj_driving_duration > 0){
+    //    ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->movingobj_driving_duration);
+    //    ros::Rate(param_ptr->movingobj_driving_duration).sleep();
+    //}
+
+    waitUntilReach();
+
     //take car to stop
     ROS_INFO("stop...");
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
@@ -278,7 +284,7 @@ void process_parking(){
 
     ds.saveDynamicParams("max_vel_x", 8.0);
     ds.saveDynamicParams("min_vel_x", 7.0);
-    param_ptr->nh.setParam("hl_controller/use_base_filter",false);
+    //param_ptr->nh.setParam("hl_controller/use_base_filter",false);
     
     //reload default params
     ds.saveDynamicParams("max_vel_x", 5.0);
