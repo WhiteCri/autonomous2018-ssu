@@ -4,16 +4,13 @@ local_costmap:
   publish_frequency: 5.0
 
   static_map: false
-
   rolling_window: true
+
   width: 13.0
   height: 13.0
 
   footprint_padding: -0.125
 
-  plugins:
-   - {name: inflation_layer,     type: "costmap_2d::InflationLayer"}
-   - {name: obstacle_layer,      type: "costmap_2d::ObstacleLayer"}
 
   obstacle_layer:
     observation_sources: lidar_scan_sensor
@@ -24,11 +21,6 @@ local_costmap:
     obstacle_range: 8.0
     raytrace_range: 8.0
     inflation_radius: 1.5
+    cost_scaling_factor: 1.5
     track_unknown_space: false
     combination_method: 1
-    
-  inflation_layer:
-    enabled: true
-    cost_scaling_factor: 1.5  # exponential rate at which the obstacle cost drops off (default: 10)
-    inflation_radius: 1.5  # max. distance from an obstacle at which costs are incurred for planning paths.
-    inflate_unknown: false
