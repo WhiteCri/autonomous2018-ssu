@@ -213,7 +213,7 @@ void CalDistance::sendDist(){
 }
 
 void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
-    
+
     nh_.param("hl_controller/use_base_filter", use_base_filter, false);
 
     laneXData.clear();
@@ -235,7 +235,7 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
     // count
     int count = 0;
     //
- 
+
     ++it;
     //why try + catch?
     while(it != laneData->data.end()){
@@ -273,7 +273,7 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
     // COUNT
     // if(groupName == "left")
-    //   ROS_INFO("left output size : %d", count);
+    //   ROS_INFO("left output size if(groupName == "left")
     // else
     //   ROS_INFO("right output size : %d", count);
     //
