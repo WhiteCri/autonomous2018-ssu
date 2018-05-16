@@ -4,9 +4,8 @@
 	<arg name="local_planner" 		default="dwa_local_planner"/> 	<!--teb_local_planner-->
 	<arg name="LocalROS" 			default="DWAPlannerROS"/> 		<!--TebLocalPlannerROS-->
 	
-	<arg name="planner_frequency"	default="1.0"/>		<arg name="controller_frequency"   default="10.0"/>
-	<arg name="planner_patience"	default="10.0"/>	<arg name="controller_patience"	   default="20.0"/>
-	
+	<arg name="planner_frequency"	default="1.0"/>		<arg name="controller_frequency"   default="5.0"/>
+	<arg name="planner_patience"	default="10.0"/>	<arg name="controller_patience"	   default="10.0"/>
 		
 	<!--  ****** Move_Base ******  -->
 	

@@ -16,20 +16,4 @@ inflation_layer:
   inflation_radius: 1.5  # max. distance from an obstacle at which costs are incurred for planning paths.
   inflate_unknown: false
 
-obstacle_layer:
-  enabled: true
-  obstacle_range: 8.0
-  raytrace_range: 8.0
-  inflation_radius: 1.5
-  cost_scaling_factor: 1.5
-  track_unknown_space: false
-  combination_method: 1
 
-  observation_sources: lidar_scan_sensor
-  lidar_scan_sensor: {data_type: LaserScan, topic: scan_lidar, marking: true, clearing: true}
-  #observation_sources: laser_scan_sensor
-  #laser_scan_sensor: {data_type: LaserScan, topic: scan, marking: true, clearing: true}
-
-static_layer:
-  enabled: true
-  map_topic: "/map"
