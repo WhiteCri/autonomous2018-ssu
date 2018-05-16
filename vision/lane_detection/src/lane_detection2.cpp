@@ -125,11 +125,11 @@ void Lane_detection::laneCb(const sensor_msgs::ImageConstPtr& img_msg) {
 	output = yEdge | wEdge;
 
 	if(debug){
-		imshow("src", src);
+		imshow(groupName + "/src", src);
 		imshow(yTrackName, yellow);
 		imshow(wTrackName, white);
-		// imshow(groupName + "/Yellow_Filter", yFilter);
-		// imshow(groupName + "/White_Filter", wFilter);
+		imshow(groupName + "/Yellow_Filter", yFilter);
+		imshow(groupName + "/White_Filter", wFilter);
 		// imshow(groupName + "/Yellow_Edge", yEdge);
 		// imshow(groupName + "/White_Edge", wEdge);
 	}
@@ -242,22 +242,22 @@ void Lane_detection::createData(){
 
 
 void Lane_detection::initParam() {
-	nh.param<int>("/"+groupName+"/lane_detection/debug", debug, 1);
-	nh.param<int>("/"+groupName+"/lane_detection/track_bar", track_bar, 1);
-	nh.param<int>("/"+groupName+"/lane_detection/track_bar", lane, 1);
-	nh.param<int>("/"+groupName+"/lane_detection/debug", video, 0);
-	nh.param<int>("/"+groupName+"/lane_detection/y_hmin",y_hmin,12);
-	nh.param<int>("/"+groupName+"/lane_detection/y_hmax",y_hmax,24);
-	nh.param<int>("/"+groupName+"/lane_detection/y_smin",y_smin,60);
-	nh.param<int>("/"+groupName+"/lane_detection/y_smax",y_smax,146);
-	nh.param<int>("/"+groupName+"/lane_detection/y_vmin",y_vmin,6);
-	nh.param<int>("/"+groupName+"/lane_detection/y_vmax",y_vmax,255);
-	nh.param<int>("/"+groupName+"/lane_detection/w_hmin",w_hmin,33);
-	nh.param<int>("/"+groupName+"/lane_detection/w_hmax",w_hmax,125);
-	nh.param<int>("/"+groupName+"/lane_detection/w_smin",w_smin,0);
-	nh.param<int>("/"+groupName+"/lane_detection/w_smax",w_smax,15);
-	nh.param<int>("/"+groupName+"/lane_detection/w_vmin",w_vmin,117);
-	nh.param<int>("/"+groupName+"/lane_detection/w_vmax",w_vmax,255);
+	nh.param<int>("/"+groupName+"/lane_detection2/debug", debug, 1);
+	nh.param<int>("/"+groupName+"/lane_detection2/track_bar", track_bar, 1);
+	nh.param<int>("/"+groupName+"/lane_detection2/track_bar", lane, 1);
+	nh.param<int>("/"+groupName+"/lane_detection2/debug", video, 0);
+	nh.param<int>("/"+groupName+"/lane_detection2/y_hmin",y_hmin,12);
+	nh.param<int>("/"+groupName+"/lane_detection2/y_hmax",y_hmax,24);
+	nh.param<int>("/"+groupName+"/lane_detection2/y_smin",y_smin,60);
+	nh.param<int>("/"+groupName+"/lane_detection2/y_smax",y_smax,146);
+	nh.param<int>("/"+groupName+"/lane_detection2/y_vmin",y_vmin,6);
+	nh.param<int>("/"+groupName+"/lane_detection2/y_vmax",y_vmax,255);
+	nh.param<int>("/"+groupName+"/lane_detection2/w_hmin",w_hmin,33);
+	nh.param<int>("/"+groupName+"/lane_detection2/w_hmax",w_hmax,125);
+	nh.param<int>("/"+groupName+"/lane_detection2/w_smin",w_smin,0);
+	nh.param<int>("/"+groupName+"/lane_detection2/w_smax",w_smax,15);
+	nh.param<int>("/"+groupName+"/lane_detection2/w_vmin",w_vmin,117);
+	nh.param<int>("/"+groupName+"/lane_detection2/w_vmax",w_vmax,255);
 
-	ROS_INFO("%d %d", w_hmin);
+	ROS_INFO("%d %d", w_hmin, w_vmin);
 }

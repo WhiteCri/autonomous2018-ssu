@@ -10,7 +10,7 @@
 serial::Serial ser;
 std::mutex lock;
 
-#define ALIVE_UPDATE_FRE 23
+#define ALIVE_UPDATE_FRE 72.15
 #define EPSILON 0.1
 
 class ParamReader{
@@ -115,8 +115,8 @@ int main (int argc, char** argv){
         //ALIVE DEBUG 
         alive_gap_d += (int)alive_gap;
         alive_gap_seconds = (ros::Time::now() - init_alive_gap_time).sec;
-        ROS_INFO("gap: %d,  time: %d(sec), alive_hz : %.3lf(hz)", alive_gap_d, alive_gap_seconds, 
-                (double)alive_gap_d/alive_gap_seconds);
+        //ROS_INFO("gap: %d,  time: %d(sec), alive_hz : %.3lf(hz)", alive_gap_d, alive_gap_seconds, 
+        //        (double)alive_gap_d/alive_gap_seconds);
 
         double time_interval = alive_gap * 1.0 / ALIVE_UPDATE_FRE; // platform send information for 50hz
         double speed = total_encoder_gap / 99.2 * 1.655 / time_interval;

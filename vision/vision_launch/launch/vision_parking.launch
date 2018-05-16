@@ -30,11 +30,11 @@
 	    	<param name="y_vmin" value="6"/>
 	    	<param name="y_vmax" value="255"/>
 
-     		<param name="w_hmin" value="33"/>
-    		<param name="w_hmax" value="255"/>
+     		<param name="w_hmin" value="0"/>
+    		<param name="w_hmax" value="40"/>
     		<param name="w_smin" value="0"/>
-    		<param name="w_smax" value="255"/>
-    		<param name="w_vmin" value="158"/>
+    		<param name="w_smax" value="49"/>
+    		<param name="w_vmin" value="134"/>
    	    	<param name="w_vmax" value="255"/>
 
 		</node>
@@ -80,7 +80,7 @@
 	    	<param name="y_vmax" value="255"/>
 
     		<param name="w_hmin" value="0"/>
-    		<param name="w_hmax" value="25"/>
+    		<param name="w_hmax" value="40"/>
      		<param name="w_smin" value="0"/>
     		<param name="w_smax" value="53"/>
     		<param name="w_vmin" value="121"/>
