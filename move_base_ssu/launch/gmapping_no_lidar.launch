@@ -22,10 +22,10 @@
 	
  
 <arg name="left_camera_name" default="left"/>
-	<arg name="left_camera_num" default="0"/>
+	<arg name="left_camera_num" default="1"/>
 
 	<arg name="right_camera_name" default="right"/>
-	<arg name="right_camera_num" default="1"/>
+	<arg name="right_camera_num" default="2"/>
 
 
 
@@ -42,13 +42,13 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="0"/>
+			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 			<param name="y_hmin" value="9"/>
 	  <param name="y_hmin" value="12"/>
 	  <param name="y_hmax" value="24"/>
-	  <param name="y_smin" value="60"/>
+	  <param name="y_smin" value="255"/>
 	  <param name="y_smax" value="146"/>
 	  <param name="y_vmin" value="6"/>
 	  <param name="y_vmax" value="255"/>
@@ -56,7 +56,7 @@
 	  <param name="w_hmax" value="180"/>
 	  <param name="w_smin" value="0"/>
 	  <param name="w_smax" value="44"/>
-	  <param name="w_vmin" value="182"/>
+	  <param name="w_vmin" value="120"/>
 	  <param name="w_vmax" value="255"/>
 		</node>
 
@@ -90,13 +90,13 @@
 			<param name="debug" value="0"/>
 			<param name="web_cam" value="1"/>
 			<param name="imshow" value="0"/>
-			<param name="track_bar" value="0"/>
+			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 			<param name="y_hmin" value="9"/>
 	  <param name="y_hmin" value="17"/>
 	  <param name="y_hmax" value="22"/>
-	  <param name="y_smin" value="52"/>
+	  <param name="y_smin" value="255"/>
 	  <param name="y_smax" value="151"/>
 	  <param name="y_vmin" value="0"/>
 	  <param name="y_vmax" value="180"/>
@@ -104,7 +104,7 @@
 	  <param name="w_hmax" value="255"/>
 	  <param name="w_smin" value="0"/>
 	  <param name="w_smax" value="60"/>
-	  <param name="w_vmin" value="195"/>
+	  <param name="w_vmin" value="145"/>
 	  <param name="w_vmax" value="255"/>
 		</node>
 
@@ -192,6 +192,12 @@
    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
         <param name="astep" value="0.02"/>
 		<param name="lstep" value="0.05"/>
+		<param name="map_update_interval" value="1"/>
+		<param name="iterations" value="5"/>
+		<param name="minimumScore" value="0.0"/>
+		<param name="linearUpdate" value="0.5"/>
+		<param name="angularUpdate" value="0.25"/>
+		<param name="particles" value="30"/>
 		<param name="xmin" value="-100.0"/>
         <param name="ymin" value="-100.0"/>
         <param name="xmax" value="100.0"/>

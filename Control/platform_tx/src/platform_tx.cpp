@@ -86,6 +86,7 @@ void serialWrite(){
         // ALIVE
         packet[11] = static_cast<uint8_t>(alive);    alive = (alive + 1) % 256;
         
+ROS_INFO("alive : %d", packet[11]);
         ser->write(packet,TX_PACKET_LENGTH);
         loop_rate.sleep();
     }
