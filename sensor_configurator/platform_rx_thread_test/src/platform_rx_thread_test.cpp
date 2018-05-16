@@ -101,11 +101,15 @@ int main (int argc, char** argv){
     typedef int8_t ALIVE_datatype;
     std::deque<std::pair<int32_t, ALIVE_datatype> > encoder(reader.moving_average_element_number);
 
+
+    int alive_gap_d = 0;
  //speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
          //   / timeInterval / interval;
     auto calc_speed =[&]()->double{
         double total_encoder_gap = encoder.front().first - encoder.back().first;
         ALIVE_datatype alive_gap = encoder.front().second - encoder.back().second;
+        //ALIVE DEBUG 
+        alive_gap_d += (int)alive_gap;
         double time_interval = alive_gap * 1.0 / ALIVE_UPDATE_FRE; // platform send information for 50hz
         double speed = total_encoder_gap / 99.2 * 1.655 / time_interval;
         return speed;
@@ -152,7 +156,7 @@ int main (int argc, char** argv){
         msg.speed = calc_speed();
         msg.steer = getParsingData<int16_t>(packet_main, 8);
         msg.brake = getParsingData<uint8_t>(packet_main, 10);
-        msg.seq = seq++;
+        msg.seq = alive_gap_d;
         bool estop = getParsingData<uint8_t>(packet_main, 4);
 //
         bool speed_flag = (fabs(msg.speed) < EPSILON) ? true : false;  
