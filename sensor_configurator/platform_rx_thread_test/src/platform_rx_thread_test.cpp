@@ -4,6 +4,7 @@
 #include <thread>
 #include <deque>
 #include <exception>
+#include <ctime>
 #include "platform_rx_msg/platform_rx_msg.h"
 
 serial::Serial ser;
@@ -103,13 +104,19 @@ int main (int argc, char** argv){
 
 
     int alive_gap_d = 0;
+    time_t alive_gap_seconds = 0;
+    const time_t init_alive_gap_time = clock();
  //speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
          //   / timeInterval / interval;
     auto calc_speed =[&]()->double{
         double total_encoder_gap = encoder.front().first - encoder.back().first;
         ALIVE_datatype alive_gap = encoder.front().second - encoder.back().second;
+        
         //ALIVE DEBUG 
         alive_gap_d += (int)alive_gap;
+        alive_gap_seconds = (double)(clock() - init_alive_gap_time) / CLOCKS_PER_SEC;
+        ROS_INFO("gap : %d,  alive_hz : %.3lf(hz)", alive_gap_d, alive_gap_d/alive_gap_seconds);
+
         double time_interval = alive_gap * 1.0 / ALIVE_UPDATE_FRE; // platform send information for 50hz
         double speed = total_encoder_gap / 99.2 * 1.655 / time_interval;
         return speed;
