@@ -104,8 +104,8 @@ int main (int argc, char** argv){
 
 
     int alive_gap_d = 0;
-    time_t alive_gap_seconds = 0;
-    const time_t init_alive_gap_time = clock();
+    int alive_gap_seconds = 0;
+    const ros::Time init_alive_gap_time = ros::Time::now();
  //speed = (encoder[0].first - encoder[1].first) / encoderValuePerCycle * distanceValuePerCycle 
          //   / timeInterval / interval;
     auto calc_speed =[&]()->double{
@@ -114,8 +114,9 @@ int main (int argc, char** argv){
         
         //ALIVE DEBUG 
         alive_gap_d += (int)alive_gap;
-        alive_gap_seconds = (double)(clock() - init_alive_gap_time) / CLOCKS_PER_SEC;
-        ROS_INFO("gap : %d,  alive_hz : %.3lf(hz)", alive_gap_d, alive_gap_d/alive_gap_seconds);
+        alive_gap_seconds = (ros::Time::now() - init_alive_gap_time).sec;
+        ROS_INFO("gap: %d,  time: %d(sec), alive_hz : %.3lf(hz)", alive_gap_d, alive_gap_seconds, 
+                (double)alive_gap_d/alive_gap_seconds);
 
         double time_interval = alive_gap * 1.0 / ALIVE_UPDATE_FRE; // platform send information for 50hz
         double speed = total_encoder_gap / 99.2 * 1.655 / time_interval;

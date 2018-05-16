@@ -1,6 +1,6 @@
 <launch>
 	<arg name="left_camera_name" default="left"/>
-	<arg name="left_camera_num" default="0"/>
+	<arg name="left_camera_num" default="2"/>
 
 	<arg name="right_camera_name" default="right"/>
 	<arg name="right_camera_num" default="1"/>
@@ -25,16 +25,16 @@
       <!-- LEFT -->
 	    	<param name="y_hmin" value="12"/>
       		<param name="y_hmax" value="24"/>
-      		<param name="y_smin" value="60"/>
+      		<param name="y_smin" value="150"/>
 	    	<param name="y_smax" value="146"/>
 	    	<param name="y_vmin" value="6"/>
 	    	<param name="y_vmax" value="255"/>
 
-     		<param name="w_hmin" value="10"/>
-    		<param name="w_hmax" value="206"/>
+     		<param name="w_hmin" value="33"/>
+    		<param name="w_hmax" value="255"/>
     		<param name="w_smin" value="0"/>
-    		<param name="w_smax" value="254"/>
-    		<param name="w_vmin" value="190"/>
+    		<param name="w_smax" value="255"/>
+    		<param name="w_vmin" value="158"/>
    	    	<param name="w_vmax" value="255"/>
 
 		</node>
@@ -65,7 +65,7 @@
 			<param name="sizeup" value="0"/>
 		</node>
 
-			<node name="lane_detection2" pkg="lane_detection" type="lane_detection2" args="$(arg right_camera_name)" output="screen">
+		<node name="lane_detection2" pkg="lane_detection" type="lane_detection2" args="$(arg right_camera_name)" output="screen">
 			<param name="debug" value="1"/>
 			<param name="track_bar" value="1"/>
 			<param name="lane" value="1"/>
@@ -79,11 +79,11 @@
 	    	<param name="y_vmin" value="6"/>
 	    	<param name="y_vmax" value="255"/>
 
-    		<param name="w_hmin" value="10"/>
-    		<param name="w_hmax" value="206"/>
+    		<param name="w_hmin" value="0"/>
+    		<param name="w_hmax" value="25"/>
      		<param name="w_smin" value="0"/>
-    		<param name="w_smax" value="254"/>
-    		<param name="w_vmin" value="190"/>
+    		<param name="w_smax" value="53"/>
+    		<param name="w_vmin" value="121"/>
    	    	<param name="w_vmax" value="255"/> 
 		</node>
 
