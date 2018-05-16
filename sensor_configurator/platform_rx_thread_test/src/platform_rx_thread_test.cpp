@@ -10,7 +10,7 @@
 serial::Serial ser;
 std::mutex lock;
 
-#define ALIVE_UPDATE_FRE 72.15
+#define ALIVE_UPDATE_FRE 21
 #define EPSILON 0.1
 
 class ParamReader{

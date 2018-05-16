@@ -214,7 +214,7 @@ void CalDistance::sendDist(){
 
 void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
-    nh_.param("hl_controller/use_base_filter", use_base_filter, false);
+    nh_.param("hl_controller/use_base_filter", use_base_filter, true);
 
     laneXData.clear();
 
@@ -252,13 +252,10 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
             targetPixel.y = (*it);
             ++it;
             targetDist = transformer.pixel_to_real(targetPixel);
-            if (use_base_filter){
-              if (box.in(targetDist.x, targetDist.y)) {
-                ROS_INFO("use base filter...");
+            if (use_base_filter)
+              if (box.in(targetDist.x, targetDist.y)) 
                 continue;
-              }
-            }
-
+              
             if ((targetDist.x == 0) && (targetDist.y == 0)) continue; //when transformer() failed, continue;
 
             if(debug){

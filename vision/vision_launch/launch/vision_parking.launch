@@ -1,9 +1,9 @@
 <launch>
 	<arg name="left_camera_name" default="left"/>
-	<arg name="left_camera_num" default="2"/>
+	<arg name="left_camera_num" default="1"/>
 
 	<arg name="right_camera_name" default="right"/>
-	<arg name="right_camera_num" default="1"/>
+	<arg name="right_camera_num" default="2"/>
 
 
 
@@ -30,12 +30,12 @@
 	    	<param name="y_vmin" value="6"/>
 	    	<param name="y_vmax" value="255"/>
 
-     		<param name="w_hmin" value="0"/>
-    		<param name="w_hmax" value="40"/>
+     		<param name="w_hmin" value="104"/>
+    		<param name="w_hmax" value="173"/>
     		<param name="w_smin" value="0"/>
-    		<param name="w_smax" value="49"/>
-    		<param name="w_vmin" value="134"/>
-   	    	<param name="w_vmax" value="255"/>
+    		<param name="w_smax" value="31"/>
+    		<param name="w_vmin" value="103"/>
+   	    	<param name="w_vmax" value="239"/>
 
 		</node>
 
@@ -80,10 +80,10 @@
 	    	<param name="y_vmax" value="255"/>
 
     		<param name="w_hmin" value="0"/>
-    		<param name="w_hmax" value="40"/>
+    		<param name="w_hmax" value="255"/>
      		<param name="w_smin" value="0"/>
-    		<param name="w_smax" value="53"/>
-    		<param name="w_vmin" value="121"/>
+    		<param name="w_smax" value="15"/>
+    		<param name="w_vmin" value="142"/>
    	    	<param name="w_vmax" value="255"/> 
 		</node>
 

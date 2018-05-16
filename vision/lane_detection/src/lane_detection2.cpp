@@ -102,7 +102,7 @@ void Lane_detection::laneCb(const sensor_msgs::ImageConstPtr& img_msg) {
 	cv_ptr = cv_bridge::toCvCopy(img_msg,sensor_msgs::image_encodings::BGR8);
 	src = cv_ptr->image;
 	
-	//src = imread("/home/whiteherb/test.png", CV_LOAD_IMAGE_COLOR);
+	//src = imread("/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data/left_calibration.png", CV_LOAD_IMAGE_COLOR);
 	
 	Rect rc(0,0,640,150);
 	Scalar color(0,0,0);
