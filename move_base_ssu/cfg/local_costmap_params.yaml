@@ -19,9 +19,10 @@ local_costmap:
     - {name: obstacle_layer,     type: "costmap_2d::VoxelLayer"}
     - {name: inflation_layer,    type: "costmap_2d::InflationLayer"}
 
-
   obstacle_layer:
-    enabled: true
+    observation_sources: lidar_scan_sensor
+    lidar_scan_sensor: {data_type: LaserScan, topic: scan_lidar, marking: true, clearing: true}
+    enabled: true 
     obstacle_range: 8.0
     raytrace_range: 8.0
     inflation_radius: 1.5
@@ -29,7 +30,3 @@ local_costmap:
     track_unknown_space: false
     combination_method: 1
 
-    observation_sources: lidar_scan_sensor
-    lidar_scan_sensor: {data_type: LaserScan, topic: scan_lidar, marking: true, clearing: true}
-    #observation_sources: laser_scan_sensor
-    #laser_scan_sensor: {data_type: LaserScan, topic: scan, marking: true, clearing: true}

@@ -39,7 +39,7 @@
 			<param name="w_smin" value="0"/>
 			<param name="w_smax" value="41"/>
 			<param name="w_vmin" value="178"/>
-			<param name="w_vmax" value="233"/>
+			<param name="w_vmax" value="248"/>
 
 			<!--주행장용-->
 			<!--<param name="y_hmin" value="17"/>
@@ -97,12 +97,12 @@
 			<param name="y_smax" value="152"/>
 			<param name="y_vmin" value="0"/>
 			<param name="y_vmax" value="255"/>
-			<param name="w_hmin" value="2"/>
+			<param name="w_hmin" value="0"/>
 			<param name="w_hmax" value="179"/>
 			<param name="w_smin" value="0"/>
-			<param name="w_smax" value="22"/>
-			<param name="w_vmin" value="122"/>
-			<param name="w_vmax" value="192"/>
+			<param name="w_smax" value="14"/>
+			<param name="w_vmin" value="159"/>
+			<param name="w_vmax" value="255"/>
 
 			<!--주행장용-->
 			<!--<param name="y_hmin" value="9"/>
