@@ -323,11 +323,11 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 //         }
                                 // }
                                 yellow_hsv = hough_zero_left | yellow_hsv; 
-                                cv::imshow("y_test_after",yellow_hsv);       
+                              //  cv::imshow("y_test_after",yellow_hsv);       
                        }
                        else if(groupName == "right"){
                                 white_hsv = hough_zero_right | white_hsv;
-                                cv::imshow("w_test_after",white_hsv);        
+                              //  cv::imshow("w_test_after",white_hsv);        
                        }
                        else if(groupName == "main"){
                                         // left_for_offset_tmp = yellow_hsv.clone();
@@ -367,7 +367,7 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                                 //         }
                                 // }
                                white_hsv = hough_zero_right | white_hsv;
-                               cv::imshow("w_test_after",white_hsv);
+                              // cv::imshow("w_test_after",white_hsv);
                        }
                        
                         

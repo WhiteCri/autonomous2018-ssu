@@ -22,7 +22,7 @@
 	<!-- Camera -->
 	<include file="$(find vision_launch)/launch/vision_launch.launch">
 		<arg name="left_camera_name" value="left"/>
-		<arg name="left_camera_num" value="1"/>
+		<arg name="left_camera_num" value="0"/>
 		<arg name="right_camera_name" value="right"/>
 		<arg name="right_camera_num" value="2"/>
 	</include>
