@@ -30,14 +30,14 @@ amcl:
   update_min_a: 0.04
 
   odom_model_type: "diff"
-  odom_alpha1: 0.2
-  odom_alpha2: 0.2
+  odom_alpha1: 0.3
+  odom_alpha2: 0.1
   odom_alpha3: 0.05
-  odom_alpha4: 0.7
+  odom_alpha4: 0.5
   odom_alpha5: 0.1
   gui_publish_rate: 10.0
-  min_particles: 700
-  max_particles: 1000
+  min_particles: 1000
+  max_particles: 1100
   kld_err: 0.05
   kld_z: 0.99
   
