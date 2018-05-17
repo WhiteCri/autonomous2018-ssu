@@ -180,11 +180,11 @@ void InitImgObjectforROS::imgCb(const sensor_msgs::ImageConstPtr& img_msg){
                         // *업로드시 복구 ///////////////////////
                         if(groupName == "left"){
                                 callane.birdEyeView_left(frame,bev);
-                                cv::imshow("test_0515_le",bev);
+                                if(debug)cv::imshow("test_0515_le",bev);
                         } 
                         else if ( groupName == "right"){
                                 callane.birdEyeView_right(frame,bev);
-                                cv::imshow("test_0515_ri",bev);
+                                if(debug)cv::imshow("test_0515_ri",bev);
                         }
                         else if(groupName == "main"){
                                 //callane.birdEyeView_left(frame,bev);

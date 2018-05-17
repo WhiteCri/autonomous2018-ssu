@@ -26,8 +26,22 @@
 			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
+				<!--학교-->
+			<param name="y_hmin" value="57"/>
+			<param name="y_hmax" value="94"/>
+			<param name="y_smin" value="26"/>
+			<param name="y_smax" value="133"/>
+			<param name="y_vmin" value="57"/>
+			<param name="y_vmax" value="158"/>
+			<param name="w_hmin" value="57"/>
+			<param name="w_hmax" value="94"/>
+			<param name="w_smin" value="26"/>
+			<param name="w_smax" value="151"/>
+			<param name="w_vmin" value="84"/>
+			<param name="w_vmax" value="248"/>
 			
-			<!--학교-->
+			
+			<!--주행장 0517
 			<param name="y_hmin" value="7"/>
 			<param name="y_hmax" value="39"/>
 			<param name="y_smin" value="38"/>
@@ -39,7 +53,7 @@
 			<param name="w_smin" value="0"/>
 			<param name="w_smax" value="41"/>
 			<param name="w_vmin" value="178"/>
-			<param name="w_vmax" value="248"/>
+			<param name="w_vmax" value="248"/>-->
 
 			<!--주행장용-->
 			<!--<param name="y_hmin" value="17"/>
@@ -89,8 +103,23 @@
 			<param name="track_bar" value="1"/>
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
-
+			
 			<!--학교-->
+			<param name="y_hmin" value="58"/>
+			<param name="y_hmax" value="43"/>
+			<param name="y_smin" value="86"/>
+			<param name="y_smax" value="162"/>
+			<param name="y_vmin" value="0"/>
+			<param name="y_vmax" value="255"/>
+			<param name="w_hmin" value="58"/>
+			<param name="w_hmax" value="93"/>
+			<param name="w_smin" value="26"/>
+			<param name="w_smax" value="151"/>
+			<param name="w_vmin" value="13"/>
+			<param name="w_vmax" value="234"/>
+			
+			
+			<!--주행장 0517
 			<param name="y_hmin" value="2"/>
 			<param name="y_hmax" value="43"/>
 			<param name="y_smin" value="63"/>
@@ -102,7 +131,7 @@
 			<param name="w_smin" value="0"/>
 			<param name="w_smax" value="14"/>
 			<param name="w_vmin" value="159"/>
-			<param name="w_vmax" value="255"/>
+			<param name="w_vmax" value="255"/>-->
 
 			<!--주행장용-->
 			<!--<param name="y_hmin" value="9"/>
