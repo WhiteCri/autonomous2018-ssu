@@ -77,9 +77,10 @@ namespace lane_detect_algo
             void makeContoursRightLane(cv::Mat src, cv::Mat& dst, int* crosswalk);
             void makeContoursRightLane(cv::Mat src, cv::Mat& dst);
             void voteLabel(cv::Mat src, cv::Mat& dst);
-            void laneHist(cv::Mat src, cv::Mat& dst);
+            int laneHist(cv::Mat src, cv::Mat dst);
             void myProjection(cv::Mat src, cv::Mat& dst, unsigned int* H_result);
-            
+            void trackingLane(cv::Mat src, cv::Mat dst);
+            void makeContoursLeftLaneByHist(cv::Mat src, cv::Mat& dst);      
     };
     
 }

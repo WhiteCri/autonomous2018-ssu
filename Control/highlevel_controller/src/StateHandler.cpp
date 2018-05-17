@@ -2,6 +2,7 @@
 #include <dynamic_reconfigure/DoubleParameter.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/Config.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include "highlevel_controller/StateHandler.h"
 #include "highlevel_controller/base_parameter.h"
 #include "highlevel_controller/goalSender.h"
@@ -86,6 +87,29 @@ bool handler_setGoal(bool newGoal=false){
     return true;
 }
 
+static void setInitialPos(double x, double y, double ori_z, double ori_w){
+    ros::Publisher pub =
+        param_ptr->nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("initialpose",100);
+    geometry_msgs::PoseWithCovarianceStamped p;
+    p.header.frame_id = "map";
+    p.header.seq = 1;
+    p.header.stamp = ros::Time::now();
+    p.pose.pose.position.x = x;
+    p.pose.pose.position.y = x;
+    p.pose.pose.orientation.z = ori_z;
+    p.pose.pose.orientation.w = ori_w;
+    p.pose.covariance = boost::array<double, 36>({{
+        0.25, 0, 0, 0, 0, 0,
+        0, 0.25, 0, 0, 0, 0,
+        0, 0, 0.25, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0.0685389,
+    }});
+    ROS_INFO("fucking initial pose set");
+    pub.publish(p);
+}
+
 static void waitUntilReach(){
     while(true){
         auto state = goalSender_ptr->getState();
@@ -107,8 +131,8 @@ static void waitUntilReach(){
 void init(){
     ROS_INFO("State Init...");
     param_ptr->nh.setParam("hl_controller/curState","INIT");
-    param_ptr->nh.setParam("hl_controller/use_base_filter",true);
-
+    //param_ptr->nh.setParam("hl_controller/use_base_filter",true);
+setInitialPos(30000,30000,1,0);
     handler_setGoal();
 }
 

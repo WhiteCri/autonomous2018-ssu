@@ -146,13 +146,13 @@ class CalDistance{
     ros::Subscriber sub_;
     ros::Publisher pub_;
 public:
-    CalDistance() : use_base_filter(false), box(std::vector<double>({7,0.5,1,0.5,1.-0,5,7,-0.5}))
+    CalDistance()
     {
       // 싱글카메라
       initParam();
       transformer = Transformer(filename, linename);
 
-      box  =  std::vector<double>({7,0.5,1,0.5,1,-0.5,7,-0.5});
+
       sub_ = nh_.subscribe("/"+ groupName +"/lane",100,&CalDistance::laneCb,this);
       pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/"+ groupName +"/dist", 100);
 
@@ -174,8 +174,6 @@ private:
     Transformer transformer;
     std::string filename;
     std::string linename;
-    Box box;
-    bool use_base_filter;
 };
 
 
@@ -191,7 +189,11 @@ int main(int argc, char** argv){
 
     ros::init(argc, argv, "cal_dirstance");
     CalDistance calDist;
-    ros::spin();
+    while(calDist.getNh().ok()){
+        calDist.sendDist();
+        ros::spinOnce();
+    }
+    return 0;
 }
 
 void CalDistance::sendDist(){
@@ -213,9 +215,6 @@ void CalDistance::sendDist(){
 }
 
 void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
-
-    nh_.param("hl_controller/use_base_filter", use_base_filter, true);
-
     laneXData.clear();
 
     laneYData.clear();
@@ -252,10 +251,7 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
             targetPixel.y = (*it);
             ++it;
             targetDist = transformer.pixel_to_real(targetPixel);
-            if (use_base_filter)
-              if (box.in(targetDist.x, targetDist.y)) 
-                continue;
-              
+
             if ((targetDist.x == 0) && (targetDist.y == 0)) continue; //when transformer() failed, continue;
 
             if(debug){
@@ -270,11 +266,11 @@ void CalDistance::laneCb(const std_msgs::Int32MultiArray::ConstPtr& laneData){
 
     // COUNT
     // if(groupName == "left")
-    //   ROS_INFO("left output size if(groupName == "left")
+    //   ROS_INFO("left output size : %d", count);
     // else
     //   ROS_INFO("right output size : %d", count);
     //
-    this->sendDist();
+
 }
 
 ros::NodeHandle CalDistance::getNh(){ return nh_; }

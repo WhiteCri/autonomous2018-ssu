@@ -76,7 +76,7 @@ namespace pointcloud_to_laserscan
     private_nh_.param<double>("inf_epsilon", inf_epsilon_, 1.0);
 
     int concurrency_level;
-    private_nh_.param<int>("concurrency_level", concurrency_level,0);
+    private_nh_.param<int>("concurrency_level", concurrency_level,1);
     private_nh_.param<bool>("use_inf", use_inf_, true);
 
     //Check if explicitly single threaded, otherwise, let nodelet manager dictate thread pool size
