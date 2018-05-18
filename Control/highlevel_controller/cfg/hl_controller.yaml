@@ -5,7 +5,7 @@ hl_controller:
   y_goal:     [149.64       ,118.97     ,76.97      ,73.86    ,103.07   ,151.10   ,144.01   ,119.44   ,113.75 ,119.44   ,116.43 ,110.90 ,116.43 ,159.81]
   ori_z_goal: [-0.7002      ,-0.6952    ,-0.7071    ,0.7043   ,0.7038   ,0.7102   ,-0.7132  ,-0.7059  ,0.9706 ,-0.7059  ,-0.7063,0.9722 ,-0.7063,0.7025]
   ori_w_goal: [0.7138       ,0.7187     ,0.7071     ,0.7098   ,0.7103   ,0.7039   ,0.7009   ,0.7082   ,-0.2404,0.7082   ,0.7078 ,-0.2340,0.7078 ,0.7116]
-  goal_type:  ["crosswalk"  ,"skip"     ,"movingobj","normal" ,normal   ,uturn    ,normal   ,parking  ,normal ,normal   ,skip   ,skip   ,skip   ,normal]
+  goal_type:  ["crosswalk"  ,"skip"     ,"movingobj","normal" ,normal   ,uturn    ,normal   ,skip     ,skip   ,skip     ,parking,normal ,normal ,normal]
 #                                                                                  afterUturn  nparkR  nparkG  nparkB    fparkR fparkG  fparkB
 #hl tmp                                                                   R:ready, G: goal, B: backing point
 #                                                                             parking takes three goals                                                                            

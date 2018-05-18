@@ -29,16 +29,17 @@
 				<!--학교-->
 			<param name="y_hmin" value="9"/>
 			<param name="y_hmax" value="41"/>
-			<param name="y_smin" value="26"/>
+			<param name="y_smin" value="39"/>
 			<param name="y_smax" value="255"/>
-			<param name="y_vmin" value="21"/>
+			<param name="y_vmin" value="10"/>
 			<param name="y_vmax" value="255"/>
 			<param name="w_hmin" value="0"/>
 			<param name="w_hmax" value="179"/>
 			<param name="w_smin" value="0"/>
 			<param name="w_smax" value="9"/>
-			<param name="w_vmin" value="230"/>
+			<param name="w_vmin" value="180"/>
 			<param name="w_vmax" value="255"/>
+			
 			
 			
 			<!--주행장 0517
@@ -109,15 +110,15 @@
 			<!--학교-->
 			<param name="y_hmin" value="9"/>
 			<param name="y_hmax" value="41"/>
-			<param name="y_smin" value="26"/>
+			<param name="y_smin" value="39"/>
 			<param name="y_smax" value="255"/>
-			<param name="y_vmin" value="21"/>
+			<param name="y_vmin" value="10"/>
 			<param name="y_vmax" value="255"/>
 			<param name="w_hmin" value="0"/>
 			<param name="w_hmax" value="179"/>
 			<param name="w_smin" value="0"/>
 			<param name="w_smax" value="9"/>
-			<param name="w_vmin" value="230"/>
+			<param name="w_vmin" value="180"/>
 			<param name="w_vmax" value="255"/>
 			
 			
