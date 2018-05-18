@@ -3,7 +3,7 @@ control:
   wheelbase: 1.0
 
   accel:
-    settling_time: 1.5
+    settling_time: 1.7
 
   speed:
     weight: 1.1
