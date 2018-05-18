@@ -201,18 +201,8 @@ void process_crosswalk(){
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_CROSSWALK");
 
     //wait until reaching goal
-    //ROS_INFO("wait for reaching goall...");
-    //waitUntilReach();
-
-    //maintaining car's status
-    //double crosswalk_driving_duration = param_ptr->crosswalk_driving_duration;
-    //if (crosswalk_driving_duration > 0){
-    //    ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->crosswalk_driving_duration);
-    //    ros::Rate(param_ptr->crosswalk_driving_duration).sleep();
-    //}
-
+    ROS_INFO("wait for reaching goall...");
     waitUntilReach();
-
 
     //take car to stop
     ROS_INFO("stop for %lf seconds...", param_ptr->crosswalk_stop_duration);
@@ -227,9 +217,8 @@ void process_crosswalk(){
     //unlock tx_control_static
     param_ptr->nh.setParam("hl_controller/tx_control_static",false);
 
-    //lock base filter
-    //param_ptr->nh.setParam("hl_controller/use_base_filter",false);
-       
+    ROS_INFO("Unlock Tx static Control...");
+
     //check that process_crosswalk had been done.
     param_ptr->nh.setParam("hl_controller/crosswalk_onetime_flag",true);
     
@@ -244,13 +233,6 @@ void process_movingobj(){
     ROS_INFO("movingobj start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_MOVINGOBJ");
 
-    //maintaining car's status
-    //double movingobj_driving_duration = param_ptr->movingobj_driving_duration;
-    //if (movingobj_driving_duration > 0){
-    //    ROS_INFO("maintaining it's status for %lf seconds...", param_ptr->movingobj_driving_duration);
-    //    ros::Rate(param_ptr->movingobj_driving_duration).sleep();
-    //}
-
     waitUntilReach();
 
     //take car to stop
@@ -263,18 +245,14 @@ void process_movingobj(){
     //take car to wait
     ros::Rate(1 / param_ptr->movingobj_stop_duration).sleep();
 
+    ROS_INFO("Unlock Tx Static Control...");
+
     //unlock tx_control_static
     param_ptr->nh.setParam("hl_controller/tx_control_static",false);
 
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/movingobj_onetime_flag",true);
 
-    //we decided to use global map, so we don't use this...
-    //while(param_ptr->movingobj){
-    //    param_ptr->nh.getParam("hl_controller/movingobj", param_ptr->movingobj);
-    //    ROS_INFO("wait for hl_controller/movingobj to be false...");
-    //    ros::Rate(1).sleep();
-    //}
     ROS_INFO("movingobj done");
     param_ptr->load_param();
 }
@@ -289,32 +267,27 @@ void process_parking(){
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
     param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
+    DynamicParamSender ds;
+    ds.saveDynamicParams("max_vel_x", -3.0);
+    ds.saveDynamicParams("min_vel_x", -2.0);    
+
     //take car to wait
     ros::Rate(1 / param_ptr->parking_stop_duration).sleep();
 
     //set goal to backing point
-    ROS_INFO("set tx_stop false");
+    ROS_INFO("Unlock tx static control...");
     param_ptr->nh.setParam("hl_controller/tx_control_static", false);
     
-    DynamicParamSender ds;
-    ds.saveDynamicParams("max_vel_x", -3.0);
-    ds.saveDynamicParams("min_vel_x", -2.0);    
-    //ros::Rate((double)1/LOAD_STOP_DURATION).sleep();
-    
-    ROS_INFO("unlock stop...");
-    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
-
     waitUntilReach();
 
     ds.saveDynamicParams("max_vel_x", 8.0);
-    ds.saveDynamicParams("min_vel_x", 7.0);
+    ds.saveDynamicParams("min_vel_x", 1.5);
     //param_ptr->nh.setParam("hl_controller/use_base_filter",false);
     
-    //reload default params
-    ds.saveDynamicParams("max_vel_x", 5.0);
-
     ROS_INFO("to the backing point...");
+    waitUntilReach();
 
+    ROS_INFO("process parking done!");
     param_ptr->nh.setParam("hl_controller/parking_onetime_flag",true);
 }
 
@@ -324,36 +297,17 @@ void process_uturn(){
 
     double uturn_duration = param_ptr->uturn_duration;
 
-    //set tx_control_static
-    //ROS_INFO("set tx_control value - speed : %d, steer : %d, brake : %d", 
-    //    param_ptr->uturn_tx_speed, param_ptr->uturn_tx_steer, param_ptr->uturn_tx_brake);
-    //param_ptr->nh.setParam("hl_controller/tx_control_static", true);
-    //param_ptr->nh.setParam("hl_controller/tx_speed", param_ptr->uturn_tx_speed);
-    //param_ptr->nh.setParam("hl_controller/tx_steer", param_ptr->uturn_tx_steer);
-    //param_ptr->nh.setParam("hl_controller/tx_brake", param_ptr->uturn_tx_brake);
-//
-    ////wait until duration ends
-    //ROS_INFO("maintaing for %lf seconds...", param_ptr->uturn_duration);
-    //ros::Rate(1/param_ptr->uturn_duration).sleep();
-//
-    ////erase tx_control_static flag
-    //param_ptr->nh.setParam("hl_controller/tx_control_static", false);
     ROS_INFO("change move_base params...");
     DynamicParamSender ds;
     ds.saveDynamicParams("acc_lim_x", 5.5);
-
-    //lock camera
-    param_ptr->nh.setParam("hl_controller/use_base_filter",true);
 
     waitUntilReach();
 
     ROS_INFO("reload pre-move_base params...");
     ds.saveDynamicParams("acc_lim_x", 3.5);
-    param_ptr->nh.setParam("hl_controller/use_base_filter",false);
-
+    
     //check that process_movingobj had been done.
     param_ptr->nh.setParam("hl_controller/uturn_onetime_flag",true);
-
 
     ROS_INFO("uturn done");
 }
@@ -362,17 +316,6 @@ void process_sload(){
 
     ROS_INFO("sload start");
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_SLOAD");
-
-//    ROS_INFO("stop...");
-//    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
-//    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
-//    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
-//    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
-//
-//    ROS_INFO("change move_base params...");
-//    
-//    ROS_INFO("unlock stop...");
-//    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
 
     waitUntilReach();
      

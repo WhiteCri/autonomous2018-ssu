@@ -3,7 +3,7 @@
 <!-- Robot Parameters Load (including sensors, sensor filters, odometry  -->
     <rosparam file="$(find move_base_ssu)/cfg/sensor_setup_params.yaml" command="load"/>
 	<rosparam file="$(find move_base_ssu)/cfg/pose_estimation_params.yaml" command="load"/>
-	<arg name="map_name" default="real_the_place.yaml"/>
+	<arg name="map_name" default="hl_tmp.yaml"/>
 
 
 <!-- Robot Frame Setup (static tf)  -->
