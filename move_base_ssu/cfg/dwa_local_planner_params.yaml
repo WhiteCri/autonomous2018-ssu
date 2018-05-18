@@ -1,6 +1,6 @@
 GlobalPlanner:
  lethal_cost: 253
- neutral_cost: 50
+ neutral_cost: 5
  cost_factor: 0.01
  publish_potential: true
  orientation_mode: 1
