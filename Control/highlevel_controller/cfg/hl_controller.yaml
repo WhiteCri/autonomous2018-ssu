@@ -1,13 +1,14 @@
 hl_controller:
 #goal
 #real the place goals
-  x_goal:     [85.02        ,91.32      ,87.42      ,115.02   ,108.34   ,113.19   ,108.96   ,100.84 ,104.48   ,100.68 ,104.55 ,88.02 ]
-  y_goal:     [149.64       ,118.97     ,76.97      ,73.86    ,103.07   ,151.10   ,144.01   ,114.25 ,118.14   ,110.94 ,116.18 ,159.81]
-  ori_z_goal: [-0.7002      ,-0.6952    ,-0.7071    ,0.7043   ,0.7038   ,0.7102   ,-0.7132  ,0.9629 ,-0.7127  ,0.9616 ,-0.7043,0.7025]
-  ori_w_goal: [0.7138       ,0.7187     ,0.7071     ,0.7098   ,0.7103   ,0.7039   ,0.7009   ,-0.2697,0.7014   ,-0.2741,0.7098 ,0.7116]
-  goal_type:  ["crosswalk"  ,"skip"     ,"movingobj","normal" ,normal   ,uturn    ,normal   ,normal ,parking  ,skip   ,skip   ,normal]
-                                                                                            nparkG  nparkB    fparkG  fparkB
-#hl tmp
+  x_goal:     [85.02        ,91.32      ,87.42      ,115.02   ,108.34   ,113.19   ,108.96   ,105.03   ,100.69 ,105.03   ,104.94 ,100.94 ,104.94 ,88.02 ]
+  y_goal:     [149.64       ,118.97     ,76.97      ,73.86    ,103.07   ,151.10   ,144.01   ,119.44   ,113.75 ,119.44   ,116.43 ,110.90 ,116.43 ,159.81]
+  ori_z_goal: [-0.7002      ,-0.6952    ,-0.7071    ,0.7043   ,0.7038   ,0.7102   ,-0.7132  ,-0.7059  ,0.9706 ,-0.7059  ,-0.7063,0.9722 ,-0.7063,0.7025]
+  ori_w_goal: [0.7138       ,0.7187     ,0.7071     ,0.7098   ,0.7103   ,0.7039   ,0.7009   ,0.7082   ,-0.2404,0.7082   ,0.7078 ,-0.2340,0.7078 ,0.7116]
+  goal_type:  ["crosswalk"  ,"skip"     ,"movingobj","normal" ,normal   ,uturn    ,normal   ,parking  ,normal ,normal   ,skip   ,skip   ,skip   ,normal]
+#                                                                                  afterUturn  nparkR  nparkG  nparkB    fparkR fparkG  fparkB
+#hl tmp                                                                   R:ready, G: goal, B: backing point
+#                                                                             parking takes three goals                                                                            
 #  x_goal:     [1.855      ,3.6537]
 #  y_goal:     [-0.851     ,0.1178]
 #  ori_z_goal: [-6.810e-5  ,0.0547]

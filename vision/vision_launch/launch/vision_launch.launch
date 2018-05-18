@@ -74,8 +74,8 @@
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg left_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
 			<!-- <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> -->
-			<!--<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
-			<param name="cal_path" value="/home/jin/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			<!--<param name="cal_path" value="/home/jin/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
 			
 		</node>
 
@@ -169,8 +169,8 @@
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg right_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
 			<!-- <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> -->
-			<!--<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
-			<param name="cal_path" value="/home/jin/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			<!--<param name="cal_path" value="/home/jin/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
 		</node>
 
 		<node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" args="$(arg right_camera_name)" respawn="true" output="screen">

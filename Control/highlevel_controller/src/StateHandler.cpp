@@ -259,6 +259,22 @@ void process_movingobj(){
 
 void process_parking(){
     ROS_INFO("process parking start");
+    DynamicParamSender ds;
+
+    ROS_INFO("Wait for arrive at Ready Point...");
+    waitUntilReach();
+
+    ROS_INFO("Processing parking...Changing params...");
+    ds.saveDynamicParams("max_vel_x", 3.0);
+    ROS_INFO("Lock Tx Static Control");
+    param_ptr->nh.setParam("hl_controller/tx_control_static", true);
+    param_ptr->nh.setParam("hl_controller/tx_speed", 0);
+    param_ptr->nh.setParam("hl_controller/tx_steer", 0);
+    param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
+    ROS_INFO("sleep for changing the params");
+    ros::Rate(1.0).sleep();
+    param_ptr->nh.setParam("hl_controller/tx_control_static", false);
+    waitUntilReach();
 
     //take car to stop
     ROS_INFO("stop...");
@@ -267,7 +283,6 @@ void process_parking(){
     param_ptr->nh.setParam("hl_controller/tx_steer", 0);
     param_ptr->nh.setParam("hl_controller/tx_brake", TX_STOP_BRAKE);
 
-    DynamicParamSender ds;
     ds.saveDynamicParams("max_vel_x", -3.0);
     ds.saveDynamicParams("min_vel_x", -2.0);    
 
@@ -280,12 +295,9 @@ void process_parking(){
     
     waitUntilReach();
 
+    //reload the params
     ds.saveDynamicParams("max_vel_x", 8.0);
     ds.saveDynamicParams("min_vel_x", 1.5);
-    //param_ptr->nh.setParam("hl_controller/use_base_filter",false);
-    
-    ROS_INFO("to the backing point...");
-    waitUntilReach();
 
     ROS_INFO("process parking done!");
     param_ptr->nh.setParam("hl_controller/parking_onetime_flag",true);
