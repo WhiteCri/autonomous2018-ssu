@@ -11,7 +11,7 @@ void execute(const move_base_msgs::MoveBaseGoalConstPtr& goal, MoveBaseServer* a
   static size_t cnt = 0;
   cnt++;
   // Do lots of awesome groundbreaking robot stuff here
-  ros::Rate rate(0.5);
+  ros::Rate rate(0.2);
   rate.sleep();
   rate.sleep();
   

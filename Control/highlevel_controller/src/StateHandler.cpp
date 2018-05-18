@@ -17,7 +17,7 @@ extern GoalSender* goalSender_ptr;
 
 class DynamicParamSender{
 public:
-    DynamicParamSender(): node_name("/move_base/DWAPlannerROS/set_parameters")
+    DynamicParamSender(std::string node_name): node_name(node_name)
     {}
 
     void saveDynamicParams(std::string name, double val){
@@ -231,6 +231,8 @@ void process_crosswalk(){
 
 void process_movingobj(){
     ROS_INFO("movingobj start");
+    DynamicParamSender ds("/move_base/local_costmap/set_parameters");
+    
     param_ptr->nh.setParam("hl_controller/curState","PROCESS_MOVINGOBJ");
 
     waitUntilReach();
@@ -244,7 +246,9 @@ void process_movingobj(){
 
     //take car to wait
     ros::Rate(1 / param_ptr->movingobj_stop_duration).sleep();
-
+    ds.saveDynamicParams("footprint_padding",-0.125001);//clear local costmap
+    handler_setGoal();
+    
     ROS_INFO("Unlock Tx Static Control...");
 
     //unlock tx_control_static
@@ -259,13 +263,13 @@ void process_movingobj(){
 
 void process_parking(){
     ROS_INFO("process parking start");
-    DynamicParamSender ds;
+    DynamicParamSender ds("/move_base/DWAPlannerROS/set_parameters");
 
     ROS_INFO("Wait for arrive at Ready Point...");
     waitUntilReach();
 
     ROS_INFO("Processing parking...Changing params...");
-    ds.saveDynamicParams("max_vel_x", 3.0);
+    ds.saveDynamicParams("min_vel_x", 0.8);
     ROS_INFO("Lock Tx Static Control");
     param_ptr->nh.setParam("hl_controller/tx_control_static", true);
     param_ptr->nh.setParam("hl_controller/tx_speed", 0);
@@ -310,7 +314,7 @@ void process_uturn(){
     double uturn_duration = param_ptr->uturn_duration;
 
     ROS_INFO("change move_base params...");
-    DynamicParamSender ds;
+    DynamicParamSender ds("/move_base/DWAPlannerROS/set_parameters");
     ds.saveDynamicParams("acc_lim_x", 5.5);
 
     waitUntilReach();
