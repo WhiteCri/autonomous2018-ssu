@@ -27,18 +27,18 @@
 			<param name="timecheck" value="0"/>
 			<param name="lable" value="0"/>
 				<!--학교-->
-			<param name="y_hmin" value="57"/>
-			<param name="y_hmax" value="94"/>
+			<param name="y_hmin" value="9"/>
+			<param name="y_hmax" value="41"/>
 			<param name="y_smin" value="26"/>
-			<param name="y_smax" value="133"/>
-			<param name="y_vmin" value="57"/>
-			<param name="y_vmax" value="158"/>
-			<param name="w_hmin" value="57"/>
-			<param name="w_hmax" value="94"/>
-			<param name="w_smin" value="26"/>
-			<param name="w_smax" value="151"/>
-			<param name="w_vmin" value="84"/>
-			<param name="w_vmax" value="248"/>
+			<param name="y_smax" value="255"/>
+			<param name="y_vmin" value="21"/>
+			<param name="y_vmax" value="255"/>
+			<param name="w_hmin" value="0"/>
+			<param name="w_hmax" value="179"/>
+			<param name="w_smin" value="0"/>
+			<param name="w_smax" value="9"/>
+			<param name="w_vmin" value="230"/>
+			<param name="w_vmax" value="255"/>
 			
 			
 			<!--주행장 0517
@@ -74,7 +74,9 @@
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg left_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
 			<!-- <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> -->
-			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			<!--<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
+			<param name="cal_path" value="/home/jin/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			
 		</node>
 
 		<node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" args="$(arg left_camera_name)" respawn="true" output="screen">
@@ -105,18 +107,18 @@
 			<param name="lable" value="0"/>
 			
 			<!--학교-->
-			<param name="y_hmin" value="58"/>
-			<param name="y_hmax" value="43"/>
-			<param name="y_smin" value="86"/>
-			<param name="y_smax" value="162"/>
-			<param name="y_vmin" value="0"/>
+			<param name="y_hmin" value="9"/>
+			<param name="y_hmax" value="41"/>
+			<param name="y_smin" value="26"/>
+			<param name="y_smax" value="255"/>
+			<param name="y_vmin" value="21"/>
 			<param name="y_vmax" value="255"/>
-			<param name="w_hmin" value="58"/>
-			<param name="w_hmax" value="93"/>
-			<param name="w_smin" value="26"/>
-			<param name="w_smax" value="151"/>
-			<param name="w_vmin" value="13"/>
-			<param name="w_vmax" value="234"/>
+			<param name="w_hmin" value="0"/>
+			<param name="w_hmax" value="179"/>
+			<param name="w_smin" value="0"/>
+			<param name="w_smax" value="9"/>
+			<param name="w_vmin" value="230"/>
+			<param name="w_vmax" value="255"/>
 			
 			
 			<!--주행장 0517
@@ -167,7 +169,8 @@
 		<node name="cal_distance" pkg="cal_distance" type="cal_distance" args="$(arg right_camera_name)" respawn="true" output="screen">
 			<param name="debug" value="0"/>
 			<!-- <param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/> -->
-			<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
+			<!--<param name="cal_path" value="/home/whiteherb/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>-->
+			<param name="cal_path" value="/home/jin/catkin_ws/src/autonomous2018-ssu/vision/cal_distance/data"/>
 		</node>
 
 		<node name="convert_cloud" pkg="convert_cloud" type="convert_cloud" args="$(arg right_camera_name)" respawn="true" output="screen">
